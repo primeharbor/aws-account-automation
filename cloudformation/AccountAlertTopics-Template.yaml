@@ -1,0 +1,273 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy SNS Notification Topics and Alarms for Generic Account Notification
+
+Parameters:
+  pAccountDescription:
+    Description: Short Name for account (ie dev,ref,prod)
+    Type: String
+  
+  pInitialSubscriberEmail:
+    Description: Add this initial email to the alerts
+    Type: String
+  
+  pInitialSubscriberSMS:
+    Description: Add this initial Cell for SMS notification of critical alerts 
+    Type: String
+    Default: 1-404-867-5309-CHANGETHIS
+  
+  pBillingThreshold:
+    Description: Sets the billing alert to go off above this figure
+    Type: Number
+  
+
+  
+  pDeployLambda:
+    Description: Whether or not to deploy the slack lambda
+    Type: String
+    AllowedValues: 
+    - yes
+    - no
+  
+  pLambdaFunctionName:
+    Description: Name of the Lambda Function
+    Type: String
+
+  # Slack Parameters passed as Env Vars to Lambda
+  pSlackWebhookURL:
+    Description: WebHook URL from Slack. Keep this secret
+    Type: String
+
+  pSlackChannel:
+    Description: Slack Channel to send the spam to
+    Type: String
+    Default: '#aws_notices'
+
+  pIconEmoji:
+    Description: Slack Emoji to use
+    Type: String
+    Default: ':cloud:'
+
+Conditions:
+  cDeployLambda:
+    !Equals [ !Ref pDeployLambda, yes]
+
+Resources:
+  SNSAlertsCritical:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Join ['', ["Critical Alerts for ", !Ref 'pAccountDescription']]
+      Subscription:
+      - Endpoint: !Ref 'pInitialSubscriberEmail'
+        Protocol: email
+      - Endpoint: !Ref 'pInitialSubscriberSMS'
+        Protocol: sms
+      - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
+        Protocol: lambda
+      TopicName: !Join ['-', ["Critical-Alerts", !Ref 'pAccountDescription']]
+  SNSAlertsError:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Join ['', ["Error Alerts for ", !Ref 'pAccountDescription']]
+      Subscription:
+      - Endpoint: !Ref 'pInitialSubscriberEmail'
+        Protocol: email
+      - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
+        Protocol: lambda
+      TopicName: !Join ['-', ["Error-Alerts", !Ref 'pAccountDescription']]
+  SNSAlertsInfo:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Join ['', ["Info Alerts for ", !Ref 'pAccountDescription']]
+      Subscription:
+      - Endpoint: !Ref 'pInitialSubscriberEmail'
+        Protocol: email
+      - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
+        Protocol: lambda
+      TopicName: !Join ['-', ["Info-Alerts", !Ref 'pAccountDescription']]
+  
+
+  SNSAlertPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Id: AlertTopicPolicy
+        Version: '2012-10-17'
+        Statement:
+        - Sid: My-statement-id
+          Effect: Allow
+          Principal:
+            AWS: "*"
+            # AWS: !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':root']]
+          Action: sns:Publish
+          Resource: '*'
+          Condition:
+            StringEquals: 
+              AWS:SourceOwner: !Ref AWS::AccountId
+      Topics: [!Ref 'SNSAlertsCritical', !Ref 'SNSAlertsError', !Ref 'SNSAlertsInfo']
+  
+
+  SpendingAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: !Join ['', [Alarm if AWS spending is over $, !Ref 'pBillingThreshold']]
+      Namespace: AWS/Billing
+      MetricName: EstimatedCharges
+      Dimensions:
+      - Name: Currency
+        Value: USD
+      Statistic: Maximum
+      Period: '21600'
+      EvaluationPeriods: '1'
+      Threshold: !Ref 'pBillingThreshold'
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: [!Ref 'SNSAlertsError']
+  
+
+  SlackNotificationLambdaRole:
+    Type: AWS::IAM::Role
+    Condition: cDeployLambda
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: CloudWatch
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action: ['cloudwatch:*']
+            Effect: Allow
+            Resource: '*'
+      - PolicyName: logs
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action: ['logs:*']
+            Effect: Allow
+  
+  SlackNotificationLambda:
+    Type: AWS::Lambda::Function
+    Condition: cDeployLambda
+    Properties:
+      Description: Send SNS Messages to Slack
+      Runtime: python2.7
+      Handler: index.lambda_handler
+      Timeout: '80'
+      FunctionName: !Ref 'pLambdaFunctionName'
+      Code:
+        ZipFile: |
+          # Lambda to send SNS Messages to Slack
+          from __future__ import print_function
+
+          import boto3
+          import json
+          import logging
+          import os
+
+          from base64 import b64decode
+          from urllib2 import Request, urlopen, URLError, HTTPError
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def lambda_handler(event, context):
+              logger.info("Received event: " + json.dumps(event, sort_keys=True))
+              message = event['Records'][0]['Sns']['Message']
+              subject = event['Records'][0]['Sns']['Subject']
+              timestamp = event['Records'][0]['Sns']['Timestamp']
+              topicARN = event['Records'][0]['Sns']['TopicArn'].split(':')[-1]
+              
+              slack_message = {
+                  'channel': os.environ['SLACK_CHANNEL'],
+                  'text': "%s: %s - %s" % (timestamp, subject, message),
+                  'username': topicARN,
+                  'icon_emoji': os.environ['ICON_EMOJI']
+              }
+
+              req = Request(os.environ['HOOK_URL'], json.dumps(slack_message))
+              try:
+                  response = urlopen(req)
+                  response.read()
+                  logger.info("Message posted to %s", slack_message['channel'])
+              except HTTPError as e:
+                  logger.error("Request failed: %d %s", e.code, e.reason)
+              except URLError as e:
+                  logger.error("Server connection failed: %s", e.reason)
+
+      Role: !GetAtt [SlackNotificationLambdaRole, Arn]
+      Environment:
+        Variables:
+          HOOK_URL: !Ref pSlackWebhookURL
+          ACCOUNT_NAME: !Ref pAccountDescription
+          SLACK_CHANNEL: !Ref pSlackChannel
+          ICON_EMOJI: !Ref pIconEmoji
+
+
+
+
+  SlackNotificationLambdaInvocationRole:
+    Type: AWS::IAM::Role
+    Condition: cDeployLambda
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [events.amazonaws.com, sns.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: ExecuteSlackLambda
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action: ['lambda:InvokeFunction']
+            Effect: Allow
+            Resource:
+            - !GetAtt [SlackNotificationLambda, Arn]
+  SlackNotificationLambdaPermissionSNSAlertsCritical:
+    Type: AWS::Lambda::Permission
+    Condition: cDeployLambda
+    Properties:
+      FunctionName: !GetAtt [SlackNotificationLambda, Arn]
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref 'SNSAlertsCritical'
+      Action: lambda:invokeFunction
+  SlackNotificationLambdaPermissionSNSAlertsInfo:
+    Type: AWS::Lambda::Permission
+    Condition: cDeployLambda
+    Properties:
+      FunctionName: !GetAtt [SlackNotificationLambda, Arn]
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref 'SNSAlertsInfo'
+      Action: lambda:invokeFunction
+  SlackNotificationLambdaPermissionSNSAlertsError:
+    Type: AWS::Lambda::Permission
+    Condition: cDeployLambda
+    Properties:
+      FunctionName: !GetAtt [SlackNotificationLambda, Arn]
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref 'SNSAlertsError'
+      Action: lambda:invokeFunction
+
+
+Outputs:
+  SNSAlertsCriticalArn:
+    Value: !Ref 'SNSAlertsCritical'
+    Export:
+      Name: SNSAlertsCriticalArn
+  SNSAlertsErrorArn:
+    Value: !Ref 'SNSAlertsError'
+    Export:
+      Name: SNSAlertsErrorArn    
+  SNSAlertsInfoArn:
+    Value: !Ref 'SNSAlertsInfo'
+    Export:
+      Name: SNSAlertsInfoArn

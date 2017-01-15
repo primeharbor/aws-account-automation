@@ -1,0 +1,334 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploys Lambda to notify users when their AWS Creds are about to expire. Locks them out if they do expire. 
+Parameters:
+
+  # Lambda Deploy Params
+  pArtifactBucket:
+    Description: Bucket Holding Lambdas
+    Type: String
+  pArtifactPrefix:
+    Description: Directory where lambdas are
+    Type: String
+    Default: aws-security-automation-ExpireUsers
+  pLambdaVersion:
+    Description: VersionPath of the Lambda zip
+    Type: String
+  pExpireUsersLambdaZipFile:
+    Description: Filename of theLambda Zip
+    Type: String
+    Default: aws-security-automation-ExpireUsers.zip
+
+  # Function Info
+  pLambdaFunctionName:
+    Description: Name of the Lambda Function
+    Type: String
+    Default: aws-security-automation-ExpireIAMUsers
+  pLambdaAlias:
+    Description: Alias of this Lambda Function
+    Type: String
+    Default: MyAWSAccount
+
+  pAlarmTopicArn:
+    Description: SNS Topic the Cloudwatch Alarm will notify on invocation failures
+    Type: String
+
+
+  # Parameters sent to Lambda via Env vars
+  pActionTopicArn:
+    Description: SNS Topic to send Lockout actions to
+    Type: String    
+
+  pGracePeriodInDays:
+    Description: How many days to send the user a warning email before the lockout occurs
+    Type: Number
+    Default: 14
+
+  pWarnOnly: 
+    Description: Set to True and the Lambda only warns users, it doesn't disable things
+    Type: String
+    Default: "true" # Be safe
+
+  pEmailUsers: 
+    Description: Set to True if SES is setup to allow you to email your user base
+    Type: String
+    Default: "false"
+
+  pFromAddress:
+    Description: Email address from which emails to users come. It should be monitored.
+    Type: String
+    Default: "My AWS Account Name <user@example.com>"
+
+  pEmailHeader:
+    Description: Preamble in the email you send users
+    Type: String
+    Default: "Company Policy requires passwords and access keys to be changed every 90 days."
+
+  pEmailFooter:
+    Description: Footer in the email you send users
+    Type: String
+    Default: "If you have any questions or need assistance please reply to this email."
+
+Resources:
+
+  # Users who are locked out will be added to this group.
+  # Since Deny trumps any Allow, we must use a NotAction on the things we wish to allow
+  ExpiredUsersGroup:
+    Type: "AWS::IAM::Group"
+    Properties:
+      GroupName: UsersWithExpiredCredentials
+      Path: "/"
+      Policies:
+      - PolicyName: DenyNotManageMyCredentials
+        PolicyDocument: 
+          Version: '2012-10-17'
+          Statement:
+          - Sid: DenyAllActionsButSome
+            Effect: Deny
+            NotAction:
+            - iam:*LoginProfile
+            - iam:CreateVirtualMFADevice
+            - iam:ListVirtualMFADevices
+            - iam:EnableMFADevice
+            - iam:ChangePassword
+            - iam:ListUsers
+            - iam:GetAccountPasswordPolicy
+            NotResource:
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':user/${aws:username}']]
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':mfa/${aws:username}']]
+
+          - Sid: DenyTheseIAMActionsOutRight
+            Effect: Deny
+            Action:
+            - iam:*SSHPublicKey*
+            - iam:*AccessKey*
+            - iam:*UserPolicy
+            - iam:CreateLoginProfile
+            - iam:DeactivateMFADevice
+            - iam:DeleteLoginProfile
+            - iam:List*UserPolicies
+            - iam:ListSigningCertificates
+            Resource: "*"
+      # Here we explictly allow the actions needed to configure MFA
+      # Only to the Resources necessary (the IAM user and said user's MFA)
+      - PolicyName: AllowManageMyCredentials
+        PolicyDocument: 
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - iam:*LoginProfile
+            - iam:*AccessKey*
+            - iam:*MFADevice
+            - iam:*SSHPublicKey*
+            - iam:ChangePassword
+            Resource:
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':user/${aws:username}']]
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':mfa/${aws:username}']]
+          - Effect: Allow
+            Action: 
+            - iam:ListUsers
+            - iam:ListVirtualMFADevices
+            Resource: 
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':user/*']]
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':mfa/']]
+
+  ExpireUsersLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        # We need to read info about IAM Users
+        # This is probably too permissive.
+      - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+      Policies:
+      - PolicyName: CloudWatchAllActions
+        # Is this policy needed?
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - cloudwatch:*
+            Effect: Allow
+            Resource: '*'
+      - PolicyName: logs
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - logs:*
+            Effect: Allow
+      - PolicyName: AddAndRemoveFromGroup
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - iam:AddUserToGroup
+            - iam:RemoveUserFromGroup
+            Resource: !GetAtt ExpiredUsersGroup.Arn
+      - PolicyName: EnableAndDisableAccessKeys
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - iam:UpdateAccessKey
+            Resource: "*"
+      - PolicyName: SendSESEmails
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - ses:SendEmail
+            Resource: "*"
+      - PolicyName: PublishToActionTopic
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - sns:Publish
+            Resource: !Ref pActionTopicArn
+
+  ExpireUsersLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Add Users who have allowed their Password Or API Crednetials to Expire to a blackhole Group 
+      Runtime: python2.7
+      Handler: ExpireUsers.lambda_handler
+      Timeout: '80'
+      FunctionName: !Ref pLambdaFunctionName
+      Role: !GetAtt ExpireUsersLambdaRole.Arn
+      Code:
+        S3Bucket: !Ref pArtifactBucket
+        S3Key: !Sub ${pArtifactPrefix}/${pLambdaVersion}/${pExpireUsersLambdaZipFile}
+      Environment:
+        Variables:
+          BLACKHOLE_GROUPNAME: !Ref ExpiredUsersGroup
+          ACTION_TOPIC_ARN: !Ref pActionTopicArn
+          GRACE_PERIOD: !Ref pGracePeriodInDays
+          WARN_ONLY: !Ref pWarnOnly
+          EMAIL_USERS: !Ref pEmailUsers
+          FROM_ADDRESS: !Ref pFromAddress
+          EXPLANATION_FOOTER: !Ref pEmailFooter
+          EXPLANATION_HEADER: !Ref pEmailHeader       
+
+  ExpireUsersLambdaAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ExpireUsersLambda
+      FunctionVersion: $LATEST
+      Name: !Ref pLambdaAlias
+
+  ExpireUsersLambdaInvocationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - events.amazonaws.com
+            - sns.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: ExecuteRequireMfaLambda
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - lambda:InvokeFunction
+            Effect: Allow
+            Resource: !GetAtt ExpireUsersLambda.Arn
+
+
+  # Version One of this template will just lock out the users. Manual intervention is required to unlock
+  # IAMActivityRule:
+  #   Type: AWS::Events::Rule
+  #   Properties:
+  #     Description: Send IAM Activity to ExpireUsers Lambda
+  #     EventPattern:
+  #       detail-type:
+  #       - AWS API Call via CloudTrail
+  #       detail: 
+  #         eventSource:
+  #           - iam.amazonaws.com
+  #         eventName:
+  #           - EnableMFADevice
+  #           - CreateLoginProfile
+  #           - DeactivateMFADevice
+  #           - DeleteAccessKey
+  #           - UpdateAccessKey
+  #           - UpdateLoginProfile
+  #           - ChangePassword
+  #     State: ENABLED
+  #     RoleArn: !GetAtt ExpireUsersLambdaInvocationRole.Arn
+  #     Targets:
+  #     - Arn: !Ref ExpireUsersLambdaAlias
+  #       Id: TargetFunctionV1
+
+  # ExpireUsersLambdaPermissionIAMActivityRule:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     FunctionName: !GetAtt ExpireUsersLambda.Arn
+  #     Principal: events.amazonaws.com
+  #     SourceArn: !GetAtt IAMActivityRule.Arn
+  #     Action: lambda:invokeFunction
+
+  ExpireUsersLambdaInvocationFailureAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+      - !Ref pAlarmTopicArn
+      AlarmDescription: Send an alert if the ExpireUsersLambda throws invocation errors
+      AlarmName: !Sub "${pLambdaFunctionName}-InvocationFailureAlarm"
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: FunctionName
+        Value: !Ref ExpireUsersLambda
+      EvaluationPeriods: 1
+      # InsufficientDataActions:
+      # - String
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      # OKActions:
+      # - String
+      Period: 60
+      Statistic: SampleCount
+      Threshold: 0
+      # Unit: String
+
+  ExpireUsersLamabdaCronEvent:
+    Type: "AWS::Events::Rule"
+    Properties: 
+      Description: !Sub "Execute the ${pLambdaFunctionName} on a scheduled basis"
+      RoleArn: !GetAtt ExpireUsersLambdaInvocationRole.Arn
+      ScheduleExpression: "cron(0 10 * * ? *)"
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt ExpireUsersLambda.Arn
+          Id: TargetFunctionV1
+
+
+Outputs:
+  ExpireUsersLambda:
+    Value: !GetAtt ExpireUsersLambda.Arn
+    Description: ARN for the ExpireUsers Lambda
+  StackName:
+    Value: !Ref AWS::StackName
