@@ -62,7 +62,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref pBucketName    
-      AccessControl: PublicRead
+      AccessControl: Private
       CorsConfiguration:
         CorsRules:
         - AllowedHeaders:
