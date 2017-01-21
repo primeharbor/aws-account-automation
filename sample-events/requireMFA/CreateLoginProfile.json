@@ -1,0 +1,41 @@
+{
+   "source" : "aws.iam",
+   "version" : "0",
+   "account" : "123456789012",
+   "detail-type" : "AWS API Call via CloudTrail",
+   "detail" : {
+      "requestID" : "8973eced-cc4e-11e6-90b3-c1491a172141",
+      "eventID" : "9cccc9f1-a8b6-406d-bf52-22280d445409",
+      "eventTime" : "2016-12-27T16:07:16Z",
+      "responseElements" : {
+         "loginProfile" : {
+            "userName" : "test1",
+            "createDate" : "Dec 27, 2016 9:07:16 PM",
+            "passwordResetRequired" : "true"
+         }
+      },
+      "eventType" : "AwsApiCall",
+      "sourceIPAddress" : "10.10.2.20",
+      "awsRegion" : "us-east-1",
+      "userAgent" : "aws-sdk-ruby2/2.6.38 ruby/2.0.0 universal.x86_64-darwin16",
+      "eventVersion" : "1.02",
+      "eventSource" : "iam.amazonaws.com",
+      "userIdentity" : {
+         "arn" : "arn:aws:iam::123456789012:user/chris@room17.com",
+         "accessKeyId" : "AKIBLAHBLAHBLAH",
+         "principalId" : "AIIBLAHBLAHBLAH",
+         "userName" : "chris@room17.com",
+         "type" : "IAMUser",
+         "accountId" : "123456789012"
+      },
+      "requestParameters" : {
+         "userName" : "test1",
+         "passwordResetRequired" : "false"
+      },
+      "eventName" : "CreateLoginProfile"
+   },
+   "time" : "2016-12-27T16:07:16Z",
+   "resources" : [],
+   "id" : "af9dab11-50b8-4eda-9d98-5dad46b0503e",
+   "region" : "us-east-1"
+}

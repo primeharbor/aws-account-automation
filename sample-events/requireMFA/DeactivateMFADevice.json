@@ -1,0 +1,41 @@
+{
+    "account": "123456789012",
+    "detail": {
+        "awsRegion": "us-east-1",
+        "eventID": "4a8bdf03-afce-455d-8d28-13f037769e6c",
+        "eventName": "DeactivateMFADevice",
+        "eventSource": "iam.amazonaws.com",
+        "eventTime": "2016-12-27T21:09:44Z",
+        "eventType": "AwsApiCall",
+        "eventVersion": "1.02",
+        "requestID": "ca4685da-cc78-11e6-9a32-e1a4cf325dcc",
+        "requestParameters": {
+            "serialNumber": "arn:aws:iam::123456789012:mfa/test1",
+            "userName": "test1"
+        },
+        "responseElements": null,
+        "sourceIPAddress": "10.10.2.20",
+        "userAgent": "console.amazonaws.com",
+        "userIdentity": {
+            "accessKeyId": "AKIBLAHBLAHBLAH",
+            "accountId": "123456789012",
+            "arn": "arn:aws:iam::123456789012:user/test1",
+            "principalId": "AIIBLAHBLAHBLAH",
+            "sessionContext": {
+                "attributes": {
+                    "creationDate": "2016-12-27T19:10:46Z",
+                    "mfaAuthenticated": "false"
+                }
+            },
+            "type": "IAMUser",
+            "userName": "test1"
+        }
+    },
+    "detail-type": "AWS API Call via CloudTrail",
+    "id": "036e9344-5c58-46d9-82e8-2a36cc2bb6e9",
+    "region": "us-east-1",
+    "resources": [],
+    "source": "aws.iam",
+    "time": "2016-12-27T21:09:44Z",
+    "version": "0"
+}

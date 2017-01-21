@@ -1,0 +1,253 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploys Lambda and Cloudwatch Events to Deny Access to user till they enable MFA
+Parameters:
+
+  # Lambda Deploy Params
+  pArtifactBucket:
+    Description: Bucket Holding Lambdas
+    Type: String
+  pArtifactPrefix:
+    Description: Directory where lambdas are
+    Type: String
+    Default: aws-admin-requireMFA
+  pLambdaVersion:
+    Description: VersionPath of the Lambda zip
+    Type: String
+  pRequireMfaLambdaZipFile:
+    Description: Filename of the  Lambda Zip
+    Type: String
+    Default: aws-admin-requireMFA.zip
+
+  # Function Info
+  pLambdaFunctionName:
+    Description: Name of the Lambda Function
+    Type: String
+    Default: aws-admin-requireMFA
+  pLambdaAlias:
+    Description: Alias of this Lambda Function
+    Type: String
+    Default: MyAWSAccount
+
+  pAlarmTopicArn:
+    Description: SNS Topic the Cloudwatch Alarm will notify on invocation failures
+    Type: String
+
+
+Resources:
+
+  # Users who do not have MFA will be added to this group.
+  # Since Deny trumps any Allow, we must use a NotAction on the things we wish to allow
+  DenyUntilMFAEnabledGroup:
+    Type: "AWS::IAM::Group"
+    Properties:
+      GroupName: DenyUntilMFAEnabledGroup
+      Path: "/"
+      Policies:
+      - PolicyName: DenyNotManageMyCredentials
+        PolicyDocument: 
+          Version: '2012-10-17'
+          Statement:
+          - Sid: DenyAllActionsButSome
+            Effect: Deny
+            NotAction:
+            - iam:*LoginProfile
+            - iam:CreateVirtualMFADevice
+            - iam:ListVirtualMFADevices
+            - iam:EnableMFADevice
+            - iam:ChangePassword
+            - iam:ListUsers
+            - iam:GetAccountPasswordPolicy
+            NotResource:
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':user/${aws:username}']]
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':mfa/${aws:username}']]
+
+          - Sid: DenyTheseIAMActionsOutRight
+            Effect: Deny
+            Action:
+            - iam:*SSHPublicKey*
+            - iam:*AccessKey*
+            - iam:*UserPolicy
+            - iam:CreateLoginProfile
+            - iam:DeactivateMFADevice
+            - iam:DeleteLoginProfile
+            - iam:List*UserPolicies
+            - iam:ListSigningCertificates
+            Resource: "*"
+      # Here we explictly allow the actions needed to configure MFA
+      # Only to the Resources necessary (the IAM user and said user's MFA)
+      - PolicyName: AllowManageMyCredentials
+        PolicyDocument: 
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - iam:*LoginProfile
+            - iam:*AccessKey*
+            - iam:*MFADevice
+            - iam:*SSHPublicKey*
+            - iam:ChangePassword
+            Resource:
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':user/${aws:username}']]
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':mfa/${aws:username}']]
+          - Effect: Allow
+            Action: 
+            - iam:ListUsers
+            - iam:ListVirtualMFADevices
+            Resource: 
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':user/*']]
+            - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':mfa/']]
+
+  RequireMFALambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        # We need to read info about IAM Users
+        # This is probably too permissive.
+      - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+      Policies:
+      - PolicyName: CloudWatchAllActions
+        # Is this policy needed?
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - cloudwatch:*
+            Effect: Allow
+            Resource: '*'
+      - PolicyName: logs
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - logs:*
+            Effect: Allow
+      - PolicyName: AddAndRemoveFromGroup
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - iam:AddUserToGroup
+            - iam:RemoveUserFromGroup
+            Resource: !GetAtt DenyUntilMFAEnabledGroup.Arn
+
+
+  RequireMFALambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Add Users without MFA to Group which denies access to everything. Removes them from group when MFA Enabled. 
+      Runtime: python2.7
+      Handler: requireMFA.lambda_handler
+      Timeout: '80'
+      FunctionName: !Ref pLambdaFunctionName
+      Code:
+        S3Bucket: !Ref pArtifactBucket
+        S3Key: !Sub ${pArtifactPrefix}/${pLambdaVersion}/${pRequireMfaLambdaZipFile}
+      Role: !GetAtt RequireMFALambdaRole.Arn
+      Environment:
+        Variables:
+          BLACKHOLE_GROUPNAME: !Ref DenyUntilMFAEnabledGroup
+
+  RequireMFALambdaAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref RequireMFALambda
+      FunctionVersion: $LATEST
+      Name: !Ref pLambdaAlias
+
+  RequireMFALambdaInvocationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - events.amazonaws.com
+            - sns.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: ExecuteRequireMfaLambda
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - lambda:InvokeFunction
+            Effect: Allow
+            Resource: !GetAtt RequireMFALambda.Arn
+
+  IAMActivityRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: aws-admin-IAMActivitiesToRequireMFA
+      Description: Send IAM Activity to RequireMFA Lambda
+      EventPattern:
+        detail-type:
+        - AWS API Call via CloudTrail
+        detail: 
+          eventSource:
+            - iam.amazonaws.com
+          eventName:
+            - EnableMFADevice
+            - CreateLoginProfile
+            - DeactivateMFADevice
+      State: ENABLED
+      RoleArn: !GetAtt RequireMFALambdaInvocationRole.Arn
+      Targets:
+      - Arn: !Ref RequireMFALambdaAlias
+        Id: TargetFunctionV1
+
+  RequireMFALambdaPermissionIAMActivityRule:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt RequireMFALambda.Arn
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt IAMActivityRule.Arn
+      Action: lambda:invokeFunction
+
+  RequireMFALambdaInvocationFailureAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+      - !Ref pAlarmTopicArn
+      AlarmDescription: Send an alert if the RequireMFALambda throws invocation errors
+      AlarmName: !Sub "${pLambdaFunctionName}-InvocationFailureAlarm"
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: FunctionName
+        Value: !Ref RequireMFALambda
+      EvaluationPeriods: 1
+      # InsufficientDataActions:
+      # - String
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      # OKActions:
+      # - String
+      Period: 60
+      Statistic: SampleCount
+      Threshold: 0
+      # Unit: String
+
+
+Outputs:
+  RequireMFALambda:
+    Value: !GetAtt RequireMFALambda.Arn
+    Description: ARN for the RequireMFA Lambda
+  StackName:
+    Value: !Ref AWS::StackName

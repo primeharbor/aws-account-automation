@@ -1,0 +1,41 @@
+{
+    "account": "123456789012",
+    "detail": {
+        "awsRegion": "us-east-1",
+        "eventID": "58c0eb89-f68c-473b-a977-c9a4ab179450",
+        "eventName": "EnableMFADevice",
+        "eventSource": "iam.amazonaws.com",
+        "eventTime": "2016-12-27T21:07:52Z",
+        "eventType": "AwsApiCall",
+        "eventVersion": "1.02",
+        "requestID": "87e3be51-cc78-11e6-9a32-e1a4cf325dcc",
+        "requestParameters": {
+            "serialNumber": "arn:aws:iam::123456789012:mfa/test1",
+            "userName": "test1"
+        },
+        "responseElements": null,
+        "sourceIPAddress": "10.10.2.20",
+        "userAgent": "console.amazonaws.com",
+        "userIdentity": {
+            "accessKeyId": "AKIBLAHBLAHBLAH",
+            "accountId": "123456789012",
+            "arn": "arn:aws:iam::123456789012:user/test1",
+            "principalId": "AIIBLAHBLAHBLAH",
+            "sessionContext": {
+                "attributes": {
+                    "creationDate": "2016-12-27T19:10:46Z",
+                    "mfaAuthenticated": "false"
+                }
+            },
+            "type": "IAMUser",
+            "userName": "test1"
+        }
+    },
+    "detail-type": "AWS API Call via CloudTrail",
+    "id": "4f261b21-ffb7-491d-9b95-adb0b58d886c",
+    "region": "us-east-1",
+    "resources": [],
+    "source": "aws.iam",
+    "time": "2016-12-27T21:07:52Z",
+    "version": "0"
+}
