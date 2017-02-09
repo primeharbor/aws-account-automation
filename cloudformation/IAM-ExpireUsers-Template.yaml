@@ -44,12 +44,12 @@ Parameters:
     Type: Number
     Default: 14
 
-  pWarnOnly: 
-    Description: Set to True and the Lambda only warns users, it doesn't disable things
+  pDisableUsers: 
+    Description: Set to True if you want to disabled expired users
     Type: String
-    Default: "true" # Be safe
+    Default: "false" # Be safe
 
-  pEmailUsers: 
+  pSendEmail: 
     Description: Set to True if SES is setup to allow you to email your user base
     Type: String
     Default: "false"
@@ -219,8 +219,8 @@ Resources:
           BLACKHOLE_GROUPNAME: !Ref ExpiredUsersGroup
           ACTION_TOPIC_ARN: !Ref pActionTopicArn
           GRACE_PERIOD: !Ref pGracePeriodInDays
-          WARN_ONLY: !Ref pWarnOnly
-          EMAIL_USERS: !Ref pEmailUsers
+          DISABLE_USERS: !Ref pDisableUsers
+          SEND_EMAIL: !Ref pSendEmail
           FROM_ADDRESS: !Ref pFromAddress
           EXPLANATION_FOOTER: !Ref pEmailFooter
           EXPLANATION_HEADER: !Ref pEmailHeader       
@@ -310,7 +310,7 @@ Resources:
       # OKActions:
       # - String
       Period: 60
-      Statistic: SampleCount
+      Statistic: Sum
       Threshold: 0
       # Unit: String
 
