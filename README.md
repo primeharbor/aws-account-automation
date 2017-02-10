@@ -8,3 +8,5 @@ Tools to Automate your AWS Account
 * IAM-Expire-Users will deploy a lambda that will SES notify users when their API Keys or password are about to expire and can be configured to disable their account, or deactivate their key if they're older than the accounts age in the password policy
 
 * CloudTrailTemplate will deploy CloudTrail to your account along with all the necessary sub-parts including the Logging Bucket, KMS Key and CloudWatch Logs Group
+
+* requireMFA-Template will deploy a IAM User Group and Lambda that will prevent users without MFA from doing anything in the account

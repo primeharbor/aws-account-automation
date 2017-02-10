@@ -240,7 +240,7 @@ Resources:
       # OKActions:
       # - String
       Period: 60
-      Statistic: SampleCount
+      Statistic: Sum
       Threshold: 0
       # Unit: String
 
