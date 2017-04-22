@@ -1,0 +1,195 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy Lambda and CloudWatch Events to tag EBS Volumes with instance usage info
+
+
+# The Purpose of this automation is to capture the attachment state of EBS Volumes for later forensic analysis
+# Volumes that are created by automation (CloudFormation or Terraform) and told to persist after instance termination 
+# don't leave a trail of who created them or what they were attached to. This is especially true of root volumes configured 
+# not to be deleted after instance termination.
+
+# This Automation is a CloudFormation Stack that creates a Lambda triggered by CloudWatch Events
+# Event "CreateVolume" will tag the volume with the user who created it
+# Event "AttachVolume" will tag the volume with the user who attached it, the instance_id attached to, device 
+#       attached as, and the attachment date
+# Event "RunInstances" will tag the root and other volumes of all instances launched with the same attachment info as AttachVolume
+# Event "DetachVolume" will tag the volume with userIdentity and date from the detachment event. 
+
+# A second lambda runs on a schedule and will tag untagged volumes with their attachment info
+
+# Parameters:
+# pTagPrefix is a string prepended to the tags to help comply with your corporate tagging policy
+# pLambdaFunctionName is the name of the LambdaFunction. Again to help comply with function naming policies
+# pLambdaAlias is a version alias added for future backward compatibility
+
+# Future Enhancements
+# * Automagically delete volumes that have been detached for XXX Days
+# * Copy over other tags from the instance which might support company billing standards
+
+
+Parameters:
+  pTagPrefix:
+    Description: Prefix for the Tag key
+    Type: String
+    Default: "EBS-Tagger"
+  pLambdaFunctionName:
+    Description: Name of the Lambda Functions
+    Type: String
+    Default: "ebs-tagger"
+  pLambdaAlias:
+    Description: Alias of this Lambda Function
+    Type: String
+    Default: prod
+
+  # Lambda Deploy Params
+  pArtifactBucket:
+    Description: Bucket Holding Lambdas
+    Type: String
+  pArtifactPrefix:
+    Description: Directory where lambdas are
+    Type: String
+    Default: aws-account-automation
+  pEBSTaggingLambdaZipFile:
+    Description: Filename of theLambda Zip
+    Type: String
+    Default: EBSAutomatedTagging.zip
+
+Resources:
+
+  EBSTaggingLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: LambdaLogging
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action: ['logs:*']
+            Effect: Allow
+      - PolicyName: ec2Describe
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Resource: '*'
+            Action: ['ec2:Describe*']
+      - PolicyName: ec2Tag
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Resource: !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/*"
+            Action: 
+            - ec2:CreateTags
+            - ec2:DeleteTags
+            
+  EBSTaggingLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Tag EBS Volumes based on instance attachment events
+      Runtime: python2.7
+      Handler: tag_ebs.lambda_handler
+      Timeout: '80'
+      FunctionName: !Sub "${pLambdaFunctionName}"
+      Code:
+        S3Bucket: !Ref pArtifactBucket
+        S3Key: !Sub ${pArtifactPrefix}/${pEBSTaggingLambdaZipFile}
+      Role: !GetAtt [EBSTaggingLambdaRole, Arn]
+      Environment:
+        Variables:
+          TAG_PREFIX: !Ref pTagPrefix
+
+  EBSTaggingLambdaAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref EBSTaggingLambda
+      FunctionVersion: $LATEST
+      Name: !Ref pLambdaAlias
+
+  EBSTaggingLambdaInvocationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 
+            - events.amazonaws.com
+            - sns.amazonaws.com            
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: ExecuteEBSTagLambda
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action: ['lambda:InvokeFunction']
+            Effect: Allow
+            Resource: 
+            - !GetAtt EBSTaggingLambda.Arn
+
+  EC2ActivityRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: EBSTaggingEvents
+      Description: Send EC2 Activity to EBS Tagging Lambda
+      EventPattern:
+        detail-type:
+        - AWS API Call via CloudTrail
+        detail: 
+          eventSource:
+            - ec2.amazonaws.com
+          eventName:
+            - RunInstances
+            - DetachVolume
+            - AttachVolume
+            - CreateVolume
+      State: ENABLED
+      RoleArn: !GetAtt EBSTaggingLambdaInvocationRole.Arn
+      Targets:
+      - Arn: !Ref EBSTaggingLambdaAlias
+        Id: TargetFunctionV1
+
+  EBSTaggingLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt EBSTaggingLambda.Arn
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt EC2ActivityRule.Arn
+      Action: lambda:invokeFunction
+
+  EBSTaggingLambdaScheduledEvent:
+    Type: "AWS::Events::Rule"
+    Properties: 
+      Description: !Sub "Execute the ${pLambdaFunctionName} function on a scheduled basis"
+      RoleArn: !GetAtt EBSTaggingLambdaInvocationRole.Arn
+      ScheduleExpression: "cron(0 10 * * ? *)"
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt EBSTaggingLambda.Arn
+          Id: TargetFunctionV1
+
+
+  EBSTaggingLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt EBSTaggingLambda.Arn
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt EBSTaggingLambdaScheduledEvent.Arn
+      Action: lambda:invokeFunction
+
+
+Outputs:
+  LambdaArn:
+    Value: !GetAtt EBSTaggingLambda.Arn
