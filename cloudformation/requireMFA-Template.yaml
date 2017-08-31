@@ -209,7 +209,7 @@ Resources:
       State: ENABLED
       RoleArn: !GetAtt RequireMFALambdaInvocationRole.Arn
       Targets:
-      - Arn: !Ref RequireMFALambdaAlias
+      - Arn: !GetAtt RequireMFALambda.Arn
         Id: TargetFunctionV1
 
   RequireMFALambdaPermissionIAMActivityRule:
