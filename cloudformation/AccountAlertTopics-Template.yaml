@@ -26,7 +26,7 @@ Parameters:
     Type: String
     AllowedValues: 
     - yes
-    - no
+    - "no"
   
   pLambdaFunctionName:
     Description: Name of the Lambda Function
