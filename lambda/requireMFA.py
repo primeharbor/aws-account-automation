@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import json
 import boto3
+from botocore.exceptions import ClientError
 import sys
 import os
 
@@ -63,16 +64,22 @@ def process_DeactivateMFADevice(event, context):
     
     # Verify there is no MFA present
     client = boto3.client('iam')
-    response = client.list_mfa_devices( UserName=username )
+    try:
+        response = client.list_mfa_devices( UserName=username )
 
-    if len(response['MFADevices']) == 0 :
-        # There is no MFA enabled
-        print (username + " does not have MFA. Adding to blackhole Group")
-        add_user_to_blackhole(username)
-    else :
-        print (username + " has an MFA. Removing from blackhole Group")
-        remove_user_from_blackhole(username)
-    print("DeactivateMFADevice Execution Complete")
+        if len(response['MFADevices']) == 0 :
+            # There is no MFA enabled
+            print (username + " does not have MFA. Adding to blackhole Group")
+            add_user_to_blackhole(username)
+        else :
+            print (username + " has an MFA. Removing from blackhole Group")
+            remove_user_from_blackhole(username)
+        print("DeactivateMFADevice Execution Complete")
+    except ClientError as e:
+        if e.response['Error']['Code'] == "NoSuchEntity":
+            print("{} no longer exists".format(username))
+        else:
+            raise
 
 def add_user_to_blackhole(username):
     client = boto3.client('iam')
