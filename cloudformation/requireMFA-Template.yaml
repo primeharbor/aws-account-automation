@@ -243,6 +243,7 @@ Resources:
       Statistic: Sum
       Threshold: 0
       # Unit: String
+      TreatMissingData: notBreaching
 
 
 Outputs:
@@ -251,3 +252,5 @@ Outputs:
     Description: ARN for the RequireMFA Lambda
   StackName:
     Value: !Ref AWS::StackName
+  TemplateVersion:
+    Value: "0.1.0"
