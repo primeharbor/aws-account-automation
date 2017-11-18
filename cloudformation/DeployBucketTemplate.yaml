@@ -99,3 +99,5 @@ Resources:
 Outputs:
   DeployBucket:
     Value: !Ref DeployBucket
+  TemplateVersion:
+    Value: "0.1.0"

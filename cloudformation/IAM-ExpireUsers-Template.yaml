@@ -332,3 +332,5 @@ Outputs:
     Description: ARN for the ExpireUsers Lambda
   StackName:
     Value: !Ref AWS::StackName
+  TemplateVersion:
+    Value: "0.1.0"

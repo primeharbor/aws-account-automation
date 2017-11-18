@@ -193,3 +193,5 @@ Resources:
 Outputs:
   LambdaArn:
     Value: !GetAtt EBSTaggingLambda.Arn
+  TemplateVersion:
+    Value: "0.1.0"

@@ -19,8 +19,6 @@ Parameters:
     Description: Sets the billing alert to go off above this figure
     Type: Number
   
-
-  
   pDeployLambda:
     Description: Whether or not to deploy the slack lambda
     Type: String
@@ -271,3 +269,5 @@ Outputs:
     Value: !Ref 'SNSAlertsInfo'
     Export:
       Name: SNSAlertsInfoArn
+  TemplateVersion:
+    Value: "0.1.0"      
