@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy S3 Bucket for Consolidated Billing Reports
+Parameters:
+
+  BucketName:
+    Description: Name of the Bucket to Create for Billing Reports
+    Type: String
+  
+  pCreateBucket:
+    Type: String
+    Description: Boolean to create bucket or use existing one
+    AllowedValues:
+      - true
+      - false
+
+Conditions:
+  CreateBucket: !Equals [!Ref 'pCreateBucket', 'true']
+
+Resources:
+
+  BillingS3Bucket:
+    DeletionPolicy: Retain
+    Condition: CreateBucket
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: LogDeliveryWrite
+      BucketName: !Ref 'BucketName'
+      VersioningConfiguration:
+        Status: Enabled
+
+  BillingBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    # Condition: CreateBucket
+    Properties:
+      Bucket: !Ref 'BucketName'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: BucketAclCheck
+          Effect: Allow
+          Principal:
+            AWS: arn:aws:iam::386209384616:root
+          Action: 
+            - s3:GetBucketAcl
+            - s3:GetBucketPolicy
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref 'BucketName']]
+        - Sid: AWSBillinngWrite
+          Effect: Allow
+          Principal:
+            AWS: arn:aws:iam::386209384616:root
+          Action: s3:PutObject
+          Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+  
+Outputs:
+
+  ReportBucket: 
+    Value: !Ref BucketName
+    Description: Bucket Name where Billing Reports are saved. 
+  TemplateVersion:
+    Value: 1.0.0
