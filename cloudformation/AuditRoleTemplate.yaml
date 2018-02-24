@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template creates a cross account role for audit & (optional) admin access for security tool mannagement
+Parameters:
+
+  AuditorAccountNumber:
+    Description: The 12 digit AWS account number to grant access to.
+    Default: '123456789012'
+    MinLength: '12'
+    AllowedPattern: '[0-9]+'
+    MaxLength: '12'
+    Type: String
+  
+  RoleName:
+    Description: The name of the Role to be created
+    Default: 'Auditor'
+    Type: String
+  
+Resources:
+  AuditorCrossAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/SecurityAudit
+      - arn:aws:iam::aws:policy/ReadOnlyAccess
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Sid: ''
+          Effect: Allow
+          Principal:
+            AWS: !Join ['', ['arn:aws:iam::', !Ref 'AuditorAccountNumber',':root']]
+      Policies:
+        - PolicyName: IAMSimulateResources
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action: "iam:Simulate*"
+                Resource: "*"
+        - PolicyName: SecurityAuditTools
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action: 
+                - "trustedAdvisor:*"
+                - "health:*"
+                - "aws-portal:View*"
+                Resource: "*"
+
+Outputs:
+  RoleARN:
+    Description: The ARN of the Audit role that can be assumed by the other account.
+    Value: !GetAtt [AuditorCrossAccountRole, Arn]
+
+  TemplateVersion:
+    Value: 1.0.0
