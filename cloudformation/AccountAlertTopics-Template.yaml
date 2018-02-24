@@ -33,7 +33,8 @@ Parameters:
   # Slack Parameters passed as Env Vars to Lambda
   pSlackWebhookURL:
     Description: WebHook URL from Slack. Keep this secret
-    Type: String
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: SlackWebhook
 
   pSlackChannel:
     Description: Slack Channel to send the spam to
