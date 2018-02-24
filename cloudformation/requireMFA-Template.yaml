@@ -45,7 +45,7 @@ Resources:
       Path: "/"
       Policies:
       - PolicyName: DenyNotManageMyCredentials
-        PolicyDocument: 
+        PolicyDocument:
           Version: '2012-10-17'
           Statement:
           - Sid: DenyAllActionsButSome
@@ -77,7 +77,7 @@ Resources:
       # Here we explictly allow the actions needed to configure MFA
       # Only to the Resources necessary (the IAM user and said user's MFA)
       - PolicyName: AllowManageMyCredentials
-        PolicyDocument: 
+        PolicyDocument:
           Version: '2012-10-17'
           Statement:
           - Effect: Allow
@@ -91,10 +91,10 @@ Resources:
             - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':user/${aws:username}']]
             - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':mfa/${aws:username}']]
           - Effect: Allow
-            Action: 
+            Action:
             - iam:ListUsers
             - iam:ListVirtualMFADevices
-            Resource: 
+            Resource:
             - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':user/*']]
             - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':mfa/']]
 
@@ -147,14 +147,120 @@ Resources:
   RequireMFALambda:
     Type: AWS::Lambda::Function
     Properties:
-      Description: Add Users without MFA to Group which denies access to everything. Removes them from group when MFA Enabled. 
+      Description: Add Users without MFA to Group which denies access to everything. Removes them from group when MFA Enabled.
       Runtime: python2.7
-      Handler: requireMFA.lambda_handler
+      Handler: index.lambda_handler
       Timeout: '80'
       FunctionName: !Ref pLambdaFunctionName
       Code:
-        S3Bucket: !Ref pArtifactBucket
-        S3Key: !Sub ${pArtifactPrefix}/${pLambdaVersion}/${pRequireMfaLambdaZipFile}
+        ZipFile: |
+          from __future__ import print_function
+
+          import json
+          import boto3
+          from botocore.exceptions import ClientError
+          import sys
+          import os
+
+          def lambda_handler(event, context):
+              print("Received event: " + json.dumps(event, sort_keys=True))
+
+              # Error Checking goes first
+              if event['source'] != "aws.iam" : sys.exit(0)
+
+              api_call = event['detail']['eventName']
+              if api_call == "CreateLoginProfile" :
+                  process_CreateLoginProfile(event,context)
+                  return 0
+              elif api_call == "EnableMFADevice" :
+                  process_EnableMFADevice(event,context)
+                  return 0
+              elif api_call == "DeactivateMFADevice" :
+                  process_DeactivateMFADevice(event,context)
+                  return 0
+              else:
+                  raise Exception("Invalid API Call: " + api_call)
+
+          def process_CreateLoginProfile(event, context):
+              # Get the important bits
+              username = event['detail']['responseElements']['loginProfile']['userName']
+
+              # Verify there is no MFA present
+              client = boto3.client('iam')
+              response = client.list_mfa_devices( UserName=username )
+
+              if len(response['MFADevices']) == 0 :
+                  # There is no MFA enabled
+                  print (username + " does not have MFA. Adding to blackhole Group")
+                  add_user_to_blackhole(username)
+              else :
+                  print (username + " has an MFA. Removing from blackhole Group")
+                  remove_user_from_blackhole(username)
+              print("CreateLoginProfile Execution Complete")
+
+          def process_EnableMFADevice(event, context):
+              # Get the important bits
+              username = event['detail']['requestParameters']['userName']
+
+              # Verify there is an MFA present
+              client = boto3.client('iam')
+              response = client.list_mfa_devices( UserName=username )
+              if len(response['MFADevices']) >= 1 :
+                  # There is now an MFA
+                  print (username + " has activated their MFA. Removing from blackhole Group")
+                  remove_user_from_blackhole(username)
+              else :
+                  print (username + " has no MFA. Adding to blackhole Group")
+                  add_user_to_blackhole(username)
+              print("EnableMFADevice Execution Complete")
+
+          def process_DeactivateMFADevice(event, context):
+              # Get the important bits
+              username = event['detail']['requestParameters']['userName']
+
+              # Verify there is no MFA present
+              client = boto3.client('iam')
+              try:
+                  response = client.list_mfa_devices( UserName=username )
+
+                  if len(response['MFADevices']) == 0 :
+                      # There is no MFA enabled
+                      print (username + " does not have MFA. Adding to blackhole Group")
+                      add_user_to_blackhole(username)
+                  else :
+                      print (username + " has an MFA. Removing from blackhole Group")
+                      remove_user_from_blackhole(username)
+                  print("DeactivateMFADevice Execution Complete")
+              except ClientError as e:
+                  if e.response['Error']['Code'] == "NoSuchEntity":
+                      print("{} no longer exists".format(username))
+                  else:
+                      raise
+
+          def add_user_to_blackhole(username):
+              client = boto3.client('iam')
+              response = client.add_user_to_group(
+                  GroupName=os.environ['BLACKHOLE_GROUPNAME'],
+                  UserName=username
+              )
+              if response['ResponseMetadata']['HTTPStatusCode'] != 200:
+                  handle_error("Adding User to Blackhole Group", username, response['ResponseMetadata'])
+              else:
+                  return 0
+
+          def remove_user_from_blackhole(username):
+              client = boto3.client('iam')
+              response = client.remove_user_from_group(
+                  GroupName=os.environ['BLACKHOLE_GROUPNAME'],
+                  UserName=username
+              )
+              if response['ResponseMetadata']['HTTPStatusCode'] != 200:
+                  handle_error("Removing User from Blackhole Group", username, response['ResponseMetadata'])
+              else:
+                  return 0
+
+          def handle_error(action, username, ResponseMetadata):
+              raise Exception("ERROR" + action + " User: " + username + " Details: " + ResponseMetadata)
       Role: !GetAtt RequireMFALambdaRole.Arn
       Environment:
         Variables:
@@ -199,7 +305,7 @@ Resources:
       EventPattern:
         detail-type:
         - AWS API Call via CloudTrail
-        detail: 
+        detail:
           eventSource:
             - iam.amazonaws.com
           eventName:
