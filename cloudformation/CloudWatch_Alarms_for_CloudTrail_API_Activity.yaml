@@ -22,6 +22,11 @@ Parameters:
     - TopicAlertsParanoid
     - TopicAlertsLax
 
+  pDashboardName:
+    Type: String
+    Description: Name of the Dashboard to create with the Alerts and Stuff
+    Default: Security
+
 
 
 Mappings: 
@@ -313,7 +318,7 @@ Resources:
     Type: AWS::Logs::MetricFilter
     Properties:
       LogGroupName: !Ref pLogGroupName
-      FilterPattern: '{ ($.errorCode = "*UnauthorizedOperation") || ($.errorCode = "AccessDenied*") }'
+      FilterPattern: '{ ($.errorCode = "*UnauthorizedOperation") || ($.errorCode = "AccessDenied*") && $.userIdentity.invokedBy != "AWS Internal" }'
       MetricTransformations:
       - MetricNamespace: CloudTrailMetrics
         MetricName: AuthorizationFailureCount
