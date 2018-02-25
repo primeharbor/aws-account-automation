@@ -391,11 +391,24 @@ Resources:
               # logger.info(json.dumps(alarm, sort_keys=True, default=str, indent=2))
               message = "{} went into {} at {} for account {}\n{}".format(alarm['AlarmName'],
                         alarm['NewStateValue'], alarm['StateChangeTime'], alarm['AWSAccountId'], alarm['AlarmDescription'])
-              print(message)
+              # print(message)
 
               sent_to_arn = sns['TopicArn']
               level = sent_to_arn.split(':')[-1].split("-")[0]
-              print("Level " + level)
+              # print("Level " + level)
+
+              subject = "ALARM {}".format(alarm['AlarmName'])
+
+              client = boto3.client('sns')
+              client.publish(
+                TopicArn=os.environ[level],
+                Message=message,
+                Subject=subject
+            )
+
+
+
+
       Role: !GetAtt [FormattingLambdaRole, Arn]
       Environment:
         Variables:
@@ -448,7 +461,7 @@ Resources:
 
 Outputs:
   TemplateVersion:
-    Value: "0.2.1"
+    Value: "0.2.2"
   SNSAlertsCritical:
     Value: !Ref 'SNSAlertsCritical'
     Export:
