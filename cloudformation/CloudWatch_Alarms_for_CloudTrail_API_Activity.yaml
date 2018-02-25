@@ -447,6 +447,17 @@ Resources:
 
 
 Outputs:
-
   TemplateVersion:
-    Value: "0.2.0"
+    Value: "0.2.1"
+  SNSAlertsCritical:
+    Value: !Ref 'SNSAlertsCritical'
+    Export:
+      Name: CloudWatchAlarmRawTopic-Critical
+  SNSAlertsError:
+    Value: !Ref 'SNSAlertsError'
+    Export:
+      Name: CloudWatchAlarmRawTopic-Error
+  SNSAlertsInfo:
+    Value: !Ref 'SNSAlertsInfo'
+    Export:
+      Name: CloudWatchAlarmRawTopic-Info
