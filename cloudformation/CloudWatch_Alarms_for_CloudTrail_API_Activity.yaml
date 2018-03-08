@@ -17,6 +17,14 @@ Parameters:
     Description: Name of the Dashboard to create with the Alerts and Stuff
     Default: Security
 
+  AccessDeniedThreshold:
+    Type: Number
+    Description: Number of AccessDenied or UnauthorizedOperation Events before alaming
+    Default: 0
+
+Conditions:
+  AccessDenied: !Not [!Equals [ !Ref AccessDeniedThreshold, 0 ]]
+
 # Each Resource consists of a Metric Filter and an Alarm on that Metric Filter
 Resources:
 
@@ -164,33 +172,6 @@ Resources:
       Threshold: '1'
       TreatMissingData: notBreaching
 
-  EC2InstanceChangesMetricFilter:
-    Type: AWS::Logs::MetricFilter
-    Properties:
-      LogGroupName: !Ref pLogGroupName
-      FilterPattern: '{ ($.eventName = RunInstances) || ($.eventName = RebootInstances)
-        || ($.eventName = StartInstances) || ($.eventName = StopInstances) || ($.eventName
-        = TerminateInstances) }'
-      MetricTransformations:
-      - MetricNamespace: CloudTrailMetrics
-        MetricName: EC2InstanceEventCount
-        MetricValue: '1'
-  EC2InstanceChangesAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      AlarmName: CloudTrailEC2InstanceChanges
-      AlarmDescription: Alarms when an API call is made to create, terminate, start, stop or reboot an EC2 instance.
-      AlarmActions:
-      - Ref: SNSAlertsInfo
-      MetricName: EC2InstanceEventCount
-      Namespace: CloudTrailMetrics
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      EvaluationPeriods: '1'
-      Period: '300'
-      Statistic: Sum
-      Threshold: '1'
-      TreatMissingData: notBreaching
-
   EC2LargeInstanceChangesMetricFilter:
     Type: AWS::Logs::MetricFilter
     Properties:
@@ -244,33 +225,9 @@ Resources:
       Threshold: '1'
       TreatMissingData: notBreaching
 
-  ConsoleSignInFailuresMetricFilter:
-    Type: AWS::Logs::MetricFilter
-    Properties:
-      LogGroupName: !Ref pLogGroupName
-      FilterPattern: '{ ($.eventName = ConsoleLogin) && ($.errorMessage = "Failed authentication") }'
-      MetricTransformations:
-      - MetricNamespace: CloudTrailMetrics
-        MetricName: ConsoleSignInFailureCount
-        MetricValue: '1'
-  ConsoleSignInFailuresAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      AlarmName: CloudTrailConsoleSignInFailures
-      AlarmDescription: Alarms when an unauthenticated API call is made to sign int the console.
-      AlarmActions:
-      - Ref: SNSAlertsError
-      MetricName: ConsoleSignInFailureCount
-      Namespace: CloudTrailMetrics
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      EvaluationPeriods: '1'
-      Period: '300'
-      Statistic: Sum
-      Threshold: '3'
-      TreatMissingData: notBreaching
-
   AuthorizationFailuresMetricFilter:
     Type: AWS::Logs::MetricFilter
+    Condition: AccessDenied
     Properties:
       LogGroupName: !Ref pLogGroupName
       FilterPattern: '{ ($.errorCode = "*UnauthorizedOperation") || ($.errorCode = "AccessDenied*") && $.userIdentity.invokedBy != "AWS Internal" }'
@@ -280,6 +237,7 @@ Resources:
         MetricValue: '1'
   AuthorizationFailuresAlarm:
     Type: AWS::CloudWatch::Alarm
+    Condition: AccessDenied
     Properties:
       AlarmName: CloudTrailAuthorizationFailures
       AlarmDescription: Alarms when an unauthorized API call is made.
@@ -291,27 +249,27 @@ Resources:
       EvaluationPeriods: '1'
       Period: '300'
       Statistic: Sum
-      Threshold: '1'
+      Threshold: !Ref AccessDeniedThreshold
       TreatMissingData: notBreaching
 
-
-  IAMPolicyChangesMetricFilter:
+  # Add KMS Key Deletion
+  KMSScheduleKeyDeletionMetricFilter:
     Type: AWS::Logs::MetricFilter
     Properties:
       LogGroupName: !Ref pLogGroupName
-      FilterPattern: '{($.eventName=DeleteGroupPolicy)||($.eventName=DeleteRolePolicy)||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}'
+      FilterPattern: '{$.eventName = "ScheduleKeyDeletion" }'
       MetricTransformations:
       - MetricNamespace: CloudTrailMetrics
-        MetricName: IAMPolicyEventCount
+        MetricName: KMSScheduleKeyDeletion
         MetricValue: '1'
-  IAMPolicyChangesAlarm:
+  KMSScheduleKeyDeletionAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmName: CloudTrailIAMPolicyChanges
-      AlarmDescription: Alarms when an API call is made to change an IAM policy.
+      AlarmName: KMSScheduleKeyDeletion
+      AlarmDescription: Alarms when a KMS Key is scheduled for deletion.
       AlarmActions:
-      - Ref: SNSAlertsCritical
-      MetricName: IAMPolicyEventCount
+      - Ref: SNSAlertsError
+      MetricName: KMSScheduleKeyDeletion
       Namespace: CloudTrailMetrics
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: '1'
@@ -319,7 +277,6 @@ Resources:
       Statistic: Sum
       Threshold: '1'
       TreatMissingData: notBreaching
-
 
   #
   # Formatting Lambda resources
@@ -389,8 +346,8 @@ Resources:
               alarm = json.loads(event['Records'][0]['Sns']['Message'])
 
               # logger.info(json.dumps(alarm, sort_keys=True, default=str, indent=2))
-              message = "{} went into {} at {} for account {}\n{}".format(alarm['AlarmName'],
-                        alarm['NewStateValue'], alarm['StateChangeTime'], alarm['AWSAccountId'], alarm['AlarmDescription'])
+              message = "{} went into {} at {} for account {}\n{}\n{}".format(alarm['AlarmName'],
+                        alarm['NewStateValue'], alarm['StateChangeTime'], alarm['AWSAccountId'], alarm['NewStateReason'], alarm['AlarmDescription'])
               # print(message)
 
               sent_to_arn = sns['TopicArn']
@@ -405,9 +362,6 @@ Resources:
                 Message=message,
                 Subject=subject
             )
-
-
-
 
       Role: !GetAtt [FormattingLambdaRole, Arn]
       Environment:
@@ -461,7 +415,7 @@ Resources:
 
 Outputs:
   TemplateVersion:
-    Value: "0.2.2"
+    Value: "0.2.4"
   SNSAlertsCritical:
     Value: !Ref 'SNSAlertsCritical'
     Export:
