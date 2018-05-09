@@ -339,4 +339,4 @@ Outputs:
   StackName:
     Value: !Ref AWS::StackName
   TemplateVersion:
-    Value: "0.1.0"
+    Value: 0.2.0
