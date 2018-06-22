@@ -37,4 +37,8 @@
 /lib/bundler/man/
 .rvmrc
 
+# jetbrains
+.idea/
 
+# git-crypt
+git-crypt.key
