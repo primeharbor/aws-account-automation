@@ -10,6 +10,14 @@ Parameters:
     Description: Add this initial email to the alerts
     Type: String
 
+  pEnableSubscriberSMS:
+    Description: Enable SMS notification of critical alerts
+    Type: String
+    Default: yes
+    AllowedValues:
+    - yes
+    - "no"
+
   pInitialSubscriberSMS:
     Description: Add this initial Cell for SMS notification of critical alerts
     Type: String
@@ -49,8 +57,19 @@ Parameters:
 Conditions:
   cDeployLambda:
     !Equals [ !Ref pDeployLambda, yes]
+  cDeploySMSAlerts:
+    !Equals [ !Ref pEnableSubscriberSMS, yes]
 
 Resources:
+  SNSAlertsNigthmare:
+    Type: AWS::SNS::Topic
+    Condition: cDeploySMSAlerts
+    Properties:
+      DisplayName: !Join ['', ["Nightmare Alerts for ", !Ref 'pAccountDescription']]
+      Subscription:
+      - Endpoint: !Ref 'pInitialSubscriberSMS'
+        Protocol: sms
+      TopicName: !Join ['-', ["Nightmare-Alerts", !Ref 'pAccountDescription']]
   SNSAlertsCritical:
     Type: AWS::SNS::Topic
     Properties:
@@ -58,8 +77,6 @@ Resources:
       Subscription:
       - Endpoint: !Ref 'pInitialSubscriberEmail'
         Protocol: email
-      - Endpoint: !Ref 'pInitialSubscriberSMS'
-        Protocol: sms
       - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
         Protocol: lambda
       TopicName: !Join ['-', ["Critical-Alerts", !Ref 'pAccountDescription']]
