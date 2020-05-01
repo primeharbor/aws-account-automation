@@ -43,9 +43,14 @@ Parameters:
     Default: ':cloud:'
 
   pAlarmEmoji:
-    Description: Slack Emoji to use for CloudWatch Alarms
+    Description: Slack Emoji to use for CloudWatch Alarm in Alarm State
     Type: String
     Default: ':alert:'
+
+  pOkEmoji:
+    Description: Slack Emoji to use for CloudWatch Alarm in OK State
+    Type: String
+    Default: ':green_check:'
 
 Conditions:
   cDeploySlackLambda: !Equals [ !Ref pDeploySlackLambda, "yes"]
@@ -220,11 +225,14 @@ Resources:
 
               if subject is None:
                 slack_body = message
-              elif "ALARM" in subject:
+              elif "AlarmArn" in message:
                 alarm = json.loads(message)
                 slack_body = f"{alarm['AlarmName']} went into {alarm['NewStateValue']} at {alarm['StateChangeTime']}\n>*Reason:* {alarm['NewStateReason']}\n>*Description:* {alarm['AlarmDescription']}\n>*Topic:* {topicARN}\n>*AccountID:* {alarm['AWSAccountId']}"
                 username = alarm['AlarmName']
-                icon = os.environ['ALARM_EMOJI']
+                if "ALARM" in subject:
+                  icon = os.environ['ALARM_EMOJI']
+                if "OK" in subject:
+                  icon = os.environ['OK_EMOJI']
               else:
                 slack_body = f"{subject} - {message}"
 
@@ -249,6 +257,7 @@ Resources:
           SLACK_CHANNEL: !Ref pSlackChannel
           ICON_EMOJI: !Ref pIconEmoji
           ALARM_EMOJI: !Ref pAlarmEmoji
+          OK_EMOJI: !Ref pOkEmoji
 
   SlackNotificationLambdaInvocationRole:
     Type: AWS::IAM::Role
