@@ -3,38 +3,34 @@ Description: Deploy SNS Notification Topics and Alarms for Generic Account Notif
 
 Parameters:
   pAccountDescription:
-    Description: Short Name for account (ie dev,ref,prod)
+    Description: Identify this account in the notices sent
     Type: String
 
   pInitialSubscriberEmail:
     Description: Add this initial email to the alerts
     Type: String
+    Default: NONE
 
   pInitialSubscriberSMS:
     Description: Add this initial Cell for SMS notification of critical alerts
     Type: String
-    Default: 1-404-867-5309-CHANGETHIS
+    Default: NONE
 
   pBillingThreshold:
     Description: Sets the billing alert to go off above this figure
     Type: Number
+    Default: 0
 
-  pDeployLambda:
+  pDeploySlackLambda:
     Description: Whether or not to deploy the slack lambda
     Type: String
     AllowedValues:
-    - yes
+    - "yes"
     - "no"
 
-  pLambdaFunctionName:
-    Description: Name of the Lambda Function
+  pSlackWebhookSecret:
+    Description: Name of the Secrets Manager secret where the WebHook is stored
     Type: String
-
-  # Slack Parameters passed as Env Vars to Lambda
-  pSlackWebhookURL:
-    Description: WebHook URL from Slack. Keep this secret
-    Type: 'AWS::SSM::Parameter::Value<String>'
-    Default: SlackWebhook
 
   pSlackChannel:
     Description: Slack Channel to send the spam to
@@ -46,11 +42,18 @@ Parameters:
     Type: String
     Default: ':cloud:'
 
+  pAlarmEmoji:
+    Description: Slack Emoji to use for CloudWatch Alarms
+    Type: String
+    Default: ':alert:'
+
 Conditions:
-  cDeployLambda:
-    !Equals [ !Ref pDeployLambda, yes]
+  cDeploySlackLambda: !Equals [ !Ref pDeploySlackLambda, "yes"]
+  cBillingAlarm: !Not [!Equals [ !Ref pBillingThreshold, 0]]
+
 
 Resources:
+
   SNSAlertsCritical:
     Type: AWS::SNS::Topic
     Properties:
@@ -63,6 +66,7 @@ Resources:
       - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
         Protocol: lambda
       TopicName: !Join ['-', ["Critical-Alerts", !Ref 'pAccountDescription']]
+
   SNSAlertsError:
     Type: AWS::SNS::Topic
     Properties:
@@ -73,6 +77,7 @@ Resources:
       - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
         Protocol: lambda
       TopicName: !Join ['-', ["Error-Alerts", !Ref 'pAccountDescription']]
+
   SNSAlertsInfo:
     Type: AWS::SNS::Topic
     Properties:
@@ -83,7 +88,6 @@ Resources:
       - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
         Protocol: lambda
       TopicName: !Join ['-', ["Info-Alerts", !Ref 'pAccountDescription']]
-
 
   SNSAlertPolicy:
     Type: AWS::SNS::TopicPolicy
@@ -106,8 +110,9 @@ Resources:
 
   SpendingAlarm:
     Type: AWS::CloudWatch::Alarm
+    Condition: cBillingAlarm
     Properties:
-      AlarmDescription: !Join ['', [Alarm if AWS spending is over $, !Ref 'pBillingThreshold']]
+      AlarmDescription: !Sub "Alarm if AWS spending is over ${pBillingThreshold}"
       Namespace: AWS/Billing
       MetricName: EstimatedCharges
       Dimensions:
@@ -122,7 +127,7 @@ Resources:
 
   SlackNotificationLambdaRole:
     Type: AWS::IAM::Role
-    Condition: cDeployLambda
+    Condition: cDeploySlackLambda
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -147,31 +152,62 @@ Resources:
           - Resource: '*'
             Action: ['logs:*']
             Effect: Allow
+      - PolicyName: SecretAccess
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: secretsmanager:GetSecretValue
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pSlackWebhookSecret}*
 
   SlackNotificationLambda:
     Type: AWS::Lambda::Function
-    Condition: cDeployLambda
+    Condition: cDeploySlackLambda
     Properties:
-      Description: Send SNS Messages to Slack
-      Runtime: python2.7
+      Description: Send SNS AlertTopics to Slack Channel
+      Runtime: python3.7
       Handler: index.lambda_handler
       Timeout: '80'
-      FunctionName: !Ref 'pLambdaFunctionName'
+      FunctionName: !Sub "${AWS::StackName}-send2slack"
+      Role: !GetAtt [SlackNotificationLambdaRole, Arn]
       Code:
         ZipFile: |
           # Lambda to send SNS Messages to Slack
-          from __future__ import print_function
 
           import boto3
+          from botocore.exceptions import ClientError
           import json
           import logging
           import os
 
           from base64 import b64decode
-          from urllib2 import Request, urlopen, URLError, HTTPError
+          import urllib3
 
           logger = logging.getLogger()
-          logger.setLevel(logging.INFO)
+          logger.setLevel(logging.DEBUG)
+
+
+          def get_webhook(secret_name):
+              client = boto3.client('secretsmanager')
+              try:
+                  get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+              except ClientError as e:
+                  logger.critical(f"Unable to get secret value for {secret_name}: {e}")
+                  return(None)
+              else:
+                  if 'SecretString' in get_secret_value_response:
+                      secret_value = get_secret_value_response['SecretString']
+                  else:
+                      secret_value = get_secret_value_response['SecretBinary']
+              try:
+                  secret_dict = json.loads(secret_value)
+                  return(secret_dict['webhook_url'])
+              except Exception as e:
+                  logger.critical(f"Error during Credential and Service extraction: {e}")
+                  raise
+
+          WEBHOOK=get_webhook(os.environ['WEBHOOK'])
+          http = urllib3.PoolManager()
 
           def lambda_handler(event, context):
               logger.info("Received event: " + json.dumps(event, sort_keys=True))
@@ -179,35 +215,44 @@ Resources:
               subject = event['Records'][0]['Sns']['Subject']
               timestamp = event['Records'][0]['Sns']['Timestamp']
               topicARN = event['Records'][0]['Sns']['TopicArn'].split(':')[-1]
+              username = topicARN
+              icon = "os.environ['ICON_EMOJI']"
+
+              if subject is None:
+                slack_body = message
+              elif "ALARM" in subject:
+                alarm = json.loads(message)
+                slack_body = f"{alarm['AlarmName']} went into {alarm['NewStateValue']} at {alarm['StateChangeTime']}\n>*Reason:* {alarm['NewStateReason']}\n>*Description:* {alarm['AlarmDescription']}\n>*Topic:* {topicARN}\n>*AccountID:* {alarm['AWSAccountId']}"
+                username = alarm['AlarmName']
+                icon = os.environ['ALARM_EMOJI']
+              else:
+                slack_body = f"{subject} - {message}"
 
               slack_message = {
                   'channel': os.environ['SLACK_CHANNEL'],
-                  'text': "%s: %s - %s" % (timestamp, subject, message),
-                  'username': topicARN,
-                  'icon_emoji': os.environ['ICON_EMOJI']
+                  'text': slack_body,
+                  'username': username,
+                  'icon_emoji': icon
               }
 
-              req = Request(os.environ['HOOK_URL'], json.dumps(slack_message))
+              logger.debug(json.dumps(slack_message, sort_keys=True, default=str, indent=2))
               try:
-                  response = urlopen(req)
-                  response.read()
+                  r = http.request('POST', WEBHOOK, body=json.dumps(slack_message))
                   logger.info("Message posted to %s", slack_message['channel'])
-              except HTTPError as e:
-                  logger.error("Request failed: %d %s", e.code, e.reason)
-              except URLError as e:
-                  logger.error("Server connection failed: %s", e.reason)
+              except Exception as e:
+                  logger.error(f"Request failed: {e}")
 
-      Role: !GetAtt [SlackNotificationLambdaRole, Arn]
       Environment:
         Variables:
-          HOOK_URL: !Ref pSlackWebhookURL
+          WEBHOOK: !Ref pSlackWebhookSecret
           ACCOUNT_NAME: !Ref pAccountDescription
           SLACK_CHANNEL: !Ref pSlackChannel
           ICON_EMOJI: !Ref pIconEmoji
+          ALARM_EMOJI: !Ref pAlarmEmoji
 
   SlackNotificationLambdaInvocationRole:
     Type: AWS::IAM::Role
-    Condition: cDeployLambda
+    Condition: cDeploySlackLambda
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -228,7 +273,7 @@ Resources:
             - !GetAtt [SlackNotificationLambda, Arn]
   SlackNotificationLambdaPermissionSNSAlertsCritical:
     Type: AWS::Lambda::Permission
-    Condition: cDeployLambda
+    Condition: cDeploySlackLambda
     Properties:
       FunctionName: !GetAtt [SlackNotificationLambda, Arn]
       Principal: sns.amazonaws.com
@@ -236,7 +281,7 @@ Resources:
       Action: lambda:invokeFunction
   SlackNotificationLambdaPermissionSNSAlertsInfo:
     Type: AWS::Lambda::Permission
-    Condition: cDeployLambda
+    Condition: cDeploySlackLambda
     Properties:
       FunctionName: !GetAtt [SlackNotificationLambda, Arn]
       Principal: sns.amazonaws.com
@@ -244,7 +289,7 @@ Resources:
       Action: lambda:invokeFunction
   SlackNotificationLambdaPermissionSNSAlertsError:
     Type: AWS::Lambda::Permission
-    Condition: cDeployLambda
+    Condition: cDeploySlackLambda
     Properties:
       FunctionName: !GetAtt [SlackNotificationLambda, Arn]
       Principal: sns.amazonaws.com
