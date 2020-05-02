@@ -21,15 +21,15 @@ The most recent version of all these templates are hosted in S3 for Easy Deploym
 * [CloudTrail Alarms](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3.amazonaws.com%2Froom17-automation-artifacts%2Fpublic%2FCloudWatch_Alarms_for_CloudTrail_API_Activity.yaml&stackName=account-cloudtrail-alarms)
 * [RequireMFA](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3.amazonaws.com%2Froom17-automation-artifacts%2Fpublic%2FCloudWatch_Alarms_for_CloudTrail_API_Activity.yaml&stackName=account-RequireMFA)
 
-## URLS
-* https://s3.amazonaws.com/room17-automation-artifacts/public/AccountAlertTopics-Template.yaml
-* https://s3.amazonaws.com/room17-automation-artifacts/public/BillingBucket.yaml
-* https://s3.amazonaws.com/room17-automation-artifacts/public/CloudTrailTemplate.yaml
-* https://s3.amazonaws.com/room17-automation-artifacts/public/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml
-* https://s3.amazonaws.com/room17-automation-artifacts/public/DeployBucketTemplate.yaml
-* https://s3.amazonaws.com/room17-automation-artifacts/public/requireMFA-Template.yaml
-
-
-
+## Directly callable URLS
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AccountAlertTopics-Template.yaml
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRoleTemplate.yaml
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/BillingBucket.yaml
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudTrailTemplate.yaml
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/DeployBucketTemplate.yaml
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/EBSAutomatedTagging.yaml
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/IAM-ExpireUsers-Template.yaml
+https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/requireMFA-Template.yaml
 
 
