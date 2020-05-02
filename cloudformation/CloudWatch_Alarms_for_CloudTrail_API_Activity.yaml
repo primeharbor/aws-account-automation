@@ -1,3 +1,4 @@
+
 #
 # Taken From the AWS Suggested Template found at:
 # https://s3-us-west-2.amazonaws.com/awscloudtrail/cloudwatch-alarms-for-cloudtrail-api-activity/CloudWatch_Alarms_for_CloudTrail_API_Activity.json
@@ -6,53 +7,79 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS CloudTrail API Activity Alarm Template for CloudWatch Logs
 
+
 Parameters:
   pLogGroupName:
     Type: String
     Default: CloudTrail/DefaultLogGroup
     Description: Enter CloudWatch Logs log group name. Default is CloudTrail/DefaultLogGroup
+  pParanoiaLevel:
+    Type: String
+    Description: Level of alerting to use (defined in mappings)
+    Default: TopicAlertsNormal
+    AllowedValues:
+    - TopicAlertsNormal
+    - TopicAlertsParanoid
+    - TopicAlertsLax
 
   pDashboardName:
     Type: String
     Description: Name of the Dashboard to create with the Alerts and Stuff
     Default: Security
 
-  AccessDeniedThreshold:
-    Type: Number
-    Description: Number of AccessDenied or UnauthorizedOperation Events before alaming
-    Default: 0
+Mappings:
+  TopicAlertsNormal:
+    SecurityGroupChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
+    # Covers NACL, Gateway, & VPC changes
+    VpcChangesAlarm:
+      TopicArn:  SNSAlertsCriticalArn
+    ConsoleSignInFailuresAlarm:
+      TopicArn: SNSAlertsErrorArn
+    EC2InstanceChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
+    EC2LargeInstanceChangesAlarm:
+      TopicArn: SNSAlertsErrorArn
+    CloudTrailChangesAlarm:
+      TopicArn: SNSAlertsCriticalArn
+    IAMPolicyChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
+  TopicAlertsParanoid:
+    SecurityGroupChangesAlarm:
+      TopicArn: SNSAlertsErrorArn
+    # Covers NACL, Gateway, & VPC changes
+    VpcChangesAlarm:
+      TopicArn: SNSAlertsCriticalArn
+    ConsoleSignInFailuresAlarm:
+      TopicArn: SNSAlertsErrorArn
+    EC2InstanceChangesAlarm:
+      TopicArn: SNSAlertsErrorArn
+    EC2LargeInstanceChangesAlarm:
+      TopicArn: SNSAlertsErrorArn
+    CloudTrailChangesAlarm:
+      TopicArn: SNSAlertsCriticalArn
+    IAMPolicyChangesAlarm:
+      TopicArn: SNSAlertsCriticalArn
+  TopicAlertsLax:
+    SecurityGroupChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
+    # Covers NACL, Gateway, & VPC changes
+    VpcChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
+    ConsoleSignInFailuresAlarm:
+      TopicArn: SNSAlertsInfoArn
+    EC2InstanceChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
+    EC2LargeInstanceChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
+    CloudTrailChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
+    IAMPolicyChangesAlarm:
+      TopicArn: SNSAlertsInfoArn
 
-Conditions:
-  AccessDenied: !Not [!Equals [ !Ref AccessDeniedThreshold, 0 ]]
 
 # Each Resource consists of a Metric Filter and an Alarm on that Metric Filter
 Resources:
-
-  # Raw SNS Topics
-  SNSAlertsInfo:
-    Type: AWS::SNS::Topic
-    Properties:
-      DisplayName: "Raw Info CloudWatch Alarms"
-      Subscription:
-      - Endpoint: !GetAtt [FormattingLambda, Arn]
-        Protocol: lambda
-      TopicName: !Sub "Info-Alerts-Raw-${AWS::StackName}"
-  SNSAlertsError:
-    Type: AWS::SNS::Topic
-    Properties:
-      DisplayName: "Raw Error CloudWatch Alarms"
-      Subscription:
-      - Endpoint: !GetAtt [FormattingLambda, Arn]
-        Protocol: lambda
-      TopicName: !Sub "Error-Alerts-Raw-${AWS::StackName}"
-  SNSAlertsCritical:
-    Type: AWS::SNS::Topic
-    Properties:
-      DisplayName: "Raw Critical CloudWatch Alarms"
-      Subscription:
-      - Endpoint: !GetAtt [FormattingLambda, Arn]
-        Protocol: lambda
-      TopicName: !Sub "Critical-Alerts-Raw-${AWS::StackName}"
 
   # Info level alert as these happen frequently
   SecurityGroupChangesMetricFilter:
@@ -73,7 +100,8 @@ Resources:
       AlarmName: CloudTrailSecurityGroupChanges
       AlarmDescription: Alarms when an API call is made to create, update or delete a Security Group.
       AlarmActions:
-      - Ref: SNSAlertsCritical
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, SecurityGroupChangesAlarm, TopicArn ]
       MetricName: SecurityGroupEventCount
       Namespace: CloudTrailMetrics
       ComparisonOperator: GreaterThanOrEqualToThreshold
@@ -102,7 +130,8 @@ Resources:
       AlarmName: CloudTrailNetworkAclChanges
       AlarmDescription: Alarms when an API call is made to create, update or delete a Network ACL.
       AlarmActions:
-      - Ref: SNSAlertsCritical
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, VpcChangesAlarm, TopicArn ]
       MetricName: NetworkAclEventCount
       Namespace: CloudTrailMetrics
       ComparisonOperator: GreaterThanOrEqualToThreshold
@@ -131,7 +160,8 @@ Resources:
       AlarmDescription: Alarms when an API call is made to create, update or delete
         a Customer or Internet Gateway.
       AlarmActions:
-      - Ref: SNSAlertsCritical
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, VpcChangesAlarm, TopicArn ]
       MetricName: GatewayEventCount
       Namespace: CloudTrailMetrics
       ComparisonOperator: GreaterThanOrEqualToThreshold
@@ -162,8 +192,37 @@ Resources:
       AlarmDescription: Alarms when an API call is made to create, update or delete
         a VPC, VPC peering connection or VPC connection to classic.
       AlarmActions:
-      - Ref: SNSAlertsCritical
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, VpcChangesAlarm, TopicArn ]
       MetricName: VpcEventCount
+      Namespace: CloudTrailMetrics
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: '1'
+      Period: '300'
+      Statistic: Sum
+      Threshold: '1'
+      TreatMissingData: notBreaching
+
+  EC2InstanceChangesMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref pLogGroupName
+      FilterPattern: '{ ($.eventName = RunInstances) || ($.eventName = RebootInstances)
+        || ($.eventName = StartInstances) || ($.eventName = StopInstances) || ($.eventName
+        = TerminateInstances) }'
+      MetricTransformations:
+      - MetricNamespace: CloudTrailMetrics
+        MetricName: EC2InstanceEventCount
+        MetricValue: '1'
+  EC2InstanceChangesAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: CloudTrailEC2InstanceChanges
+      AlarmDescription: Alarms when an API call is made to create, terminate, start, stop or reboot an EC2 instance.
+      AlarmActions:
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, EC2InstanceChangesAlarm, TopicArn ]
+      MetricName: EC2InstanceEventCount
       Namespace: CloudTrailMetrics
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: '1'
@@ -188,7 +247,8 @@ Resources:
       AlarmName: CloudTrailEC2LargeInstanceChanges
       AlarmDescription: Alarms when an API call is made to create, terminate, start, stop or reboot a 4x or 8x-large EC2 instance.
       AlarmActions:
-      - Ref: SNSAlertsCritical
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, EC2LargeInstanceChangesAlarm, TopicArn ]
       MetricName: EC2LargeInstanceEventCount
       Namespace: CloudTrailMetrics
       ComparisonOperator: GreaterThanOrEqualToThreshold
@@ -215,7 +275,8 @@ Resources:
       AlarmName: CloudTrailChanges
       AlarmDescription: Alarms when an API call is made to create, update or delete a CloudTrail trail, or to start or stop logging to a trail.
       AlarmActions:
-      - Ref: SNSAlertsCritical
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, CloudTrailChangesAlarm, TopicArn ]
       MetricName: CloudTrailEventCount
       Namespace: CloudTrailMetrics
       ComparisonOperator: GreaterThanOrEqualToThreshold
@@ -225,9 +286,34 @@ Resources:
       Threshold: '1'
       TreatMissingData: notBreaching
 
+  ConsoleSignInFailuresMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref pLogGroupName
+      FilterPattern: '{ ($.eventName = ConsoleLogin) && ($.errorMessage = "Failed authentication") }'
+      MetricTransformations:
+      - MetricNamespace: CloudTrailMetrics
+        MetricName: ConsoleSignInFailureCount
+        MetricValue: '1'
+  ConsoleSignInFailuresAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: CloudTrailConsoleSignInFailures
+      AlarmDescription: Alarms when an unauthenticated API call is made to sign int the console.
+      AlarmActions:
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, ConsoleSignInFailuresAlarm, TopicArn ]
+      MetricName: ConsoleSignInFailureCount
+      Namespace: CloudTrailMetrics
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: '1'
+      Period: '300'
+      Statistic: Sum
+      Threshold: '3'
+      TreatMissingData: notBreaching
+
   AuthorizationFailuresMetricFilter:
     Type: AWS::Logs::MetricFilter
-    Condition: AccessDenied
     Properties:
       LogGroupName: !Ref pLogGroupName
       FilterPattern: '{ ($.errorCode = "*UnauthorizedOperation") || ($.errorCode = "AccessDenied*") && $.userIdentity.invokedBy != "AWS Internal" }'
@@ -237,39 +323,13 @@ Resources:
         MetricValue: '1'
   AuthorizationFailuresAlarm:
     Type: AWS::CloudWatch::Alarm
-    Condition: AccessDenied
     Properties:
       AlarmName: CloudTrailAuthorizationFailures
       AlarmDescription: Alarms when an unauthorized API call is made.
       AlarmActions:
-      - Ref: SNSAlertsError
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, ConsoleSignInFailuresAlarm, TopicArn ]
       MetricName: AuthorizationFailureCount
-      Namespace: CloudTrailMetrics
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      EvaluationPeriods: '1'
-      Period: '300'
-      Statistic: Sum
-      Threshold: !Ref AccessDeniedThreshold
-      TreatMissingData: notBreaching
-
-  # Add KMS Key Deletion
-  KMSScheduleKeyDeletionMetricFilter:
-    Type: AWS::Logs::MetricFilter
-    Properties:
-      LogGroupName: !Ref pLogGroupName
-      FilterPattern: '{$.eventName = "ScheduleKeyDeletion" }'
-      MetricTransformations:
-      - MetricNamespace: CloudTrailMetrics
-        MetricName: KMSScheduleKeyDeletion
-        MetricValue: '1'
-  KMSScheduleKeyDeletionAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      AlarmName: KMSScheduleKeyDeletion
-      AlarmDescription: Alarms when a KMS Key is scheduled for deletion.
-      AlarmActions:
-      - Ref: SNSAlertsError
-      MetricName: KMSScheduleKeyDeletion
       Namespace: CloudTrailMetrics
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: '1'
@@ -278,153 +338,34 @@ Resources:
       Threshold: '1'
       TreatMissingData: notBreaching
 
-  #
-  # Formatting Lambda resources
-  #
-
-  FormattingLambdaRole:
-    Type: AWS::IAM::Role
+  IAMPolicyChangesMetricFilter:
+    Type: AWS::Logs::MetricFilter
     Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: [lambda.amazonaws.com]
-          Action: ['sts:AssumeRole']
-      Path: /
-      Policies:
-      - PolicyName: CloudWatch
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Action: ['cloudwatch:*']
-            Effect: Allow
-            Resource: '*'
-      - PolicyName: logs
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Resource: '*'
-            Action: ['logs:*']
-            Effect: Allow
-      - PolicyName: SNSPublish
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Resource: '*'
-            Action: ['sns:publish']
-            Effect: Allow
-
-  FormattingLambda:
-    Type: AWS::Lambda::Function
+      LogGroupName: !Ref pLogGroupName
+      FilterPattern: '{($.eventName=DeleteGroupPolicy)||($.eventName=DeleteRolePolicy)||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}'
+      MetricTransformations:
+      - MetricNamespace: CloudTrailMetrics
+        MetricName: IAMPolicyEventCount
+        MetricValue: '1'
+  IAMPolicyChangesAlarm:
+    Type: AWS::CloudWatch::Alarm
     Properties:
-      Description: Format Alarm messages to be readable
-      Runtime: python2.7
-      Handler: index.lambda_handler
-      Timeout: '80'
-      FunctionName: !Sub '${AWS::StackName}-FormattingLambda'
-      Code:
-        ZipFile: |
-          # Lambda to send SNS Messages to Slack
-          from __future__ import print_function
-
-          import boto3
-          import json
-          import logging
-          import os
-
-          from base64 import b64decode
-          from urllib2 import Request, urlopen, URLError, HTTPError
-
-          logger = logging.getLogger()
-          logger.setLevel(logging.INFO)
-
-          def lambda_handler(event, context):
-              logger.info("Received event: " + json.dumps(event, sort_keys=True))
-              sns = event['Records'][0]['Sns']
-              alarm = json.loads(event['Records'][0]['Sns']['Message'])
-
-              # logger.info(json.dumps(alarm, sort_keys=True, default=str, indent=2))
-              message = "{} went into {} at {} for account {}\n{}\n{}".format(alarm['AlarmName'],
-                        alarm['NewStateValue'], alarm['StateChangeTime'], alarm['AWSAccountId'], alarm['NewStateReason'], alarm['AlarmDescription'])
-              # print(message)
-
-              sent_to_arn = sns['TopicArn']
-              level = sent_to_arn.split(':')[-1].split("-")[0]
-              # print("Level " + level)
-
-              subject = "ALARM {}".format(alarm['AlarmName'])
-
-              client = boto3.client('sns')
-              client.publish(
-                TopicArn=os.environ[level],
-                Message=message,
-                Subject=subject
-            )
-
-      Role: !GetAtt [FormattingLambdaRole, Arn]
-      Environment:
-        Variables:
-          Critical: !ImportValue SNSAlertsCriticalArn
-          Error: !ImportValue SNSAlertsErrorArn
-          Info: !ImportValue SNSAlertsInfoArn
-
-  FormattingLambdaInvocationRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: [events.amazonaws.com, sns.amazonaws.com]
-          Action: ['sts:AssumeRole']
-      Path: /
-      Policies:
-      - PolicyName: ExecuteSlackLambda
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Action: ['lambda:InvokeFunction']
-            Effect: Allow
-            Resource:
-            - !GetAtt [FormattingLambda, Arn]
-  FormattingLambdaPermissionSNSAlertsCritical:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !GetAtt [FormattingLambda, Arn]
-      Principal: sns.amazonaws.com
-      SourceArn: !Ref 'SNSAlertsCritical'
-      Action: lambda:invokeFunction
-  FormattingLambdaPermissionSNSAlertsInfo:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !GetAtt [FormattingLambda, Arn]
-      Principal: sns.amazonaws.com
-      SourceArn: !Ref 'SNSAlertsInfo'
-      Action: lambda:invokeFunction
-  FormattingLambdaPermissionSNSAlertsError:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !GetAtt [FormattingLambda, Arn]
-      Principal: sns.amazonaws.com
-      SourceArn: !Ref 'SNSAlertsError'
-      Action: lambda:invokeFunction
+      AlarmName: CloudTrailIAMPolicyChanges
+      AlarmDescription: Alarms when an API call is made to change an IAM policy.
+      AlarmActions:
+        - Fn::ImportValue:
+            Fn::FindInMap: [ !Ref pParanoiaLevel, IAMPolicyChangesAlarm, TopicArn ]
+      MetricName: IAMPolicyEventCount
+      Namespace: CloudTrailMetrics
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: '1'
+      Period: '300'
+      Statistic: Sum
+      Threshold: '1'
+      TreatMissingData: notBreaching
 
 
 Outputs:
+
   TemplateVersion:
-    Value: "0.2.4"
-  SNSAlertsCritical:
-    Value: !Ref 'SNSAlertsCritical'
-    Export:
-      Name: CloudWatchAlarmRawTopic-Critical
-  SNSAlertsError:
-    Value: !Ref 'SNSAlertsError'
-    Export:
-      Name: CloudWatchAlarmRawTopic-Error
-  SNSAlertsInfo:
-    Value: !Ref 'SNSAlertsInfo'
-    Export:
-      Name: CloudWatchAlarmRawTopic-Info
+    Value: 1.0.0
