@@ -17,7 +17,7 @@ Tools to Automate your AWS Account
 * [requireMFA](cloudformation/requireMFA-Template.yaml) will deploy a IAM User Group and Lambda that will prevent users without MFA from doing anything in the account
 
 
-** :exclamation: Also check out the [aws-fast-fixes python scripts](https://github.com/WarnerMedia/aws-fast-fixes) for manual security fixes for your account! :exclamation: **
+:exclamation: **Also check out the [aws-fast-fixes python scripts](https://github.com/WarnerMedia/aws-fast-fixes) for manual security fixes for your account!** :exclamation:
 
 
 ## Hosting
