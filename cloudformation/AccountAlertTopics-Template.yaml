@@ -320,4 +320,4 @@ Outputs:
     Export:
       Name: SNSAlertsInfoArn
   TemplateVersion:
-    Value: "0.1.0"
+    Value: "1.0.0"
