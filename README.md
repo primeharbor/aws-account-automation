@@ -1,35 +1,34 @@
 # aws-account-automation
 Tools to Automate your AWS Account
 
-* DeployBucketTemplate will create a Bucket for lambda or other package deployments. It can be configured to allow access via http from your VPC endpoints or corporate network
 
-* AccountAlertTopics will create three SNS Topics (Critical, Error, Info) and export the ARNs to be used in other templates. It can optionally deploy a lambda that will push the published messages to a slack channel
+* [AccountAlertTopics](AccountAlertTopics.md) will create three SNS Topics (Critical, Error, Info) and stack export them to be used in other templates. It can optionally deploy a lambda that will push the published messages to a slack channel
 
-* IAM-Expire-Users will deploy a lambda that will SES notify users when their API Keys or password are about to expire and can be configured to disable their account, or deactivate their key if they're older than the accounts age in the password policy
+* [AuditRole](cloudformation/AuditRoleTemplate.yaml) creates a generic security auditor role for an account. [Deploy QuickLink](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateUrl=https%3A%2F%2Fs3.amazonaws.com%2Fpht-cloudformation%2Faws-account-automation%2FAuditRoleTemplate.yaml&stackName=SecurityAuditRole&param_RoleName=Auditor)
 
-* CloudTrailTemplate will deploy CloudTrail to your account along with all the necessary sub-parts including the Logging Bucket, KMS Key and CloudWatch Logs Group
+* [BillingBucket](cloudformation/BillingBucket.yaml) creates a bucket in your payer account for billing reports and applies the appropriate Bucket Policy. [Deploy QuickLink](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateUrl=https%3A%2F%2Fs3.amazonaws.com%2Fpht-cloudformation%2Faws-account-automation%2FBillingBucket.yaml&stackName=BillingBucket&param_pCreateBucket=true)
 
-* requireMFA-Template will deploy a IAM User Group and Lambda that will prevent users without MFA from doing anything in the account
+* [CloudTrailTemplate](cloudformation/CloudTrailTemplate.yaml) creates a [CloudTrail](https://aws.amazon.com/cloudtrail/) following industry best practices. It creates the S3 bucket, a Customer Managed Key for the events, enables log validation and multi-region support and will send events to CloudWatch Logs. [Deploy QuickLink](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateUrl=https%3A%2F%2Fs3.amazonaws.com%2Fpht-cloudformation%2Faws-account-automation%2FCloudTrailTemplate.yaml&stackName=CloudTrail&param_pCloudTrailLogGroupName=CloudTrail%2FDefaultLogGroup&param_pCreateBucket=true&param_pCreateTopic=true)
+
+* [CloudWatch Alarms for CloudTrail API Activity](cloudformation/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml) Deploys multiple CloudWatch Alarms for CloudTrail events that happen in your account. Requires CloudTrail to be feeding a LogGroup and the [AccountAlertTopics](AccountAlertTopics.md) stack to be deployed.
+
+
+
+* [requireMFA](cloudformation/requireMFA-Template.yaml) will deploy a IAM User Group and Lambda that will prevent users without MFA from doing anything in the account
 
 
 ## Hosting
 The most recent version of all these templates are hosted in S3 for Easy Deployment.
 
-* [Deploy CloudTrail Template](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?filter=active&templateURL=https:%2F%2Fs3.amazonaws.com%2Froom17-automation-artifacts%2Fpublic%2FCloudTrailTemplate.yaml&stackName=admin-CloudTrail&param_pCloudTrailLogGroupName=CloudTrail%2FDefaultLogGroup&param_pCreateBucket=false&param_pCreateTopic=true)
-* [Bucket for Billing Reports](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3.amazonaws.com%2Froom17-automation-artifacts%2Fpublic%2FBillingBucket.yaml&stackName=admin-BillingBucket&param_pCreateBucket=true)
-* [AccountAlertTopics](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3.amazonaws.com%2Froom17-automation-artifacts%2Fpublic%2FAccountAlertTopics-Template.yaml&stackName=account-alert-topics&pDeployLambda=true)
-* [CloudTrail Alarms](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3.amazonaws.com%2Froom17-automation-artifacts%2Fpublic%2FCloudWatch_Alarms_for_CloudTrail_API_Activity.yaml&stackName=account-cloudtrail-alarms)
-* [RequireMFA](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3.amazonaws.com%2Froom17-automation-artifacts%2Fpublic%2FCloudWatch_Alarms_for_CloudTrail_API_Activity.yaml&stackName=account-RequireMFA)
-
-## Directly callable URLS
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AccountAlertTopics-Template.yaml
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRoleTemplate.yaml
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/BillingBucket.yaml
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudTrailTemplate.yaml
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/DeployBucketTemplate.yaml
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/EBSAutomatedTagging.yaml
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/IAM-ExpireUsers-Template.yaml
-https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/requireMFA-Template.yaml
+Directly callable URLS:
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AccountAlertTopics-Template.yaml`
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRoleTemplate.yaml`
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/BillingBucket.yaml`
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudTrailTemplate.yaml`
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml`
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/DeployBucketTemplate.yaml`
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/EBSAutomatedTagging.yaml`
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/IAM-ExpireUsers-Template.yaml`
+* `https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/requireMFA-Template.yaml`
 
 

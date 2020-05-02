@@ -11,7 +11,7 @@ You must specifiy an email and SMS number. The email will be subscribed to all t
 
 ## Deploy
 
-1. Create a Secret for your Slack Webhook
+1. Create a Secret in AWS Secrets Manager for your Slack Webhook
 ```json
 {"webhook_url": "https://hooks.slack.com/services/THISPARTISSECRET"}
 ```
