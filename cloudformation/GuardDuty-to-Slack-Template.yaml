@@ -1,0 +1,197 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy Lambda to send GuardDuty CloudWatch Events to Slack WebHook
+
+Parameters:
+
+  pAccountDescription:
+    Description: Identify this account in the notices sent
+    Type: String
+
+  pSlackWebhookSecretRegion:
+    Description: Region where the Slack WebHook secret is stored
+    Type: String
+
+  pSlackWebhookSecret:
+    Description: Name of the Secrets Manager secret where the WebHook is stored
+    Type: String
+    Default: SlackGuardDutyWebhook
+
+  pSlackChannel:
+    Description: Slack Channel to send the spam to
+    Type: String
+    Default: '#aws_notices'
+
+  pIconURL:
+    Description: Slack Emoji to use
+    Type: String
+    Default: https://raw.githubusercontent.com/aws-samples/amazon-guardduty-to-slack/master/images/gd_logo.png
+
+
+Resources:
+
+  GuardDuty2SlackLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: LambdaLogging
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - logs:*
+            Effect: Allow
+      - PolicyName: GetSecret
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - secretsmanager:GetSecret*
+            Resource: !Sub arn:aws:secretsmanager:${pSlackWebhookSecretRegion}:${AWS::AccountId}:secret:${pSlackWebhookSecret}*
+
+  GuardDuty2SlackLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Send GuardDuty CloudWatch Events to Slack Channel
+      Runtime: python3.7
+      Handler: index.lambda_handler
+      Timeout: '80'
+      FunctionName: !Sub "${AWS::StackName}-Function"
+      Role: !GetAtt GuardDuty2SlackLambdaRole.Arn
+      Environment:
+        Variables:
+          WEBHOOK: !Ref pSlackWebhookSecret
+          SLACK_CHANNEL: !Ref pSlackChannel
+          ACCOUNT_NAME: !Ref pAccountDescription
+          ICON_URL: !Ref pIconURL
+          LOG_LEVEL: 'INFO'
+      Code:
+        ZipFile: |
+          # Lambda to send SNS Messages to Slack
+
+          import boto3
+          from botocore.exceptions import ClientError
+          import json
+          import logging
+          import os
+
+          from base64 import b64decode
+          import urllib3
+
+          import logging
+          logger = logging.getLogger()
+          logger.setLevel(getattr(logging, os.getenv('LOG_LEVEL', default='INFO')))
+          logging.getLogger('botocore').setLevel(logging.WARNING)
+          logging.getLogger('boto3').setLevel(logging.WARNING)
+          logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+
+          def get_webhook(secret_name):
+              client = boto3.client('secretsmanager')
+              try:
+                  get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+              except ClientError as e:
+                  logger.critical(f"Unable to get secret value for {secret_name}: {e}")
+                  return(None)
+              else:
+                  if 'SecretString' in get_secret_value_response:
+                      secret_value = get_secret_value_response['SecretString']
+                  else:
+                      secret_value = get_secret_value_response['SecretBinary']
+              try:
+                  secret_dict = json.loads(secret_value)
+                  return(secret_dict['webhook_url'])
+              except Exception as e:
+                  logger.critical(f"Error during Credential and Service extraction: {e}")
+                  raise
+
+          WEBHOOK=get_webhook(os.environ['WEBHOOK'])
+          http = urllib3.PoolManager()
+
+          def lambda_handler(event, context):
+              logger.debug("Received event: " + json.dumps(event, sort_keys=True))
+
+              account_id = event['detail']['account']
+              region = event['region']
+              finding = event['detail']['type']
+              msgid = event['detail']['id']
+              url = f"https://console.aws.amazon.com/guardduty/home?region={region}#/findings?search=id%3D${msgid}"
+              numeric_sev = event['detail']['severity']
+
+              if numeric_sev < 4.0:
+                severity = "Low"
+                color = '#7CD197'
+              elif numeric_sev < 7.0:
+                severity = "Medium"
+                color = "#e2d43b"
+              else:
+                severity = "High"
+                color = "#ad0614"
+
+              attachment = {
+                'fallback': f"{finding} - {url}",
+                'pretext': f"*Finding in {region} for Acct: {account_id}*",
+                'title': finding,
+                'title_link': url,
+                'text': event['detail']['description'],
+                'fields': [
+                  {"title": "SourceAccount","value": os.environ['SLACK_CHANNEL'], "short": True},
+                  {"title": "Severity","value": severity, "short": True},
+                  {"title": "Region","value": region ,"short": True},
+                  {"title": "Last Seen","value": event['detail']['updatedAt'], "short": True}
+                ],
+                'mrkdwn_in': ["pretext"],
+                'color': color
+              }
+
+              slack_message = {
+                  'channel': os.environ['ACCOUNT_NAME'],
+                  'text': f"{finding} for {account_id}",
+                  'attachments': [attachment],
+                  'username': "GuardDuty",
+                  'mrkdwn': True,
+                  'icon_url': os.environ['ICON_URL']
+              }
+
+              logger.debug(json.dumps(slack_message, sort_keys=True, default=str, indent=2))
+              try:
+                  r = http.request('POST', WEBHOOK, body=json.dumps(slack_message))
+                  logger.info("Message posted to %s", slack_message['channel'])
+              except Exception as e:
+                  logger.error(f"Request failed: {e}")
+
+  GuardDutyCloudWatchEvent:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: GuardDutyRuleForSlack
+      State: ENABLED
+      EventPattern:
+        source:
+          - aws.guardduty
+      Targets:
+        - Arn: !GetAtt GuardDuty2SlackLambdaFunction.Arn
+          Id: GuardDutyFunction
+
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      FunctionName: !Ref GuardDuty2SlackLambdaFunction
+      SourceArn: !GetAtt GuardDutyCloudWatchEvent.Arn
+
+
+Outputs:
+  StackName:
+    Value: !Ref AWS::StackName
