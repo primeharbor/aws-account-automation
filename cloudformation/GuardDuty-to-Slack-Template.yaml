@@ -67,7 +67,7 @@ Resources:
       Runtime: python3.7
       Handler: index.lambda_handler
       Timeout: '80'
-      FunctionName: !Sub "${AWS::StackName}-Function"
+      FunctionName: !Sub "GuardDuty2Slack-${AWS::Region}"
       Role: !GetAtt GuardDuty2SlackLambdaRole.Arn
       Environment:
         Variables:
