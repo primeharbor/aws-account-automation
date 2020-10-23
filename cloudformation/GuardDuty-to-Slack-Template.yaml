@@ -72,6 +72,7 @@ Resources:
       Environment:
         Variables:
           WEBHOOK: !Ref pSlackWebhookSecret
+          WEBHOOK_REGION: !Ref pSlackWebhookSecretRegion
           SLACK_CHANNEL: !Ref pSlackChannel
           ACCOUNT_NAME: !Ref pAccountDescription
           ICON_URL: !Ref pIconURL
@@ -96,7 +97,7 @@ Resources:
 
 
           def get_webhook(secret_name):
-              client = boto3.client('secretsmanager')
+              client = boto3.client('secretsmanager', region_name=os.environ['WEBHOOK_REGION'])
               try:
                   get_secret_value_response = client.get_secret_value(SecretId=secret_name)
               except ClientError as e:
