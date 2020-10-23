@@ -85,8 +85,6 @@ Resources:
           import json
           import logging
           import os
-
-          from base64 import b64decode
           import urllib3
 
           import logging
@@ -122,7 +120,7 @@ Resources:
           def lambda_handler(event, context):
               logger.debug("Received event: " + json.dumps(event, sort_keys=True))
 
-              account_id = event['detail']['account']
+              account_id = event['detail']['accountId']
               region = event['region']
               finding = event['detail']['type']
               msgid = event['detail']['id']
@@ -146,7 +144,7 @@ Resources:
                 'title_link': url,
                 'text': event['detail']['description'],
                 'fields': [
-                  {"title": "SourceAccount","value": os.environ['SLACK_CHANNEL'], "short": True},
+                  {"title": "SourceAccount","value": os.environ['ACCOUNT_NAME'], "short": True},
                   {"title": "Severity","value": severity, "short": True},
                   {"title": "Region","value": region ,"short": True},
                   {"title": "Last Seen","value": event['detail']['updatedAt'], "short": True}
@@ -156,7 +154,7 @@ Resources:
               }
 
               slack_message = {
-                  'channel': os.environ['ACCOUNT_NAME'],
+                  'channel': os.environ['SLACK_CHANNEL'],
                   'text': f"{finding} for {account_id}",
                   'attachments': [attachment],
                   'username': "GuardDuty",
