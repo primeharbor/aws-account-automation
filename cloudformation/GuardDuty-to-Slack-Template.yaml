@@ -125,7 +125,7 @@ Resources:
               region = event['region']
               finding = event['detail']['type']
               msgid = event['detail']['id']
-              url = f"https://console.aws.amazon.com/guardduty/home?region={region}#/findings?search=id%3D${msgid}"
+              url = f"https://console.aws.amazon.com/guardduty/home?region={region}#/findings?search=id%3D{msgid}"
               numeric_sev = event['detail']['severity']
 
               if numeric_sev < 4.0:
