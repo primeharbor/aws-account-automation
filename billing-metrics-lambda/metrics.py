@@ -51,6 +51,7 @@ def lambda_handler(event, context):
 
   metrics = []
   fields = []
+  child_fields = []
   response = client.list_metrics(MetricName=metric_name)
   while 'NextToken' in response:  # Gotta Catch 'em all!
     metrics += response['Metrics']
@@ -87,10 +88,15 @@ def lambda_handler(event, context):
       total_diff = round(m['LatestDataPoint'][stat] - m['YesterdayDataPoint'][stat], 2)
       timestamp = m['LatestDataPoint']['Timestamp']
     else:
-      if m['LatestDataPoint'][stat] == 0:
+      if m['LatestDataPoint'][stat] < float(os.environ['THRESHOLD']):
         continue
       diff = round(m['LatestDataPoint'][stat] - m['YesterdayDataPoint'][stat], 2)
-      fields.append({"title": m['Dimensions']['ServiceName'], "value": f"US$ {m['LatestDataPoint'][stat]} (+ ${diff})", "short": True})
+      if 'LinkedAccount' in m['Dimensions']:
+        title = f"{m['Dimensions']['ServiceName']} ({m['Dimensions']['LinkedAccount']})"
+        child_fields.append({"title": title, "value": f"US$ {m['LatestDataPoint'][stat]} (+ ${diff})", "short": True})
+      else:
+        title = f"{m['Dimensions']['ServiceName']}"
+        fields.append({"title": title, "value": f"US$ {m['LatestDataPoint'][stat]} (+ ${diff})", "short": True})
 
   if total is not None:
     attachment = {
@@ -98,7 +104,7 @@ def lambda_handler(event, context):
       'pretext': f"*Estimated Charges for Acct: {os.environ['ACCOUNT_NAME']}*",
       'title': f"Service Usage as of {timestamp}",
       'text': f"*Total Bill:* US${total} +(${total_diff})",
-      'fields': fields,
+      'fields': fields + child_fields,
       'mrkdwn_in': ["pretext", "text"],
       'color': '#7CD197'
     }

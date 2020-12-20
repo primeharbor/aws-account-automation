@@ -36,6 +36,11 @@ Parameters:
     Type: String
     Default: '#aws_notices'
 
+  pThreshold:
+    Description: Don't report services with spend less than this number
+    Type: String
+    Default: 0.50
+
 Resources:
 
   LambdaRole:
@@ -99,6 +104,7 @@ Resources:
           WEBHOOK_REGION: !Ref pSlackWebhookSecretRegion
           SLACK_CHANNEL: !Ref pSlackChannel
           ACCOUNT_NAME: !Ref pAccountDescription
+          THRESHOLD: !Ref pThreshold
           LOG_LEVEL: 'INFO'
       Events:
         TriggerTrigger:
