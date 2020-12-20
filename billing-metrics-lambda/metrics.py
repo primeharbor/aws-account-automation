@@ -82,7 +82,9 @@ def lambda_handler(event, context):
     m['Dimensions'] = munge_dimensions(m['Dimensions'])
     logger.debug(f"Most Recent Datapoint for {metric_name} in is {m} ")
 
-    if 'ServiceName' not in m['Dimensions'] and 'LinkedAccount' not in m['Dimensions']:
+    if 'ServiceName' not in m['Dimensions']:
+      if 'LinkedAccount' not in m['Dimensions']:
+        continue  # We're not caring about the total bill in each account.
       # This is the total bill
       total = m['LatestDataPoint'][stat]
       total_diff = round(m['LatestDataPoint'][stat] - m['YesterdayDataPoint'][stat], 2)
