@@ -83,7 +83,7 @@ def lambda_handler(event, context):
     logger.debug(f"Most Recent Datapoint for {metric_name} in is {m} ")
 
     if 'ServiceName' not in m['Dimensions']:
-      if 'LinkedAccount' not in m['Dimensions']:
+      if 'LinkedAccount' in m['Dimensions']:
         continue  # We're not caring about the total bill in each account.
       # This is the total bill
       total = m['LatestDataPoint'][stat]
