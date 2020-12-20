@@ -1,0 +1,136 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Publish Daily billing details to Slack
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+
+  pExecutionRate:
+    Description: How frequently the StepFunction should Run (As a CloudWatch ScheduleExpression)
+    Type: String
+    Default: rate(1 day)
+
+  pRuleState:
+    Type: String
+    Description: Enable to disable the CloudWatch Event to fire the Stepfunction
+    Default: ENABLED
+    AllowedValues:
+      - DISABLED
+      - ENABLED
+
+  pAccountDescription:
+    Description: Identify this account in the notices sent
+    Type: String
+
+  pSlackWebhookSecretRegion:
+    Description: Region where the Slack WebHook secret is stored
+    Type: String
+    Default: us-east-1
+
+  pSlackWebhookSecret:
+    Description: Name of the Secrets Manager secret where the WebHook is stored
+    Type: String
+    Default: SlackWebhook
+
+  pSlackChannel:
+    Description: Slack Channel to send the spam to
+    Type: String
+    Default: '#aws_notices'
+
+Resources:
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: CloudWatchMetrics
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - cloudwatch:Get*
+            - cloudwatch:List*
+            Effect: Allow
+            Resource: "*"
+      - PolicyName: LambdaLogging
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - logs:*
+            Effect: Allow
+      - PolicyName: GetSecret
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - secretsmanager:GetSecret*
+            Resource: !Sub arn:aws:secretsmanager:${pSlackWebhookSecretRegion}:${AWS::AccountId}:secret:${pSlackWebhookSecret}*
+
+  #
+  # Lambda
+  #
+
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Fetch the latest billing info and send it to Slack
+      Runtime: python3.7
+      Handler: metrics.lambda_handler
+      Timeout: 120
+      MemorySize: 1024
+      FunctionName: !Sub "${AWS::StackName}-function"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: ../billing-metrics-lambda
+      Environment:
+        Variables:
+          WEBHOOK: !Ref pSlackWebhookSecret
+          WEBHOOK_REGION: !Ref pSlackWebhookSecretRegion
+          SLACK_CHANNEL: !Ref pSlackChannel
+          ACCOUNT_NAME: !Ref pAccountDescription
+          LOG_LEVEL: 'INFO'
+      Events:
+        TriggerTrigger:
+          Type: Schedule
+          Properties:
+            Description: !Sub "Trigger for ${AWS::StackName}"
+            Enabled: !Ref pRuleState
+            Name: !Sub "${AWS::StackName}-trigger"
+            Schedule: !Ref pExecutionRate
+
+
+  # CloudWatchEvent:
+  #   Type: AWS::Events::Rule
+  #   Properties:
+  #     Description: !Sub "Trigger Function for ${AWS::StackName}"
+  #     State: !Ref pRuleState
+  #     ScheduleExpression: !Ref pExecutionRate
+  #     Targets:
+  #       - Arn: !GetAtt LambdaFunction.Arn
+  #         Id: TargetFunctionV1
+
+  # LambdaInvokePermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     Action: lambda:InvokeFunction
+  #     Principal: events.amazonaws.com
+  #     FunctionName: !Ref LambdaFunction
+  #     SourceArn: !GetAtt CloudWatchEvent.Arn
+
+
+Outputs:
+  StackName:
+    Value: !Ref AWS::StackName
+    Description: Just the name of this stack
+
