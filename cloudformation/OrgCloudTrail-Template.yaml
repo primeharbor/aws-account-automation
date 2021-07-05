@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploys a CloudTrail configuration in a Organizational Payer account. This assumes a pre-configured S3 Bucket in a security or logging account
+
+Parameters:
+
+  pCloudTrailBucketName:
+    Description: Name of the (existing) Bucket for CloudTrail Logs
+    Type: String
+    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
+
+  pDataTrailBucketName:
+    Description: Name of the (existing) Bucket for CloudTrail Logs
+    Type: String
+    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
+    Default: "disabled"
+
+  pEnableEventsTopic:
+    Type: String
+    Description: Boolean to Enable SNS Topic for the Org Trail.
+    AllowedValues:
+      - true
+      - false
+    Default: false
+
+  pEnableDataTrails:
+    Type: String
+    Description: Boolean to Enable a CloudTrail for S3 Data Events.
+    AllowedValues:
+      - true
+      - false
+    Default: false
+
+Conditions:
+  cEnableEventsTopic: !Equals [!Ref 'pEnableEventsTopic', 'true']
+  cEnableDataEvents: !Equals [!Ref 'pEnableDataTrails', 'true']
+
+
+Resources:
+
+  # And Define the CloudTrail. Make it Global and for all regions
+  OrgCloudTrail:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      S3BucketName: !Ref pCloudTrailBucketName
+      TrailName: !Ref AWS::StackName
+      IsLogging: true
+      EnableLogFileValidation: true
+      IncludeGlobalServiceEvents: true
+      IsMultiRegionTrail: true
+      SnsTopicName: !If [cEnableEventsTopic, !GetAtt CloudTrailTopic.TopicName, !Ref AWS::NoValue ]
+      # EventSelectors:
+      #   - IncludeManagementEvents: true
+      #     ReadWriteType: WriteOnly
+
+
+
+  CloudTrailTopic:
+    Type: AWS::SNS::Topic
+    Condition: cEnableEventsTopic
+    Properties:
+      DisplayName: !Sub "${AWS::StackName}-ModifyEventsTopic"
+      TopicName: !Sub "${AWS::StackName}-ModifyEventsTopic"
+
+
+  CloudTrailPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Condition: cEnableEventsTopic
+    Properties:
+      PolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+        - Sid: AWSCloudTrailSNSPolicy
+          Effect: Allow
+          Principal:
+            Service: cloudtrail.amazonaws.com
+          Resource: '*'
+          Action: SNS:Publish
+      Topics:
+        - !Ref CloudTrailTopic
+
+  DataTrail:
+    Type: AWS::CloudTrail::Trail
+    Condition: cEnableDataEvents
+    Properties:
+      S3BucketName: !Ref pDataTrailBucketName
+      TrailName: !Sub ${AWS::StackName}-DataTrail
+      IsLogging: true
+      EnableLogFileValidation: true
+      IncludeGlobalServiceEvents: true
+      IsMultiRegionTrail: true
+      EventSelectors:
+        - DataResources:
+            - Type: AWS::S3::Object
+              Values:
+                # This will log all events in all S3 Buckets in this account
+                # It will also log all S3 events this account does with buckets in _other_ accounts
+                # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudtrail-trail-dataresource.html
+                - !Sub "arn:aws:s3:::"
+          IncludeManagementEvents: false
+          ReadWriteType: All
+
+
+Outputs:
+
+  CloudTrailBucketName:
+    Value: !Ref pCloudTrailBucketName
+    Description: Name of the (existing) Bucket for Org CloudTrail Logs
+
+  pDataTrailBucketName:
+    Condition: cEnableDataEvents
+    Value: !Ref pDataTrailBucketName
+    Description: Name of the (existing) Bucket for Org S3 Data Event Logs
+
+  CloudTrailTopicName:
+    Condition: cEnableEventsTopic
+    Description: TopicName of the SNS Topic attached to the Org Event Trail
+    Value: !GetAtt CloudTrailTopic.TopicName
+
+  CloudTrailTopicArn:
+    Condition: cEnableEventsTopic
+    Description: Arn of the SNS Topic attached to the Org Event Trail
+    Value: !Ref CloudTrailTopic
+
+  TemplateVersion:
+    Value: 1.0.0
