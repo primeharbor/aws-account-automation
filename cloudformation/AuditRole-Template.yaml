@@ -49,6 +49,13 @@ Resources:
                 - "trustedAdvisor:*"
                 - "health:*"
                 - "aws-portal:View*"
+                - "guardduty:*"
+                - "macie:*"
+                - "inspector:*"
+                - "support:*"
+                - "guardduty:*"
+                - "securityhub:*"
+                - "ce:*"
                 Resource: "*"
 
 Outputs:
@@ -57,4 +64,4 @@ Outputs:
     Value: !GetAtt [AuditorCrossAccountRole, Arn]
 
   TemplateVersion:
-    Value: 1.0.0
+    Value: 1.0.1
