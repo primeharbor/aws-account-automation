@@ -5,6 +5,7 @@ Parameters:
   pAccountDescription:
     Description: Identify this account in the notices sent
     Type: String
+    AllowedPattern: "[A-Za-z0-9]+"
 
   pInitialSubscriberEmail:
     Description: Add this initial email to the alerts
@@ -55,6 +56,9 @@ Parameters:
 Conditions:
   cDeploySlackLambda: !Equals [ !Ref pDeploySlackLambda, "yes"]
   cBillingAlarm: !Not [!Equals [ !Ref pBillingThreshold, 0]]
+  cSNSSubscription: !Not [!Equals [ !Ref pInitialSubscriberSMS, "NONE"]]
+  cEMailSubscription: !Not [!Equals [ !Ref pInitialSubscriberEmail, "NONE"]]
+
 
 
 Resources:
@@ -64,12 +68,21 @@ Resources:
     Properties:
       DisplayName: !Join ['', ["Critical Alerts for ", !Ref 'pAccountDescription']]
       Subscription:
-      - Endpoint: !Ref 'pInitialSubscriberEmail'
-        Protocol: email
-      - Endpoint: !Ref 'pInitialSubscriberSMS'
-        Protocol: sms
-      - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
-        Protocol: lambda
+      - !If
+        - cEMailSubscription
+        - Endpoint: !Ref 'pInitialSubscriberEmail'
+          Protocol: email
+        - AWS::NoValue
+      # - !If
+      #   - cSNSSubscription
+      #   - Endpoint: !Ref 'pInitialSubscriberSMS'
+      #     Protocol: sms
+      #   - AWS::NoValue
+      - !If
+        - cDeploySlackLambda
+        - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
+          Protocol: lambda
+        - AWS::NoValue
       TopicName: !Join ['-', ["Critical-Alerts", !Ref 'pAccountDescription']]
 
   SNSAlertsError:
@@ -77,10 +90,16 @@ Resources:
     Properties:
       DisplayName: !Join ['', ["Error Alerts for ", !Ref 'pAccountDescription']]
       Subscription:
-      - Endpoint: !Ref 'pInitialSubscriberEmail'
-        Protocol: email
-      - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
-        Protocol: lambda
+      - !If
+        - cEMailSubscription
+        - Endpoint: !Ref 'pInitialSubscriberEmail'
+          Protocol: email
+        - AWS::NoValue
+      - !If
+        - cDeploySlackLambda
+        - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
+          Protocol: lambda
+        - AWS::NoValue
       TopicName: !Join ['-', ["Error-Alerts", !Ref 'pAccountDescription']]
 
   SNSAlertsInfo:
@@ -88,10 +107,16 @@ Resources:
     Properties:
       DisplayName: !Join ['', ["Info Alerts for ", !Ref 'pAccountDescription']]
       Subscription:
-      - Endpoint: !Ref 'pInitialSubscriberEmail'
-        Protocol: email
-      - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
-        Protocol: lambda
+      - !If
+        - cEMailSubscription
+        - Endpoint: !Ref 'pInitialSubscriberEmail'
+          Protocol: email
+        - AWS::NoValue
+      - !If
+        - cDeploySlackLambda
+        - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
+          Protocol: lambda
+        - AWS::NoValue
       TopicName: !Join ['-', ["Info-Alerts", !Ref 'pAccountDescription']]
 
   SNSAlertPolicy:
