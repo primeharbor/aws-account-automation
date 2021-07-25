@@ -31,25 +31,26 @@ Resources:
     Type: "AWS::SNS::Topic"
     Properties:
       TopicName: !Sub "${AWS::StackName}-${AWS::Region}"
-      DisplayName: !Sub "${AWS::StackName}-${AWS::Region}"
+      DisplayName: AWS Config Notification Topic
+      KmsMasterKeyId: "alias/aws/sns"
+
 
   ConfigTopicPolicy:
-    Type: "AWS::SNS::TopicPolicy"
+    Condition: CreateTopic
+    Type: AWS::SNS::TopicPolicy
     Properties:
-      PolicyDocument:
-        Id: AllowParentToSubscribeToTopic
-        Version: 2012-10-17
-        Statement:
-        - Sid: AllowParent
-          Effect: Allow
-          Principal:
-            AWS: !Ref pSecurityAccountId
-          Action:
-            - sns:Subscribe
-          Resource: "*"
       Topics:
         - !Ref ConfigTopic
-
+      PolicyDocument:
+        Statement:
+          - Sid: AWSConfigSNSPolicy
+            Action:
+              - sns:Publish
+            Effect: Allow
+            Resource: !Ref ConfigTopic
+            Principal:
+              Service:
+                - config.amazonaws.com
 
   ConfigRecorder:
     Type: AWS::Config::ConfigurationRecorder
@@ -68,12 +69,12 @@ Resources:
       S3BucketName: !Ref pOrganizationConfigBucket
       SnsTopicARN: !Ref 'ConfigTopic'
 
-  ConfigAggregationAuthorization:
-    Type: AWS::Config::AggregationAuthorization
-    Condition: CreateAggregationAuthorization
-    Properties:
-      AuthorizedAccountId: !Ref pSecurityAccountId
-      AuthorizedAwsRegion: !Ref pAggregationRegion
+  # ConfigAggregationAuthorization:
+  #   Type: AWS::Config::AggregationAuthorization
+  #   Condition: CreateAggregationAuthorization
+  #   Properties:
+  #     AuthorizedAccountId: !Ref pSecurityAccountId
+  #     AuthorizedAwsRegion: !Ref pAggregationRegion
 
   AWSServiceRoleForConfig:
     Type: AWS::IAM::ServiceLinkedRole
@@ -86,4 +87,4 @@ Outputs:
   ConfigTopicArn:
     Value: !Ref ConfigTopic
   TemplateVersion:
-    Value: "1.0.0"
+    Value: "1.1.0"
