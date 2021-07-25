@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Deploy S3 Bucket for recieving AWS Org CloudTrail Events
+Description: Deploy S3 Bucket for recieving AWS Org CloudTrail or Config Events
 
-# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/CloudTrailBucket-Template.yaml
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/CloudTrailConfigBucket-Template.yaml
 
 Parameters:
 
-  pCloudtrailEventBucketName:
-    Description: Name of the bucket to create for storing the CloudTrail Events
+  pEventBucketName:
+    Description: Name of the bucket to create for storing the CloudTrail or Config Events
     Type: String
     AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
 
@@ -15,14 +15,21 @@ Parameters:
     Type: String
     Default: 30
 
+  pService:
+    Description: Service which will use this Bucket (Cloudtrail or Config)
+    Type: String
+    AllowedValues:
+      - cloudtrail.amazonaws.com
+      - config.amazonaws.com
+
 Resources:
 
-  CloudtrailEventsS3Bucket:
+  EventsS3Bucket:
     DeletionPolicy: Retain
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: LogDeliveryWrite
-      BucketName: !Ref 'pCloudtrailEventBucketName'
+      BucketName: !Ref 'pEventBucketName'
       OwnershipControls:
         Rules:
           - ObjectOwnership: BucketOwnerPreferred
@@ -35,7 +42,7 @@ Resources:
       NotificationConfiguration:
         TopicConfigurations:
           - Event: s3:ObjectCreated:*
-            Topic: !Ref CloudtrailEventTopic
+            Topic: !Ref EventTopic
             Filter:
               S3Key:
                 Rules:
@@ -57,49 +64,50 @@ Resources:
               - TransitionInDays: !Ref pTransitionToIADays
                 StorageClass: STANDARD_IA
 
-  CloudtrailEventsS3BucketPolicy:
+  EventsS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref 'CloudtrailEventsS3Bucket'
+      Bucket: !Ref 'EventsS3Bucket'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-        - Sid: AWSCloudTrailAclCheck
+        - Sid: AWSServiceAclCheck
           Effect: Allow
           Principal:
-            Service: cloudtrail.amazonaws.com
+            Service: !Ref pService
           Action: s3:GetBucketAcl
-          Resource: !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}"
-        - Sid: AWSCloudTrailWrite
+          Resource: !Sub "arn:aws:s3:::${pEventBucketName}"
+        - Sid: AWSServiceWrite
           Effect: Allow
           Principal:
-            Service: cloudtrail.amazonaws.com
+            Service: !Ref pService
           Action: s3:PutObject
-          Resource: !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}/AWSLogs/*"
+          Resource: !Sub "arn:aws:s3:::${pEventBucketName}/AWSLogs/*"
           Condition:
             StringEquals:
               s3:x-amz-acl: bucket-owner-full-control
 
+
   # Define an SNS Topic for Logfile delivery
-  CloudtrailEventTopic:
+  EventTopic:
     Type: AWS::SNS::Topic
     Properties:
-      DisplayName: CloudTrail Notification Topic for Cloudtrail Events
+      DisplayName: Notification Topic for Cloudtrail or Config Events
 
-  CloudtrailEventTopicPolicy:
+  EventTopicPolicy:
     Type: AWS::SNS::TopicPolicy
     Properties:
-      Topics: [!Ref 'CloudtrailEventTopic']
+      Topics: [!Ref 'EventTopic']
       PolicyDocument:
         Version: '2008-10-17'
         Statement:
-        - Sid: AWSCloudTrailSNSPolicy
+        - Sid: AWSServiceSNSPolicy
           Effect: Allow
           Principal:
-            Service: cloudtrail.amazonaws.com
+            Service: !Ref pService
           Resource: '*'
           Action: SNS:Publish
-        - Sid: AWSCloudTrailSNSPolicy2
+        - Sid: AllowSubscribe
           Effect: Allow
           Principal:
             AWS: !Ref AWS::AccountId
@@ -112,26 +120,26 @@ Resources:
           Action:
           - SNS:Publish
           Resource:
-          - !Ref CloudtrailEventTopic
+          - !Ref EventTopic
           Condition:
             ArnLike:
-              aws:SourceArn: !Sub "arn:aws:s3:*:*:${pCloudtrailEventBucketName}"
+              aws:SourceArn: !Sub "arn:aws:s3:*:*:${pEventBucketName}"
             StringEquals:
               aws:SourceAccount: !Ref AWS::AccountId
 
 
 Outputs:
-  CloudTrailTopicArn:
-    Value: !Ref 'CloudtrailEventTopic'
+  EventTopicArn:
+    Value: !Ref 'EventTopic'
     Description: ARN of the SNS Topic Created
 
-  CloudTrailTopicName:
-    Value: !GetAtt CloudtrailEventTopic.TopicName
+  EventTopicName:
+    Value: !GetAtt EventTopic.TopicName
     Description: Name of the SNS Topic Created
 
   LogBucket:
-    Value: !Ref pCloudtrailEventBucketName
-    Description: Bucket Name where CloudTrail events sent.
+    Value: !Ref pEventBucketName
+    Description: Bucket Name where CloudTrail or Config events sent.
 
   TemplateVersion:
-    Value: 1.0.0
+    Value: 1.1.0
