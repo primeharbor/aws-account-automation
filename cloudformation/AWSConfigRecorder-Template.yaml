@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy the AWS Config Service Recorder in this region and send recorded events to central bucket
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AWSConfigRecorder-Template.yaml
+
+Parameters:
+
+  pOrganizationConfigBucket:
+    Description: Name of the bucket where Config Events are stored.
+    Type: String
+
+  pSecurityAccountId:
+    Description: Security Account Number
+    MinLength: '12'
+    AllowedPattern: '[0-9]+'
+    MaxLength: '12'
+    Type: String
+
+  pAggregationRegion:
+    Description: Region to authorize for a Config Aggregation (Set to NONE for no authorization)
+    Default: NONE
+    Type: String
+
+Conditions:
+  CreateAggregationAuthorization: !Not [!Equals [ !Ref pAggregationRegion, "NONE"]]
+  CreateServiceLinkedRole: !Equals [ !Ref "AWS::Region", "us-east-1"]
+  cIncludeGlobalResourceTypes: !Equals [ !Ref "AWS::Region", "us-east-1"]
+
+Resources:
+
+  ConfigTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      TopicName: !Sub "${AWS::StackName}-${AWS::Region}"
+      DisplayName: !Sub "${AWS::StackName}-${AWS::Region}"
+
+  ConfigTopicPolicy:
+    Type: "AWS::SNS::TopicPolicy"
+    Properties:
+      PolicyDocument:
+        Id: AllowParentToSubscribeToTopic
+        Version: 2012-10-17
+        Statement:
+        - Sid: AllowParent
+          Effect: Allow
+          Principal:
+            AWS: !Ref pSecurityAccountId
+          Action:
+            - sns:Subscribe
+          Resource: "*"
+      Topics:
+        - !Ref ConfigTopic
+
+
+  ConfigRecorder:
+    Type: AWS::Config::ConfigurationRecorder
+    Properties:
+      Name: default
+      RecordingGroup:
+        AllSupported: true
+        IncludeGlobalResourceTypes: !If [ cIncludeGlobalResourceTypes, True, False ]
+      RoleARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig'
+
+  ConfigDeliveryChannel:
+    Type: AWS::Config::DeliveryChannel
+    Properties:
+      ConfigSnapshotDeliveryProperties:
+        DeliveryFrequency: Six_Hours
+      S3BucketName: !Ref pOrganizationConfigBucket
+      SnsTopicARN: !Ref 'ConfigTopic'
+
+  ConfigAggregationAuthorization:
+    Type: AWS::Config::AggregationAuthorization
+    Condition: CreateAggregationAuthorization
+    Properties:
+      AuthorizedAccountId: pSecurityAccountId
+      AuthorizedAwsRegion: pAggregationRegion
+
+  AWSServiceRoleForConfig:
+    Type: AWS::IAM::ServiceLinkedRole
+    Condition: CreateServiceLinkedRole
+    Properties:
+      AWSServiceName: config.amazonaws.com
+
+
+Outputs:
+  ConfigTopicArn:
+    Value: !Ref ConfigTopic
+  TemplateVersion:
+    Value: "1.0.0"

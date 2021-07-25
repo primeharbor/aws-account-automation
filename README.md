@@ -24,11 +24,13 @@ Tools to Automate your AWS Account
 The most recent version of all these templates are hosted in S3 for Easy Deployment.
 
 Directly callable URLS:
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AWSConfigRecorder-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AccountAlertTopics-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRole-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/BillingBucket-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/BillingMetrics-Template.yaml
-* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudTrail-Template.yaml
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudTrailConfig-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/EBSAutomatedTagging.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/GuardDuty-to-Slack-Template.yaml

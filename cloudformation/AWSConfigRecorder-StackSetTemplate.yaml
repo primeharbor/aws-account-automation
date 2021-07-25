@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy the AWS Config Service Recorder in this region and send recorded events to central bucket
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AWSConfigRecorder-StackSetTemplate.yaml
+
+Parameters:
+
+  pOrganizationConfigBucket:
+    Description: Name of the bucket where Config Events are stored.
+    Type: String
+
+  pSecurityAccountId:
+    Description: Security Account Number
+    MinLength: '12'
+    AllowedPattern: '[0-9]+'
+    MaxLength: '12'
+    Type: String
+
+  pAggregationRegion:
+    Description: Region to authorize for a Config Aggregation (Set to NONE for no authorization)
+    Default: NONE
+    Type: String
+
+  pTemplateURL:
+    Description: Location of the S3 Template to deploy as the StackSet
+    Type: String
+    Default: https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AWSConfigRecorder-Template.yaml
+
+  pAWSOrgUnit:
+    Description: AWS Organizations OU to deploy this stackset to. Probably should be the default OU
+    Type: String
+    AllowedPattern: 'o-[a-z0-9]+'
+
+Resources:
+
+  ConfigRecorderStackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      # AdministrationRoleARN: String
+      AutoDeployment:
+        Enabled: True
+        RetainStacksOnAccountRemoval: True
+      CallAs: DELEGATED_ADMIN
+      Capabilities:
+        - CAPABILITY_IAM
+      Description: Organizational StackSet to Deploy AWS Config Recorder
+      # ExecutionRoleName: String
+      OperationPreferences:
+        FailureToleranceCount: 20
+        MaxConcurrentCount: 20
+        RegionConcurrencyType: PARALLEL
+        # Special stuff happens if the region is us-east-1, so ensure that is first.
+        RegionOrder:
+          - us-east-1
+          - eu-north-1
+          - ap-south-1
+          - eu-west-3
+          - eu-west-2
+          - eu-west-1
+          - ap-northeast-3
+          - ap-northeast-2
+          - ap-northeast-1
+          - sa-east-1
+          - ca-central-1
+          - ap-southeast-1
+          - ap-southeast-2
+          - eu-central-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+      Parameters:
+        - ParameterKey: pOrganizationConfigBucket
+          ParameterValue: !Ref pOrganizationConfigBucket
+        - ParameterKey: pSecurityAccountId
+          ParameterValue: !Ref pSecurityAccountId
+        - ParameterKey: pAggregationRegion
+          ParameterValue: !Ref pAggregationRegion
+      PermissionModel: SERVICE_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            OrganizationalUnitIds:
+            - !Ref pAWSOrgUnit
+            Regions:
+              - us-east-1
+              - eu-north-1
+              - ap-south-1
+              - eu-west-3
+              - eu-west-2
+              - eu-west-1
+              - ap-northeast-3
+              - ap-northeast-2
+              - ap-northeast-1
+              - sa-east-1
+              - ca-central-1
+              - ap-southeast-1
+              - ap-southeast-2
+              - eu-central-1
+              - us-east-2
+              - us-west-1
+              - us-west-2
+      StackSetName: !Sub "${AWS::StackName}-StackSet"
+      # TemplateBody: String
+      TemplateURL: !Ref pTemplateURL
+
+
+Outputs:
+  TemplateVersion:
+    Value: "1.0.0"
