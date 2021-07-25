@@ -1,0 +1,139 @@
+# Copyright 2021 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Configure The Organizational Config Service Aggregator and Conformance Pack Infrastructure
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AWSConfigAggregator-Template.yaml
+
+Parameters:
+
+  pOrganizationConformancePackBucketSuffix:
+    Description: Suffix to append to awsconfigconforms when creating the bucket
+    Type: String
+
+  pOrganizationId:
+    Description: AWS Organization ID
+    Type: String
+
+  pCreateBucket:
+    Description: If true, the ConformancePackResults Bucket is created
+    Type: String
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "true"
+
+Conditions:
+  CreateBucket: !Equals [ !Ref pCreateBucket, "true" ]
+
+
+Resources:
+
+  ConformancePackDeliveryS3Bucket:
+    Type: AWS::S3::Bucket
+    Condition: CreateBucket
+    Properties:
+      BucketName: !Sub "awsconfigconforms-${pOrganizationConformancePackBucketSuffix}"
+      AccessControl: Private
+      # LoggingConfiguration:
+      #   DestinationBucketName:
+      #     Ref: pLoggingBucket
+      #   LogFilePrefix: !Join ['', ['S3logs/', !Ref pBucketName, '/']]
+      # VersioningConfiguration:
+      #   Status: Disabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  ConformancePackDeliveryS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Sub "awsconfigconforms-${pOrganizationConformancePackBucketSuffix}"
+      PolicyDocument:
+        Statement:
+        - Sid: AllowGetObject
+          Effect: Allow
+          Principal: '*'
+          Action:
+            - s3:getObject
+            - s3:PutObject
+          Resource: !Sub "arn:aws:s3:::awsconfigconforms-${pOrganizationConformancePackBucketSuffix}/*"
+          Condition:
+            StringEquals:
+              aws:PrincipalOrgID: !Ref pOrganizationId
+        - Sid: AllowGetBucketAcl
+          Effect: Allow
+          Principal: '*'
+          Action:
+            - s3:GetBucketAcl
+          Resource: !Sub "arn:aws:s3:::awsconfigconforms-${pOrganizationConformancePackBucketSuffix}"
+          Condition:
+            StringEquals:
+              aws:PrincipalOrgID: !Ref pOrganizationId
+
+  ConfigTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      TopicName: !Sub "${AWS::StackName}"
+      DisplayName: "Organizational Config Topic"
+
+  ConfigTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref ConfigTopic
+      PolicyDocument:
+        Statement:
+          - Sid: AWSConfigSNSPolicy
+            Action:
+              - sns:Publish
+            Effect: Allow
+            Resource: !Ref ConfigTopic
+            Principal:
+              Service:
+                - config.amazonaws.com
+
+
+  # Why they don't have a service linked role here is beyond me
+  ConfigAggregatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "aws-config-aggregator-role-${AWS::StackName}"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: config.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /service-role/
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSConfigRoleForOrganizations
+
+  # Create the Aggregator
+  ConfigAggregator:
+    Type: AWS::Config::ConfigurationAggregator
+    Properties:
+      ConfigurationAggregatorName: !Sub "${AWS::StackName}-Aggregator"
+      OrganizationAggregationSource:
+          AllAwsRegions: True
+          RoleArn: !GetAtt ConfigAggregatorRole.Arn
+
+Outputs:
+  ConfigTopicArn:
+    Value: !Ref ConfigTopic
+  TemplateVersion:
+    Value: "1.0.0"
