@@ -72,8 +72,8 @@ Resources:
     Type: AWS::Config::AggregationAuthorization
     Condition: CreateAggregationAuthorization
     Properties:
-      AuthorizedAccountId: pSecurityAccountId
-      AuthorizedAwsRegion: pAggregationRegion
+      AuthorizedAccountId: !Ref pSecurityAccountId
+      AuthorizedAwsRegion: !Ref pAggregationRegion
 
   AWSServiceRoleForConfig:
     Type: AWS::IAM::ServiceLinkedRole
