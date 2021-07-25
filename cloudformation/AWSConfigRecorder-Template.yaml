@@ -8,12 +8,12 @@ Parameters:
     Description: Name of the bucket where Config Events are stored.
     Type: String
 
-  pSecurityAccountId:
-    Description: Security Account Number
-    MinLength: '12'
-    AllowedPattern: '[0-9]+'
-    MaxLength: '12'
-    Type: String
+  # pSecurityAccountId:
+  #   Description: Security Account Number
+  #   MinLength: '12'
+  #   AllowedPattern: '[0-9]+'
+  #   MaxLength: '12'
+  #   Type: String
 
   pAggregationRegion:
     Description: Region to authorize for a Config Aggregation (Set to NONE for no authorization)
