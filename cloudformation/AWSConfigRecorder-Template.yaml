@@ -27,10 +27,6 @@ Parameters:
     Default: NONE
     Type: String
 
-  pConfigTopicArn:
-    Description: Topic Arn for the central SNS Topic all recorders publish to
-    Type: String
-
 Conditions:
   CreateAggregationAuthorization: !Not [!Equals [ !Ref pAggregationRegion, "NONE"]]
   CreateServiceLinkedRole: !Equals [ !Ref "AWS::Region", "us-east-1"]
@@ -38,28 +34,28 @@ Conditions:
 
 Resources:
 
-  # ConfigTopic:
-  #   Type: "AWS::SNS::Topic"
-  #   Properties:
-  #     TopicName: !Sub "${AWS::StackName}-${AWS::Region}"
-  #     DisplayName: AWS Config Notification Topic
-  #     KmsMasterKeyId: "alias/aws/sns"
+  ConfigTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      TopicName: !Sub "ConfigTopic-${AWS::Region}"
+      DisplayName: Local AWS Config Notification Topic
+      KmsMasterKeyId: "alias/aws/sns"
 
-  # ConfigTopicPolicy:
-  #   Type: AWS::SNS::TopicPolicy
-  #   Properties:
-  #     Topics:
-  #       - !Ref ConfigTopic
-  #     PolicyDocument:
-  #       Statement:
-  #         - Sid: AWSConfigSNSPolicy
-  #           Action:
-  #             - sns:Publish
-  #           Effect: Allow
-  #           Resource: !Ref ConfigTopic
-  #           Principal:
-  #             Service:
-  #               - config.amazonaws.com
+  ConfigTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref ConfigTopic
+      PolicyDocument:
+        Statement:
+          - Sid: AWSConfigSNSPolicy
+            Action:
+              - sns:Publish
+            Effect: Allow
+            Resource: !Ref ConfigTopic
+            Principal:
+              Service:
+                - config.amazonaws.com
 
   ConfigRecorder:
     Type: AWS::Config::ConfigurationRecorder
@@ -76,7 +72,7 @@ Resources:
       ConfigSnapshotDeliveryProperties:
         DeliveryFrequency: Six_Hours
       S3BucketName: !Ref pOrganizationConfigBucket
-      SnsTopicARN: !Ref 'pConfigTopicArn'
+      SnsTopicARN: !Ref 'ConfigTopic'
 
   AWSServiceRoleForConfig:
     Type: AWS::IAM::ServiceLinkedRole
@@ -86,7 +82,7 @@ Resources:
 
 
 Outputs:
-  # ConfigTopicArn:
-  #   Value: !Ref ConfigTopic
+  ConfigTopicArn:
+    Value: !Ref ConfigTopic
   TemplateVersion:
     Value: "1.1.1"

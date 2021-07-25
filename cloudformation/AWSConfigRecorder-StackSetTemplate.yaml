@@ -37,10 +37,6 @@ Parameters:
     Type: String
     AllowedPattern: '^(ou-[a-z0-9]{4,32}-[a-z0-9]{8,32}|r-[a-z0-9]{4,32})$'
 
-  pConfigTopicArn:
-    Description: Topic Arn for the central SNS Topic all recorders publish to
-    Type: String
-
 Resources:
 
   ConfigRecorderStackSet:
@@ -57,7 +53,7 @@ Resources:
       # ExecutionRoleName: String
       OperationPreferences:
         # Per the docs: MaxConcurrentCount is at most one more than the FailureToleranceCount.
-        FailureToleranceCount: 19
+        FailureToleranceCount: 0
         MaxConcurrentCount: 20
         # Special stuff happens if the region is us-east-1, so ensure that is first.
         RegionOrder:
@@ -83,8 +79,6 @@ Resources:
           ParameterValue: !Ref pOrganizationConfigBucket
         - ParameterKey: pAggregationRegion
           ParameterValue: !Ref pAggregationRegion
-        - ParameterKey: pConfigTopicArn
-          ParameterValue: !Ref pConfigTopicArn
       PermissionModel: SERVICE_MANAGED
       StackInstancesGroup:
         - DeploymentTargets:

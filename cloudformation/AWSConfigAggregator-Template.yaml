@@ -37,7 +37,6 @@ Parameters:
 Conditions:
   CreateBucket: !Equals [ !Ref pCreateBucket, "true" ]
 
-
 Resources:
 
   ConformancePackDeliveryS3Bucket:
@@ -83,29 +82,6 @@ Resources:
             StringEquals:
               aws:PrincipalOrgID: !Ref pOrganizationId
 
-  ConfigTopic:
-    Type: "AWS::SNS::Topic"
-    Properties:
-      TopicName: !Sub "${AWS::StackName}"
-      DisplayName: "Organizational Config Topic"
-
-  ConfigTopicPolicy:
-    Type: AWS::SNS::TopicPolicy
-    Properties:
-      Topics:
-        - !Ref ConfigTopic
-      PolicyDocument:
-        Statement:
-          - Sid: AWSConfigSNSPolicy
-            Action:
-              - sns:Publish
-            Effect: Allow
-            Resource: !Ref ConfigTopic
-            Principal:
-              Service:
-                - config.amazonaws.com
-
-
   # Why they don't have a service linked role here is beyond me
   ConfigAggregatorRole:
     Type: AWS::IAM::Role
@@ -133,7 +109,5 @@ Resources:
           RoleArn: !GetAtt ConfigAggregatorRole.Arn
 
 Outputs:
-  ConfigTopicArn:
-    Value: !Ref ConfigTopic
   TemplateVersion:
     Value: "1.0.0"
