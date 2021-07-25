@@ -1,3 +1,17 @@
+# Copyright 2021 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deploy the AWS Config Service Recorder in this region and send recorded events to central bucket
 # TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AWSConfigRecorder-StackSetTemplate.yaml
@@ -6,13 +20,6 @@ Parameters:
 
   pOrganizationConfigBucket:
     Description: Name of the bucket where Config Events are stored.
-    Type: String
-
-  pSecurityAccountId:
-    Description: Security Account Number
-    MinLength: '12'
-    AllowedPattern: '[0-9]+'
-    MaxLength: '12'
     Type: String
 
   pAggregationRegion:
@@ -26,9 +33,9 @@ Parameters:
     Default: https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AWSConfigRecorder-Template.yaml
 
   pAWSOrgUnit:
-    Description: AWS Organizations OU to deploy this stackset to. Probably should be the default OU
+    Description: AWS Organizations OU to deploy this stackset to. Probably should be the root OU
     Type: String
-    AllowedPattern: 'o-[a-z0-9]+'
+    AllowedPattern: '^(ou-[a-z0-9]{4,32}-[a-z0-9]{8,32}|r-[a-z0-9]{4,32})$'
 
 Resources:
 
@@ -45,9 +52,9 @@ Resources:
       Description: Organizational StackSet to Deploy AWS Config Recorder
       # ExecutionRoleName: String
       OperationPreferences:
-        FailureToleranceCount: 20
+        # Per the docs: MaxConcurrentCount is at most one more than the FailureToleranceCount.
+        FailureToleranceCount: 19
         MaxConcurrentCount: 20
-        RegionConcurrencyType: PARALLEL
         # Special stuff happens if the region is us-east-1, so ensure that is first.
         RegionOrder:
           - us-east-1
@@ -70,35 +77,32 @@ Resources:
       Parameters:
         - ParameterKey: pOrganizationConfigBucket
           ParameterValue: !Ref pOrganizationConfigBucket
-        - ParameterKey: pSecurityAccountId
-          ParameterValue: !Ref pSecurityAccountId
         - ParameterKey: pAggregationRegion
           ParameterValue: !Ref pAggregationRegion
       PermissionModel: SERVICE_MANAGED
       StackInstancesGroup:
         - DeploymentTargets:
             OrganizationalUnitIds:
-            - !Ref pAWSOrgUnit
-            Regions:
-              - us-east-1
-              - eu-north-1
-              - ap-south-1
-              - eu-west-3
-              - eu-west-2
-              - eu-west-1
-              - ap-northeast-3
-              - ap-northeast-2
-              - ap-northeast-1
-              - sa-east-1
-              - ca-central-1
-              - ap-southeast-1
-              - ap-southeast-2
-              - eu-central-1
-              - us-east-2
-              - us-west-1
-              - us-west-2
+              - !Ref pAWSOrgUnit
+          Regions:
+            - us-east-1
+            - eu-north-1
+            - ap-south-1
+            - eu-west-3
+            - eu-west-2
+            - eu-west-1
+            - ap-northeast-3
+            - ap-northeast-2
+            - ap-northeast-1
+            - sa-east-1
+            - ca-central-1
+            - ap-southeast-1
+            - ap-southeast-2
+            - eu-central-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
       StackSetName: !Sub "${AWS::StackName}-StackSet"
-      # TemplateBody: String
       TemplateURL: !Ref pTemplateURL
 
 
