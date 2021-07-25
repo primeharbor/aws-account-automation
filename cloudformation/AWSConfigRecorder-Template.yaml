@@ -76,7 +76,7 @@ Resources:
       ConfigSnapshotDeliveryProperties:
         DeliveryFrequency: Six_Hours
       S3BucketName: !Ref pOrganizationConfigBucket
-      SnsTopicARN: !Ref 'ConfigTopic'
+      SnsTopicARN: !Ref 'pConfigTopicArn'
 
   AWSServiceRoleForConfig:
     Type: AWS::IAM::ServiceLinkedRole
@@ -86,7 +86,7 @@ Resources:
 
 
 Outputs:
-  ConfigTopicArn:
-    Value: !Ref ConfigTopic
+  # ConfigTopicArn:
+  #   Value: !Ref ConfigTopic
   TemplateVersion:
     Value: "1.1.1"
