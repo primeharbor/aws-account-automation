@@ -128,6 +128,10 @@ Resources:
 
             findings_to_ignore = json.loads(os.getenv('IGNORE_FINDINGS', default="[]"))
 
+            # if the source is not the same region, drop the event
+            if 'region' in event['detail'] and event['detail']['region'] != event['region']:
+              return(None)
+
             account_id = event['detail']['accountId']
             region = event['region']
             finding = event['detail']['type']
