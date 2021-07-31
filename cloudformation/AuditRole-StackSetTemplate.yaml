@@ -1,0 +1,80 @@
+# Copyright 2021 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy the a Security Audit Role in all account in your Organization
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AuditRole-StackSetTemplate.yaml
+
+Parameters:
+
+  AuditorAccountNumber:
+    Description: The 12 digit AWS account number to grant access to.
+    Default: '123456789012'
+    MinLength: '12'
+    AllowedPattern: '[0-9]+'
+    MaxLength: '12'
+    Type: String
+
+  RoleName:
+    Description: The name of the Role to be created
+    Default: 'Auditor'
+    Type: String
+
+  pTemplateURL:
+    Description: Location of the S3 Template to deploy as the StackSet
+    Type: String
+    Default: https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRole-Template.yaml
+
+  pAWSOrgUnit:
+    Description: AWS Organizations OU to deploy this stackset to. Probably should be the root OU
+    Type: String
+    AllowedPattern: '^(ou-[a-z0-9]{4,32}-[a-z0-9]{8,32}|r-[a-z0-9]{4,32})$'
+
+Resources:
+
+  AuditRoleStackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      # AdministrationRoleARN: String
+      AutoDeployment:
+        Enabled: True
+        RetainStacksOnAccountRemoval: True
+      CallAs: DELEGATED_ADMIN
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      Description: Organizational StackSet to Deploy Security Account Audit Role
+      # ExecutionRoleName: String
+      OperationPreferences:
+        # Per the docs: MaxConcurrentCount is at most one more than the FailureToleranceCount.
+        FailureToleranceCount: 0
+        MaxConcurrentCount: 20
+      Parameters:
+        - ParameterKey: AuditorAccountNumber
+          ParameterValue: !Ref AuditorAccountNumber
+        - ParameterKey: RoleName
+          ParameterValue: !Ref RoleName
+      PermissionModel: SERVICE_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            OrganizationalUnitIds:
+              - !Ref pAWSOrgUnit
+          Regions:
+            - us-east-1
+      StackSetName: !Sub "${AWS::StackName}-StackSet"
+      TemplateURL: !Ref pTemplateURL
+
+
+Outputs:
+  TemplateVersion:
+    Value: "1.1.0"
