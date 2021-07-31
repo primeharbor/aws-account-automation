@@ -24,17 +24,44 @@ Tools to Automate your AWS Account
 The most recent version of all these templates are hosted in S3 for Easy Deployment.
 
 Directly callable URLS:
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AWSConfigAggregator-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AWSConfigRecorder-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AccountAlertTopics-Template.yaml
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRole-StackSetTemplate.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRole-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/BillingBucket-Template.yaml
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/BillingMetrics-Template-Transformed.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/BillingMetrics-Template.yaml
-* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudTrailConfig-Template.yaml
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudTrail-Template.yaml
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudTrailConfigBucket-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/EBSAutomatedTagging.yaml
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/GuardDuty-to-Slack-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/IAM-ExpireUsers-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/OrgCloudTrail-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/requireMFA-Template.yaml
 
+
+S3 Paths:
+* s3://pht-cloudformation/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/AWSConfigAggregator-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml
+* s3://pht-cloudformation/aws-account-automation/AWSConfigRecorder-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/AccountAlertTopics-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/AuditRole-StackSetTemplate.yaml
+* s3://pht-cloudformation/aws-account-automation/AuditRole-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/BillingBucket-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/BillingMetrics-Template-Transformed.yaml
+* s3://pht-cloudformation/aws-account-automation/BillingMetrics-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/CloudTrail-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/CloudTrailConfigBucket-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/EBSAutomatedTagging.yaml
+* s3://pht-cloudformation/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml
+* s3://pht-cloudformation/aws-account-automation/GuardDuty-to-Slack-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/IAM-ExpireUsers-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/OrgCloudTrail-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/requireMFA-Template.yaml
