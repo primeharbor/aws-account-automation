@@ -1,5 +1,22 @@
+# Copyright 2019-2021 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deploy Lambda to send GuardDuty CloudWatch Events to Slack WebHook
+
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/GuardDuty-to-Slack-Template.yaml
 
 Parameters:
 
@@ -31,10 +48,19 @@ Parameters:
     Type: String
     Default: "[]"
 
+  pLambdaRoleArn:
+    Description: If supplied, this Lambda Role will be used, rather than creation of another
+    Type: String
+    Default: None
+
+Conditions:
+  cCreateRole:  !Equals [ !Ref pLambdaRoleArn, "None" ]
+
 Resources:
 
   GuardDuty2SlackLambdaRole:
     Type: AWS::IAM::Role
+    Condition: cCreateRole
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -72,7 +98,10 @@ Resources:
       Handler: index.lambda_handler
       Timeout: '80'
       FunctionName: !Sub "GuardDuty2Slack-${AWS::Region}"
-      Role: !GetAtt GuardDuty2SlackLambdaRole.Arn
+      Role: !If
+        - cCreateRole
+        - !GetAtt GuardDuty2SlackLambdaRole.Arn
+        - !Ref pLambdaRoleArn
       Environment:
         Variables:
           WEBHOOK: !Ref pSlackWebhookSecret

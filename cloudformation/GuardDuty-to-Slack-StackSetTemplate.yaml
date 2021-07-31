@@ -1,0 +1,162 @@
+# Copyright 2021 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: StackSet to push out GuardDuty-to-Slack automation CFT in all regions
+
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/GuardDuty-to-Slack-StackSetTemplate.yaml
+
+Parameters:
+
+  pAccountDescription:
+    Description: Identify this account in the notices sent
+    Type: String
+
+  pSlackWebhookSecretRegion:
+    Description: Region where the Slack WebHook secret is stored
+    Type: String
+
+  pSlackWebhookSecret:
+    Description: Name of the Secrets Manager secret where the WebHook is stored
+    Type: String
+    Default: SlackGuardDutyWebhook
+
+  pSlackChannel:
+    Description: Slack Channel to send the spam to
+    Type: String
+    Default: '#aws_notices'
+
+  pIconURL:
+    Description: Slack Emoji to use
+    Type: String
+    Default: https://raw.githubusercontent.com/aws-samples/amazon-guardduty-to-slack/master/images/gd_logo.png
+
+  pIgnoreFindingsJson:
+    Description: JSON array of GuardDuty Detail Types to ignore
+    Type: String
+    Default: "[]"
+
+  pTemplateURL:
+    Description: Location of the S3 Template to deploy as the StackSet
+    Type: String
+    Default: https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/GuardDuty-to-Slack-Template.yaml
+
+Resources:
+
+  GuardDuty2SlackLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: LambdaLogging
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - logs:*
+            Effect: Allow
+      - PolicyName: GetSecret
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - secretsmanager:GetSecret*
+            Resource: !Sub "arn:aws:secretsmanager:${pSlackWebhookSecretRegion}:${AWS::AccountId}:secret:${pSlackWebhookSecret}-*"
+
+  StackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      Capabilities:
+        - CAPABILITY_IAM
+      Description: StackSet to push out GuardDuty-to-Slack automation CFT in all regions
+      OperationPreferences:
+        # Per the docs: MaxConcurrentCount is at most one more than the FailureToleranceCount.
+        FailureToleranceCount: 0
+        MaxConcurrentCount: 20
+        # Special stuff happens if the region is us-east-1, so ensure that is first.
+        RegionOrder:
+          - us-east-1
+          - eu-north-1
+          - ap-south-1
+          - eu-west-3
+          - eu-west-2
+          - eu-west-1
+          - ap-northeast-3
+          - ap-northeast-2
+          - ap-northeast-1
+          - sa-east-1
+          - ca-central-1
+          - ap-southeast-1
+          - ap-southeast-2
+          - eu-central-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+      Parameters:
+        - ParameterKey: pAccountDescription
+          ParameterValue: !Ref pAccountDescription
+        - ParameterKey: pSlackWebhookSecretRegion
+          ParameterValue: !Ref pSlackWebhookSecretRegion
+        - ParameterKey: pSlackWebhookSecret
+          ParameterValue: !Ref pSlackWebhookSecret
+        - ParameterKey: pSlackChannel
+          ParameterValue: !Ref pSlackChannel
+        - ParameterKey: pIconURL
+          ParameterValue: !Ref pIconURL
+        - ParameterKey: pIgnoreFindingsJson
+          ParameterValue: !Ref pIgnoreFindingsJson
+        - ParameterKey: pLambdaRoleArn
+          ParameterValue: !GetAtt GuardDuty2SlackLambdaRole.Arn
+      PermissionModel: SELF_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            Accounts:
+              - !Ref AWS::AccountId
+          Regions:
+            - us-east-1
+            - eu-north-1
+            - ap-south-1
+            - eu-west-3
+            - eu-west-2
+            - eu-west-1
+            - ap-northeast-3
+            - ap-northeast-2
+            - ap-northeast-1
+            - sa-east-1
+            - ca-central-1
+            - ap-southeast-1
+            - ap-southeast-2
+            - eu-central-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+      StackSetName: !Sub "${AWS::StackName}-StackSet"
+      TemplateURL: !Ref pTemplateURL
+
+
+
+Outputs:
+  StackName:
+    Value: !Ref AWS::StackName
