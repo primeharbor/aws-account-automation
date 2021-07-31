@@ -53,8 +53,8 @@ Resources:
       # ExecutionRoleName: String
       OperationPreferences:
         # Per the docs: MaxConcurrentCount is at most one more than the FailureToleranceCount.
-        FailureToleranceCount: 0
-        MaxConcurrentCount: 20
+        FailureTolerancePercentage: 100
+        MaxConcurrentPercentage: 100
         # Special stuff happens if the region is us-east-1, so ensure that is first.
         RegionOrder:
           - us-east-1

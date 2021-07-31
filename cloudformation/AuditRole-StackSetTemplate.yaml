@@ -56,9 +56,8 @@ Resources:
       Description: Organizational StackSet to Deploy Security Account Audit Role
       # ExecutionRoleName: String
       OperationPreferences:
-        # Per the docs: MaxConcurrentCount is at most one more than the FailureToleranceCount.
-        FailureToleranceCount: 0
-        MaxConcurrentCount: 20
+        FailureTolerancePercentage: 0
+        MaxConcurrentPercentage: 100
       Parameters:
         - ParameterKey: AuditorAccountNumber
           ParameterValue: !Ref AuditorAccountNumber

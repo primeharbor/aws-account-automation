@@ -95,6 +95,7 @@ Resources:
         # Per the docs: MaxConcurrentCount is at most one more than the FailureToleranceCount.
         FailureToleranceCount: 0
         MaxConcurrentCount: 20
+        RegionConcurrencyType: PARALLEL
       Parameters:
         - ParameterKey: pAccountDescription
           ParameterValue: !Ref pAccountDescription
