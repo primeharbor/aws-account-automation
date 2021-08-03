@@ -24,6 +24,11 @@ Parameters:
     Description: Identify this account in the notices sent
     Type: String
 
+  pFunctionName:
+    Description: Name of the Lambda function to create in each region
+    Type: String
+    Default: guardduty-to-slack-lambda
+
   pSlackWebhookSecretRegion:
     Description: Region where the Slack WebHook secret is stored
     Type: String
@@ -81,6 +86,15 @@ Resources:
             Action:
             - logs:*
             Effect: Allow
+      - PolicyName: AWSOrganizations
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - organizations:ListAccounts
+            - organizations:ListTagsForResource
+            Effect: Allow
       - PolicyName: GetSecret
         PolicyDocument:
           Version: '2012-10-17'
@@ -97,7 +111,7 @@ Resources:
       Runtime: python3.7
       Handler: index.lambda_handler
       Timeout: '80'
-      FunctionName: !Sub "GuardDuty2Slack-${AWS::Region}"
+      FunctionName: !Sub "${pFunctionName}-${AWS::Region}"
       Role: !If
         - cCreateRole
         - !GetAtt GuardDuty2SlackLambdaRole.Arn
@@ -162,6 +176,10 @@ Resources:
               return(None)
 
             account_id = event['detail']['accountId']
+            if account_id in org_info:
+              account_name = org_info[account_id]
+            else:
+              account_name = account_id
             region = event['region']
             finding = event['detail']['type']
             msgid = event['detail']['id']
@@ -184,12 +202,12 @@ Resources:
 
             attachment = {
               'fallback': f"{finding} - {url}",
-              'pretext': f"*Finding in {region} for Acct: {account_id}*",
+              'pretext': f"*Finding in {region} for Acct: {account_name}*",
               'title': finding,
               'title_link': url,
               'text': event['detail']['description'],
               'fields': [
-                {"title": "SourceAccount","value": os.environ['ACCOUNT_NAME'], "short": True},
+                {"title": "GuardDutyAccount","value": os.environ['ACCOUNT_NAME'], "short": True},
                 {"title": "Severity","value": severity, "short": True},
                 {"title": "Region","value": region ,"short": True},
                 {"title": "Last Seen","value": event['detail']['updatedAt'], "short": True}

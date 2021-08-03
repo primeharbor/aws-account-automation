@@ -23,6 +23,11 @@ Parameters:
     Description: Identify this account in the notices sent
     Type: String
 
+  pFunctionName:
+    Description: Name of the Lambda function to create in each region
+    Type: String
+    Default: guardduty-to-slack-lambda
+
   pSlackWebhookSecretRegion:
     Description: Region where the Slack WebHook secret is stored
     Type: String
@@ -76,6 +81,15 @@ Resources:
             Action:
             - logs:*
             Effect: Allow
+      - PolicyName: AWSOrganizations
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - organizations:ListAccounts
+            - organizations:ListTagsForResource
+            Effect: Allow
       - PolicyName: GetSecret
         PolicyDocument:
           Version: '2012-10-17'
@@ -99,6 +113,8 @@ Resources:
       Parameters:
         - ParameterKey: pAccountDescription
           ParameterValue: !Ref pAccountDescription
+        - ParameterKey: pFunctionName
+          ParameterValue: !Ref pFunctionName
         - ParameterKey: pSlackWebhookSecretRegion
           ParameterValue: !Ref pSlackWebhookSecretRegion
         - ParameterKey: pSlackWebhookSecret
