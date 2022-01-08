@@ -16,6 +16,8 @@ Tools to Automate your AWS Account
 * [IAM-ExpireUsers](cloudformation/IAM-ExpireUsers-Template.yaml) - Work in progress to automatically handle users that have not changed their password or rotated access keys
 * [requireMFA](cloudformation/requireMFA-Template.yaml) will deploy a IAM User Group and Lambda that will prevent users without MFA from doing anything in the account
 
+* [SESRuleToSlack](cloudformation/SESRuleToSlack-Template.yaml) Creates and SES Email receiving rule/rulset to accept all email for a domain, invoke a lambda function that sends a summary of the email to Slack. Useful for when you might get an important notice, but you don't really need to interact from a domain.
+
 
 :exclamation: **Also check out the [aws-fast-fixes python scripts](https://github.com/WarnerMedia/aws-fast-fixes) for manual security fixes for your account!** :exclamation:
 
@@ -43,7 +45,7 @@ Directly callable URLS:
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/IAM-ExpireUsers-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/OrgCloudTrail-Template.yaml
 * https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/requireMFA-Template.yaml
-
+* https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/SESRuleToSlack-Template.yaml
 
 S3 Paths:
 * s3://pht-cloudformation/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml
@@ -65,3 +67,5 @@ S3 Paths:
 * s3://pht-cloudformation/aws-account-automation/IAM-ExpireUsers-Template.yaml
 * s3://pht-cloudformation/aws-account-automation/OrgCloudTrail-Template.yaml
 * s3://pht-cloudformation/aws-account-automation/requireMFA-Template.yaml
+* s3://pht-cloudformation/aws-account-automation/SESRuleToSlack-Template.yaml
+
