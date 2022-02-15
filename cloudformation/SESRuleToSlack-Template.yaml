@@ -33,11 +33,6 @@ Parameters:
     Description: Name of the Secrets Manager secret where the WebHook is stored
     Type: String
 
-  pSlackChannel:
-    Description: Slack Channel to send the spam to
-    Type: String
-    Default: '#aws_notices'
-
   pIconEmoji:
     Description: Slack Emoji to use
     Type: String
@@ -45,6 +40,21 @@ Parameters:
 
   pRuleSetName:
     Type: String
+    Description: Name of the RuleSet for this account
+
+  pCreateRuleSet:
+    Description: Create a RuleSet, or using an existing one. An account can only have one active RuleSet at a time
+    Type: String
+    AllowedValues:
+    - "yes"
+    - "no"
+
+  pCreateBucket:
+    Description: Create a new Bucket, or reuse and existing one
+    Type: String
+    AllowedValues:
+    - "yes"
+    - "no"
 
   pDomain:
     Type: String
@@ -54,22 +64,62 @@ Parameters:
     Type: String
     Description: Pre-existing S3 Bucket to Send the raw emails to.
 
+Conditions:
+  cCreateRuleSet: !Equals [ !Ref pCreateRuleSet, "yes"]
+  cCreateBucket: !Equals [ !Ref pCreateBucket, "yes"]
+
+
 Resources:
+
+  MessageS3Bucket:
+    DeletionPolicy: Retain
+    Condition: cCreateBucket
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref pDeliveryBucketName
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
+
+  BillingBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Condition: cCreateBucket
+    Properties:
+      Bucket: !Ref MessageS3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: AllowSESPuts
+          Effect: Allow
+          Principal:
+            Service: ses.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub "arn:aws:s3:::${pDeliveryBucketName}/*"
+          Condition:
+            StringEquals:
+              AWS:SourceAccount: !Ref AWS::AccountId
+            StringLike:
+              AWS:SourceArn: arn:aws:ses:*
 
   SESReceiptRuleSet:
     Type: AWS::SES::ReceiptRuleSet
+    Condition: cCreateRuleSet
     Properties:
       RuleSetName: !Ref pRuleSetName
 
   SESReceiptRule:
     Type: 'AWS::SES::ReceiptRule'
     DependsOn:
-      - SESReceiptRuleSet
       - SlackNotificationLambdaPermission
     Properties:
       RuleSetName: !Ref pRuleSetName
       Rule:
-        Name: !Ref pRuleSetName
+        Name: !Ref pDomain
         Enabled: true
         ScanEnabled: true
         Recipients:
@@ -139,7 +189,6 @@ Resources:
         Variables:
           LOG_LEVEL: INFO
           WEBHOOK: !Ref pSlackWebhookSecret
-          SLACK_CHANNEL: !Ref pSlackChannel
           ICON_EMOJI: !Ref pIconEmoji
           BUCKET: !Ref pDeliveryBucketName
           DOMAIN: !Ref pDomain
@@ -205,7 +254,6 @@ Resources:
             logger.debug(f"Found Message body: {message_body}")
 
             slack_message = {
-              'channel': os.environ['SLACK_CHANNEL'],
               'icon_emoji': os.environ['ICON_EMOJI'],
               'attachments': [
                 {
@@ -226,7 +274,7 @@ Resources:
             }
             try:
               r = http.request('POST', WEBHOOK, body=json.dumps(slack_message))
-              logger.info(f"Message posted to {os.environ['SLACK_CHANNEL']}")
+              logger.info(f"Message posted")
             except Exception as e:
               logger.error(f"Request failed: {e}")
           # End process_message()
@@ -292,7 +340,7 @@ Resources:
     Properties:
       FunctionName: !GetAtt EmailToSlackLambda.Arn
       Principal: ses.amazonaws.com
-      SourceArn: !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/${pRuleSetName}:receipt-rule/${pRuleSetName}"
+      SourceArn: !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/${pRuleSetName}:receipt-rule/${pDomain}"
       Action: lambda:invokeFunction
 
 Outputs:
