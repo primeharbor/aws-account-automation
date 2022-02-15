@@ -1,0 +1,337 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Publish Daily billing details to Slack
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+
+  pExecutionRate:
+    Description: How frequently the StepFunction should Run (As a CloudWatch ScheduleExpression)
+    Type: String
+    Default: rate(1 day)
+
+  pRuleState:
+    Type: String
+    Description: Enable to disable the CloudWatch Event to fire the Stepfunction
+    Default: ENABLED
+    AllowedValues:
+      - DISABLED
+      - ENABLED
+
+  pAccountDescription:
+    Description: Identify this account in the notices sent
+    Type: String
+
+  pSlackWebhookSecret:
+    Description: Name of the Secrets Manager secret where the WebHook is stored
+    Type: String
+    Default: SlackWebhook
+
+  pEventInput:
+    Description: Json event passed to Lambda
+    Type: String
+    Default: '{"threshold": "10", "alert_percent": "20"}'
+
+Resources:
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: CostExplorer
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - ce:*
+            Effect: Allow
+            Resource: "*"
+      - PolicyName: CloudWatchMetrics
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - cloudwatch:Get*
+            - cloudwatch:List*
+            Effect: Allow
+            Resource: "*"
+      - PolicyName: LambdaLogging
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - logs:*
+            Effect: Allow
+      - PolicyName: GetSecret
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - secretsmanager:GetSecret*
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pSlackWebhookSecret}*
+
+  #
+  # Lambda
+  #
+
+  CostLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Fetch the latest billing info and send it to Slack
+      Runtime: python3.7
+      Handler: cost.lambda_handler
+      Timeout: 120
+      MemorySize: 1024
+      FunctionName: !Sub "${AWS::StackName}-function"
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          WEBHOOK: !Ref pSlackWebhookSecret
+          ACCOUNT_NAME: !Ref pAccountDescription
+          LOG_LEVEL: 'INFO'
+      Events:
+        TriggerTrigger:
+          Type: Schedule
+          Properties:
+            Description: !Sub "Trigger for ${AWS::StackName}"
+            Enabled: !Ref pRuleState
+            Name: !Sub "${AWS::StackName}-trigger"
+            Schedule: !Ref pExecutionRate
+            Input: !Ref pEventInput
+      InlineCode: |
+        import boto3
+        from botocore.exceptions import ClientError
+        import json
+        import os
+        import time
+        from datetime import datetime, timezone, date
+        from dateutil import tz
+        import datetime as dt
+        import urllib3
+
+        import logging
+        logger = logging.getLogger()
+        logger.setLevel(getattr(logging, os.getenv('LOG_LEVEL', default='INFO')))
+        logging.getLogger('botocore').setLevel(logging.WARNING)
+        logging.getLogger('boto3').setLevel(logging.WARNING)
+        logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+        METRIC="BlendedCost"
+
+        def get_webhook(secret_name):
+          if secret_name == "NONE":
+            return(None)
+          client = boto3.client('secretsmanager')
+          try:
+            get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+          except ClientError as e:
+            logger.critical(f"Unable to get secret value for {secret_name}: {e}")
+            return(None)
+          else:
+            if 'SecretString' in get_secret_value_response:
+              secret_value = get_secret_value_response['SecretString']
+            else:
+              secret_value = get_secret_value_response['SecretBinary']
+          try:
+            secret_dict = json.loads(secret_value)
+            return(secret_dict['webhook_url'])
+          except Exception as e:
+            logger.critical(f"Error during Credential and Service extraction: {e}")
+            raise
+
+        WEBHOOK=get_webhook(os.getenv('WEBHOOK', default='NONE'))
+
+        def lambda_handler(event, context):
+            logger.debug("Received event: " + json.dumps(event, sort_keys=True))
+
+            THRESHOLD_PCT=float(event['alert_percent']) / 100
+
+            cost_alerts = []
+            slack_fields = []
+            slack_text = ""
+
+            try:
+                ce_client = boto3.client('ce')
+
+                # Get the dates for the CostExplorer Calls
+                today = date.today()
+                yesterday = today - dt.timedelta(days=1)
+                one_week_ago = today - dt.timedelta(days=8)
+                start_of_this_month = today.replace(day=1)
+                end_of_last_month = start_of_this_month - dt.timedelta(days=1)
+                start_of_last_month = end_of_last_month.replace(day=1)
+
+                # Get per-service costs
+                alert_args = {
+                    "TimePeriod": {'Start': str(one_week_ago), 'End': str(yesterday) },
+                    "Metrics": [METRIC],
+                    "Granularity": 'DAILY',
+                    "Filter": {"Dimensions": {"Key": "RECORD_TYPE", "Values": ["Usage"] }},
+                    "GroupBy": [{'Type': 'DIMENSION', 'Key': 'SERVICE'}],
+                }
+
+                if 'services' in event:
+                    alert_args['Filter'] = {
+                        "And": [
+                            {"Dimensions": {"Key": "RECORD_TYPE", "Values": ["Usage"] }},
+                            {"Dimensions": {"Key": "SERVICE", "Values": event['services'] }}
+                        ]
+                    }
+                response = ce_client.get_cost_and_usage(**alert_args)
+
+                # Go though the data
+                last_week_cost_data = response['ResultsByTime'][0]['Groups']
+                today_cost_data = response['ResultsByTime'][-1]['Groups']
+
+                last_week_costs = {}
+                for c in last_week_cost_data:
+                    last_week_costs[c['Keys'][0]] = round(float(c['Metrics'][METRIC]['Amount']), 2)
+
+                todays_costs = {}
+                for c in today_cost_data:
+                    todays_costs[c['Keys'][0]] = round(float(c['Metrics'][METRIC]['Amount']), 2)
+
+                for key, amount in todays_costs.items():
+                    if key not in last_week_costs:
+                        logger.debug(f"Key {key} not in last_week_costs")
+                        continue
+
+                    cost_diff = round(amount - last_week_costs[key], 2)
+                    if last_week_costs[key] != 0:
+                        cost_diff_pct = round(cost_diff/last_week_costs[key], 2)
+                    else:
+                        cost_diff_pct = 0
+
+                    if 'all' in event and event['all'] is True:
+                        if last_week_costs[key] == 0 and amount == 0:
+                            continue
+                        cost_alerts.append(f"{key} Cost-per-day Last Week: ${last_week_costs[key]:,} ; Cost-per-day Today: ${amount:,} ; Difference: ${cost_diff} USD ({round(cost_diff_pct*100)}%)")
+                        slack_fields.append({"title": key, "value": f"Today:       ${amount:,}\nLast Week: ${last_week_costs[key]:,}\n Difference: {round(cost_diff_pct*100)}%", "short": True})
+
+                    elif cost_diff > float(event['threshold']) and cost_diff_pct > THRESHOLD_PCT:
+                            cost_alerts.append(f"{key} Cost-per-day Last Week: ${last_week_costs[key]:,} ; Cost-per-day Today: ${amount:,} ; Difference: ${cost_diff} USD ({round(cost_diff_pct*100)}%)")
+                            slack_fields.append({"title": key, "value": f"Today:       ${amount:,}\nLast Week: ${last_week_costs[key]:,}\n Difference: {round(cost_diff_pct*100)}%", "short": True})
+
+                # Get the total overall cost by day
+                response = ce_client.get_cost_and_usage(
+                    TimePeriod={'Start': str(one_week_ago), 'End': str(yesterday) },
+                    Metrics=[METRIC],
+                    Granularity='DAILY',
+                    Filter={"Dimensions": {"Key": "RECORD_TYPE", "Values": ["Usage"] }},
+                )
+
+                last_week_total_cost = round(float(response['ResultsByTime'][0]['Total'][METRIC]['Amount']),2)
+                today_total_cost = round(float(response['ResultsByTime'][-1]['Total'][METRIC]['Amount']),2)
+                cost_diff = round(today_total_cost-last_week_total_cost,2)
+                cost_diff_pct = round(cost_diff/today_total_cost,2)
+                slack_text += f"Total Cost per day Last Week:   ${last_week_total_cost:,}\n"
+                slack_text += f"Cost per day Today:             ${today_total_cost:,}\n"
+                slack_text += f"Difference (week over week):    ${cost_diff:,} ({round(cost_diff_pct*100)}%)\n"
+
+                # Total Spent Month To Date
+                response = ce_client.get_cost_and_usage(
+                    TimePeriod={'Start': str(start_of_last_month), 'End': str(today) },
+                    Metrics=[METRIC],
+                    Granularity='MONTHLY',
+                    Filter={"Dimensions": {"Key": "RECORD_TYPE", "Values": ["Usage"] }},
+                    # GroupBy=[{'Type': 'DIMENSION', 'Key': 'RECORD_TYPE'}],
+                )
+
+                lastmonth_total_cost = round(float(response['ResultsByTime'][0]['Total'][METRIC]['Amount']),2)
+                thismonth_total_cost = round(float(response['ResultsByTime'][-1]['Total'][METRIC]['Amount']),2)
+                slack_text += f"Total Spent month-to-date:      ${thismonth_total_cost:,}\n"
+                slack_text += f"Last Month Total:               ${lastmonth_total_cost:,}\n"
+
+                if 'credits' in event and event['credits'] is True:
+                    # Total Credits Month To Date
+                    response = ce_client.get_cost_and_usage(
+                        TimePeriod={'Start': str(start_of_last_month), 'End': str(today) },
+                        Metrics=[METRIC],
+                        Granularity='MONTHLY',
+                        Filter={"Dimensions": {"Key": "RECORD_TYPE", "Values": ["Credit"] }},
+                        # GroupBy=[{'Type': 'DIMENSION', 'Key': 'RECORD_TYPE'}],
+                    )
+                    lastmonth_total_credit = round(float(response['ResultsByTime'][0]['Total'][METRIC]['Amount']),2)
+                    thismonth_total_credit = round(float(response['ResultsByTime'][-1]['Total'][METRIC]['Amount']),2)
+                    slack_text += f"Total Credits month-to-date:    ${thismonth_total_credit:,}\n"
+                    slack_text += f"Last Month Credits:             ${lastmonth_total_credit:,}\n"
+
+                if WEBHOOK is not None:
+                    fields = [
+                        {"title": "Total Cost per day Last Week:", "value": f"${last_week_total_cost:,}", "short": False},
+                        {"title": "Cost per day Today:          ", "value": f"${today_total_cost:,}", "short": False},
+                        {"title": "Difference (week over week): ", "value": f"${cost_diff:,} ({round(cost_diff_pct*100)}%)", "short": False},
+                        {"title": "Total Spent month-to-date    ", "value": f"${thismonth_total_cost:,}", "short": False},
+                        {"title": "Last Month Total Spend:      ", "value": f"${lastmonth_total_cost:,}", "short": False}
+                    ]
+
+                    total_attachment = {
+                      'pretext': f"*Total Spend For: {os.environ['ACCOUNT_NAME']}*",
+                      'title': f"Service Usage as of {yesterday}",
+                      'fields': fields,
+                      'mrkdwn_in': ["pretext", "text"],
+                      'color': '#7CD197'
+                    }
+
+                    slack_message = {
+                        'text': f"Billing anomaly report for {yesterday}",
+                        'attachments': [total_attachment],
+                        'username': "BillingMetrics",
+                        'mrkdwn': True,
+                        'icon_emoji': ':moneybag:'
+                    }
+
+                    if slack_fields is not []:
+                        attachment = {
+                          'pretext': f"*Cost Spikes for: {os.environ['ACCOUNT_NAME']}*",
+                          'title': f"Service Usage as of {yesterday}",
+                          'fields': slack_fields,
+                          'mrkdwn_in': ["pretext", "text"],
+                          'color': '#ff0000'
+                        }
+                        slack_message['attachments'].append(attachment)
+
+                    logger.debug(json.dumps(slack_message, sort_keys=True, default=str, indent=2))
+                    try:
+                        http = urllib3.PoolManager()
+                        r = http.request('POST', WEBHOOK, body=json.dumps(slack_message))
+                        logger.info("Message posted to slack")
+                    except Exception as e:
+                        logger.error(f"Slack Request failed: {e}")
+                        raise
+                else:
+                    for a in cost_alerts:
+                        print(a)
+                    print(slack_text)
+
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    logger.error(f"AccessDeniedException for cost-explorer")
+                    return()
+                else:
+                    logger.critical(f"AWS Error getting info: {e}")
+                    raise
+            except Exception as e:
+                raise
+        ## End of Function Code ##
+
+
+
+
+
+Outputs:
+  StackName:
+    Value: !Ref AWS::StackName
+    Description: Just the name of this stack
+
