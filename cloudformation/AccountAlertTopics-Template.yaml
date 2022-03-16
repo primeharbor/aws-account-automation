@@ -12,11 +12,6 @@ Parameters:
     Type: String
     Default: NONE
 
-  pInitialSubscriberSMS:
-    Description: Add this initial Cell for SMS notification of critical alerts
-    Type: String
-    Default: NONE
-
   pBillingThreshold:
     Description: Sets the billing alert to go off above this figure
     Type: Number
@@ -25,6 +20,7 @@ Parameters:
   pDeploySlackLambda:
     Description: Whether or not to deploy the slack lambda
     Type: String
+    Default: "no"
     AllowedValues:
     - "yes"
     - "no"
@@ -56,10 +52,7 @@ Parameters:
 Conditions:
   cDeploySlackLambda: !Equals [ !Ref pDeploySlackLambda, "yes"]
   cBillingAlarm: !Not [!Equals [ !Ref pBillingThreshold, 0]]
-  cSNSSubscription: !Not [!Equals [ !Ref pInitialSubscriberSMS, "NONE"]]
   cEMailSubscription: !Not [!Equals [ !Ref pInitialSubscriberEmail, "NONE"]]
-
-
 
 Resources:
 
@@ -67,56 +60,18 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       DisplayName: !Join ['', ["Critical Alerts for ", !Ref 'pAccountDescription']]
-      Subscription:
-      - !If
-        - cEMailSubscription
-        - Endpoint: !Ref 'pInitialSubscriberEmail'
-          Protocol: email
-        - AWS::NoValue
-      # - !If
-      #   - cSNSSubscription
-      #   - Endpoint: !Ref 'pInitialSubscriberSMS'
-      #     Protocol: sms
-      #   - AWS::NoValue
-      - !If
-        - cDeploySlackLambda
-        - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
-          Protocol: lambda
-        - AWS::NoValue
       TopicName: !Join ['-', ["Critical-Alerts", !Ref 'pAccountDescription']]
 
   SNSAlertsError:
     Type: AWS::SNS::Topic
     Properties:
       DisplayName: !Join ['', ["Error Alerts for ", !Ref 'pAccountDescription']]
-      Subscription:
-      - !If
-        - cEMailSubscription
-        - Endpoint: !Ref 'pInitialSubscriberEmail'
-          Protocol: email
-        - AWS::NoValue
-      - !If
-        - cDeploySlackLambda
-        - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
-          Protocol: lambda
-        - AWS::NoValue
       TopicName: !Join ['-', ["Error-Alerts", !Ref 'pAccountDescription']]
 
   SNSAlertsInfo:
     Type: AWS::SNS::Topic
     Properties:
       DisplayName: !Join ['', ["Info Alerts for ", !Ref 'pAccountDescription']]
-      Subscription:
-      - !If
-        - cEMailSubscription
-        - Endpoint: !Ref 'pInitialSubscriberEmail'
-          Protocol: email
-        - AWS::NoValue
-      - !If
-        - cDeploySlackLambda
-        - Endpoint: !GetAtt [SlackNotificationLambda, Arn]
-          Protocol: lambda
-        - AWS::NoValue
       TopicName: !Join ['-', ["Info-Alerts", !Ref 'pAccountDescription']]
 
   SNSAlertPolicy:
@@ -136,7 +91,10 @@ Resources:
           Condition:
             StringEquals:
               AWS:SourceOwner: !Ref AWS::AccountId
-      Topics: [!Ref 'SNSAlertsCritical', !Ref 'SNSAlertsError', !Ref 'SNSAlertsInfo']
+      Topics:
+        - !Ref 'SNSAlertsCritical'
+        - !Ref 'SNSAlertsError'
+        - !Ref 'SNSAlertsInfo'
 
   SpendingAlarm:
     Type: AWS::CloudWatch::Alarm
@@ -155,6 +113,34 @@ Resources:
       ComparisonOperator: GreaterThanThreshold
       AlarmActions: [!Ref 'SNSAlertsError']
 
+  InitialInfoSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: cEMailSubscription
+    Properties:
+      Endpoint: !Ref 'pInitialSubscriberEmail'
+      Protocol: email
+      TopicArn: !Ref SNSAlertsInfo
+
+  InitialErrorSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: cEMailSubscription
+    Properties:
+      Endpoint: !Ref 'pInitialSubscriberEmail'
+      Protocol: email
+      TopicArn: !Ref SNSAlertsError
+
+  InitialCriticalSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: cEMailSubscription
+    Properties:
+      Endpoint: !Ref 'pInitialSubscriberEmail'
+      Protocol: email
+      TopicArn: !Ref SNSAlertsCritical
+
+
+  #
+  # Alarm to Slack Lambda
+  #
   SlackNotificationLambdaRole:
     Type: AWS::IAM::Role
     Condition: cDeploySlackLambda
@@ -332,6 +318,30 @@ Resources:
       Principal: sns.amazonaws.com
       SourceArn: !Ref 'SNSAlertsError'
       Action: lambda:invokeFunction
+
+  LambdaInfoSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: cDeploySlackLambda
+    Properties:
+      Endpoint: !GetAtt SlackNotificationLambda.Arn
+      Protocol: lambda
+      TopicArn: !Ref SNSAlertsInfo
+
+  LambdaErrorSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: cDeploySlackLambda
+    Properties:
+      Endpoint: !GetAtt SlackNotificationLambda.Arn
+      Protocol: lambda
+      TopicArn: !Ref SNSAlertsError
+
+  LambdaCriticalSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: cDeploySlackLambda
+    Properties:
+      Endpoint: !GetAtt SlackNotificationLambda.Arn
+      Protocol: lambda
+      TopicArn: !Ref SNSAlertsCritical
 
 
 Outputs:
