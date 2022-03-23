@@ -150,11 +150,10 @@ Resources:
             logger.critical(f"Error during Credential and Service extraction: {e}")
             raise
 
-        WEBHOOK=get_webhook(os.getenv('WEBHOOK', default='NONE'))
-
         def lambda_handler(event, context):
             logger.debug("Received event: " + json.dumps(event, sort_keys=True))
 
+            WEBHOOK=get_webhook(os.getenv('WEBHOOK', default='NONE'))
             THRESHOLD_PCT=float(event['alert_percent']) / 100
 
             cost_alerts = []
@@ -166,15 +165,15 @@ Resources:
 
                 # Get the dates for the CostExplorer Calls
                 today = date.today()
-                yesterday = today - dt.timedelta(days=1)
-                one_week_ago = today - dt.timedelta(days=8)
+                # yesterday = today - dt.timedelta(days=1)
+                one_week_ago = today - dt.timedelta(days=7)
                 start_of_this_month = today.replace(day=1)
                 end_of_last_month = start_of_this_month - dt.timedelta(days=1)
                 start_of_last_month = end_of_last_month.replace(day=1)
 
                 # Get per-service costs
                 alert_args = {
-                    "TimePeriod": {'Start': str(one_week_ago), 'End': str(yesterday) },
+                    "TimePeriod": {'Start': str(one_week_ago), 'End': str(today) },
                     "Metrics": [METRIC],
                     "Granularity": 'DAILY',
                     "Filter": {"Dimensions": {"Key": "RECORD_TYPE", "Values": ["Usage"] }},
@@ -225,7 +224,7 @@ Resources:
 
                 # Get the total overall cost by day
                 response = ce_client.get_cost_and_usage(
-                    TimePeriod={'Start': str(one_week_ago), 'End': str(yesterday) },
+                    TimePeriod={'Start': str(one_week_ago), 'End': str(today) },
                     Metrics=[METRIC],
                     Granularity='DAILY',
                     Filter={"Dimensions": {"Key": "RECORD_TYPE", "Values": ["Usage"] }},
@@ -278,14 +277,14 @@ Resources:
 
                     total_attachment = {
                       'pretext': f"*Total Spend For: {os.environ['ACCOUNT_NAME']}*",
-                      'title': f"Service Usage as of {yesterday}",
+                      'title': f"Service Usage as of {today}",
                       'fields': fields,
                       'mrkdwn_in': ["pretext", "text"],
                       'color': '#7CD197'
                     }
 
                     slack_message = {
-                        'text': f"Billing anomaly report for {yesterday}",
+                        'text': f"Billing anomaly report for {today}",
                         'attachments': [total_attachment],
                         'username': "BillingMetrics",
                         'mrkdwn': True,
@@ -295,7 +294,7 @@ Resources:
                     if len(slack_fields) != 0:
                         attachment = {
                           'pretext': f"*Cost Spikes for: {os.environ['ACCOUNT_NAME']}*",
-                          'title': f"Service Usage as of {yesterday}",
+                          'title': f"Service Usage as of {today}",
                           'fields': slack_fields,
                           'mrkdwn_in': ["pretext", "text"],
                           'color': '#ff0000'
