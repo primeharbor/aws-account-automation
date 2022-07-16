@@ -195,7 +195,7 @@ def lambda_handler(event, context):
                 'icon_emoji': ':moneybag:'
             }
 
-            if slack_fields is not []:
+            if len(slack_fields) != 0:
                 attachment = {
                   'pretext': f"*Cost Spikes for: {os.environ['ACCOUNT_NAME']}*",
                   'title': f"Service Usage as of {yesterday}",
