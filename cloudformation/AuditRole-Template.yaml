@@ -166,6 +166,7 @@ Outputs:
     Value: !GetAtt AuditorCrossAccountRole.Arn
 
   ResponderRoleARN:
+    Condition: CreateResponderRole
     Description: The ARN of the Responder role that can be assumed by the other account.
     Value: !GetAtt ResponderCrossAccountRole.Arn
 

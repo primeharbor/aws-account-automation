@@ -36,6 +36,10 @@ Parameters:
     Type: String
     Default: https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRole-Template.yaml
 
+  pTemplateObjectVersion:
+    Description: Version ID of the Template to Deploy
+    Type: String
+
   pAWSOrgUnit:
     Description: AWS Organizations OU to deploy this stackset to. Probably should be the root OU
     Type: String
@@ -71,7 +75,7 @@ Resources:
           Regions:
             - us-east-1
       StackSetName: !Sub "${AWS::StackName}-StackSet"
-      TemplateURL: !Ref pTemplateURL
+      TemplateURL: !Sub "${pTemplateURL}?versionId=${pTemplateObjectVersion}"
 
 
 Outputs:
