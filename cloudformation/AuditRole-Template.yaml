@@ -48,6 +48,7 @@ Resources:
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/SecurityAudit
       - arn:aws:iam::aws:policy/ReadOnlyAccess
+      - arn:aws:iam::aws:policy/AWSAccountManagementReadOnlyAccess
       Path: /
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -170,4 +171,4 @@ Outputs:
 
 
   TemplateVersion:
-    Value: 1.1.0
+    Value: 1.2.0
