@@ -59,12 +59,14 @@ Resources:
           Principal:
             AWS: !Join ['', ['arn:aws:iam::', !Ref 'AuditorAccountNumber',':root']]
       Policies:
-        - PolicyName: IAMSimulateResources
+        - PolicyName: MissingPermissions
           PolicyDocument: 
             Version: "2012-10-17"
             Statement: 
               - Effect: "Allow"
-                Action: "iam:Simulate*"
+                Action:
+                  - "iam:Simulate*"
+                  - "account:GetContactInformation"
                 Resource: "*"
         - PolicyName: SecurityAuditTools
           PolicyDocument: 
@@ -172,4 +174,4 @@ Outputs:
 
 
   TemplateVersion:
-    Value: 1.2.0
+    Value: 1.2.1

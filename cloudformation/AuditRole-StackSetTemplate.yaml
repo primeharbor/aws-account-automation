@@ -60,7 +60,7 @@ Resources:
       Description: Organizational StackSet to Deploy Security Account Audit Role
       # ExecutionRoleName: String
       OperationPreferences:
-        FailureTolerancePercentage: 0
+        FailureTolerancePercentage: 100
         MaxConcurrentPercentage: 100
       Parameters:
         - ParameterKey: AuditorAccountNumber
