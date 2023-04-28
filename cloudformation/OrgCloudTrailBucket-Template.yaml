@@ -1,0 +1,187 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy S3 Buckets for recieving AWS Org CloudTrail Events
+# TemplateSource: https://github.com/jchrisfarris/pht-private-artifacts/blob/master/content/cloudformation/OrgTrails-Bucket-Template.yaml
+
+Parameters:
+
+  pSecurityAccountIDs:
+    Description: Account IDs to allow to read any S3 Object (useful for security account, etc)
+    Type: CommaDelimitedList
+    Default: "None"
+
+  pCloudtrailEventBucketName:
+    Description: Name of the bucket to create for storing the CloudTrail Events
+    Type: String
+    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
+
+  pOrganizationId:
+    Description: ID of the AWS Organization to allow accounts access to their Trail Objects
+    Type: String
+    AllowedPattern: "^o-[a-z0-9]{10,32}"
+    Default: o-xxxnonexxx
+
+  pTransitionToIADays:
+    Description: Days after object creation before the object is transitioned to InfrequentAccess (Must be > 30)
+    Type: String
+    Default: 180
+
+Conditions:
+  cOrgAccess: !Not [!Equals [!Ref pOrganizationId, "o-xxxnonexxx"]]
+  cSecurityAccountAccess: !Not [!Contains [!Ref pSecurityAccountIDs, "NONE"]]
+
+Resources:
+
+  CloudtrailEventsS3Bucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: LogDeliveryWrite
+      BucketName: !Ref 'pCloudtrailEventBucketName'
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      NotificationConfiguration:
+        TopicConfigurations:
+          - Event: s3:ObjectCreated:*
+            Topic: !Ref CloudtrailEventTopic
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: "AWSLogs/"
+                  - Name: suffix
+                    Value: ".json.gz"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: False  # This rule also prohibits Cross-Account bucket access
+      LifecycleConfiguration:
+        Rules:
+          - Id: InfrequentAccessRule
+            Prefix: AWSLogs
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: !Ref pTransitionToIADays
+                StorageClass: STANDARD_IA
+
+  CloudtrailEventsS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref 'CloudtrailEventsS3Bucket'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: AWSCloudTrailAclCheck
+          Effect: Allow
+          Principal:
+            Service: cloudtrail.amazonaws.com
+          Action: s3:GetBucketAcl
+          Resource: !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}"
+        - Sid: AWSCloudTrailWrite
+          Effect: Allow
+          Principal:
+            Service: cloudtrail.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}/AWSLogs/*"
+          Condition:
+            StringEquals:
+              s3:x-amz-acl: bucket-owner-full-control
+
+        # Only add this statement if a security account is defined
+        - Fn::If:
+          - cSecurityAccountAccess
+          - Sid: SecurityAccountRead
+            Action:
+            - s3:Get*
+            - s3:List*
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}/*"
+              - !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}"
+            Principal:
+              AWS: !Ref pSecurityAccountIDs
+          - !Ref AWS::NoValue
+
+        # Only add this statement if a Org ID is provided
+        - Fn::If:
+          - cOrgAccess
+          - Sid: IAMAccessAnalyzer
+            # Access Analyzer Policy documented here: https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-policy-generation.html?icmpid=docs_iam_console#access-analyzer-policy-generation-cross-account
+            Effect: Allow
+            Principal:
+              AWS: "*"
+            Action:
+            - s3:GetObject
+            - s3:ListBucket
+            Resource:
+            - !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}"
+            - !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}/AWSLogs/${pOrganizationId}/${!aws:PrincipalAccount}/*"
+            Condition:
+              StringEquals:
+                aws:PrincipalOrgID: !Ref pOrganizationId
+              StringLike:
+                aws:PrincipalArn: arn:aws:iam::${aws:PrincipalAccount}:role/service-role/AccessAnalyzerMonitorServiceRole*
+          - !Ref AWS::NoValue
+
+  # Define an SNS Topic for Logfile delivery
+  CloudtrailEventTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: CloudTrail Notification Topic for Cloudtrail Events
+
+  CloudtrailEventTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics: [!Ref 'CloudtrailEventTopic']
+      PolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+        - Sid: AWSCloudTrailSNSPolicy
+          Effect: Allow
+          Principal:
+            Service: cloudtrail.amazonaws.com
+          Resource: '*'
+          Action: SNS:Publish
+        - Sid: AWSCloudTrailSNSPolicy2
+          Effect: Allow
+          Principal:
+            AWS: !Ref pSecurityAccountIDs
+          Resource: '*'
+          Action: sns:Subscribe
+        - Sid: AllowBucketPublish
+          Effect: Allow
+          Principal:
+            AWS: "*"
+          Action:
+          - SNS:Publish
+          Resource:
+          - !Ref CloudtrailEventTopic
+          Condition:
+            ArnLike:
+              aws:SourceArn: !Sub "arn:aws:s3:*:*:${pCloudtrailEventBucketName}"
+            StringEquals:
+              aws:SourceAccount: !Ref AWS::AccountId
+
+
+Outputs:
+  CloudTrailTopicArn:
+    Value: !Ref 'CloudtrailEventTopic'
+    Description: ARN of the SNS Topic Created
+
+  CloudTrailTopicName:
+    Value: !GetAtt CloudtrailEventTopic.TopicName
+    Description: Name of the SNS Topic Created
+
+  LogBucket:
+    Value: !Ref pCloudtrailEventBucketName
+    Description: Bucket Name where CloudTrail events sent.
+
+  TemplateVersion:
+    Value: 1.1.0
