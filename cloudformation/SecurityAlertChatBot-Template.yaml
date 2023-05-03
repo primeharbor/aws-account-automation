@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Configure a Slack Chatbot for an account
+
+Parameters:
+
+  pChatBotWorkspaceId:
+    Description: pre-created Workspace ID
+    Type: String
+
+  pSlackChannelId:
+    Description: To get the ID, open Slack, right click on the channel name in the left pane, then choose Copy Link.
+    Type: String
+
+  pSnsTopicName:
+    Description: Name of the SNS Topic which will send events to ChatBot & Slack
+    Type: String
+
+Resources:
+
+  #
+  # Chat Bot
+  #
+  Chatbot:
+    Type: AWS::Chatbot::SlackChannelConfiguration
+    Properties:
+      ConfigurationName: !Sub "${AWS::StackName}-Chatbot"
+      # GuardrailPolicies:
+      #   - String
+      IamRoleArn: !GetAtt ChatbotRole.Arn
+      LoggingLevel: INFO
+      SlackChannelId: !Ref pSlackChannelId
+      SlackWorkspaceId: !Ref pChatBotWorkspaceId
+      SnsTopicArns:
+        - !GetAtt SlackSNSTopic.TopicArn
+      # UserRoleRequired: Boolean
+
+  SlackSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub "${AWS::StackName}-topic"
+      TopicName: !Ref pSnsTopicName
+
+  ChatbotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - chatbot.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      # ManagedPolicyArns:
+      #   - TBD
+      Policies:
+      - PolicyName: Logging
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - logs:*
+            Effect: Allow
+
+
+Outputs:
+
+  ChatbotTopicArn:
+    Value: !GetAtt SlackSNSTopic.TopicArn
