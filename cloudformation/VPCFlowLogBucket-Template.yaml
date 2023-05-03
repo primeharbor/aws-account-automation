@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy S3 Buckets for recieving Cross-Account VPC FlowLogs
+
+Parameters:
+
+  pSecurityAccountIDs:
+    Description: Account IDs to allow to read any S3 Object (useful for security account, etc)
+    Type: CommaDelimitedList
+
+  pVPCFlowLogsBucketName:
+    Description: Name of the bucket to create for storing the VPCFlowLogs
+    Type: String
+    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
+
+  pTransitionToIADays:
+    Description: Days after object creation before the object is transitioned to InfrequentAccess (Must be > 30)
+    Type: String
+    Default: 180
+
+Resources:
+
+  VPCFlowLogsS3Bucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: LogDeliveryWrite
+      BucketName: !Ref 'pVPCFlowLogsBucketName'
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      NotificationConfiguration:
+        TopicConfigurations:
+          - Event: s3:ObjectCreated:*
+            Topic: !Ref VPCFlowLogsTopic
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: "AWSLogs/"
+                  - Name: suffix
+                    Value: ".log.gz"
+      # BPA causes issues with FlowLogs
+      # PublicAccessBlockConfiguration:
+      #   BlockPublicAcls: True
+      #   BlockPublicPolicy: True
+      #   IgnorePublicAcls: True
+      #   RestrictPublicBuckets: False  # This rule also prohibits Cross-Account bucket access
+      LifecycleConfiguration:
+        Rules:
+          - Id: InfrequentAccessRule
+            Prefix: AWSLogs
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: !Ref pTransitionToIADays
+                StorageClass: STANDARD_IA
+
+  VPCFlowLogsS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref 'VPCFlowLogsS3Bucket'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: SecurityAccountList
+          Action:
+          - s3:ListBucket
+          Effect: Allow
+          Resource: !Sub "arn:aws:s3:::${pVPCFlowLogsBucketName}"
+          Principal:
+            AWS: !Ref pSecurityAccountIDs
+        - Sid: SecurityAccountRead
+          Action:
+          - s3:GetObject*
+          Effect: Allow
+          Resource: !Sub "arn:aws:s3:::${pVPCFlowLogsBucketName}/AWSLogs/*"
+          Principal:
+            AWS: !Ref pSecurityAccountIDs
+        - Sid: AWSLogDeliveryWrite
+          Effect: Allow
+          Principal:
+            Service: delivery.logs.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub "arn:aws:s3:::${pVPCFlowLogsBucketName}/AWSLogs/*"
+          Condition:
+            StringEquals:
+              # aws:SourceAccount: account_id
+              s3:x-amz-acl: bucket-owner-full-control
+        - Sid: AWSLogDeliveryAclCheck
+          Effect: Allow
+          Principal:
+            Service: delivery.logs.amazonaws.com
+          Action: s3:GetBucketAcl
+          Resource: !Sub "arn:aws:s3:::${pVPCFlowLogsBucketName}"
+          # Condition:
+          #   StringEquals:
+          #     # aws:SourceAccount: account_id
+
+  # Define an SNS Topic for Logfile delivery
+  VPCFlowLogsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: Notification Topic for VPCFlowLogs
+
+  VPCFlowLogsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics: [!Ref 'VPCFlowLogsTopic']
+      PolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+        - Sid: AWSVPCFlowLogsSNSPolicy2
+          Effect: Allow
+          Principal:
+            AWS: !Ref pSecurityAccountIDs
+          Resource: '*'
+          Action: sns:Subscribe
+        - Sid: AllowBucketPublish
+          Effect: Allow
+          Principal:
+            AWS: "*"
+          Action:
+          - SNS:Publish
+          Resource:
+          - !Ref VPCFlowLogsTopic
+          Condition:
+            ArnLike:
+              aws:SourceArn: !Sub "arn:aws:s3:*:*:${pVPCFlowLogsBucketName}"
+            StringEquals:
+              aws:SourceAccount: !Ref AWS::AccountId
+
+
+Outputs:
+  VPCFlowLogsTopicArn:
+    Value: !Ref 'VPCFlowLogsTopic'
+    Description: ARN of the SNS Topic Created
+
+  VPCFlowLogsTopicName:
+    Value: !GetAtt VPCFlowLogsTopic.TopicName
+    Description: Name of the SNS Topic Created
+
+  LogBucket:
+    Value: !Ref pVPCFlowLogsBucketName
+    Description: Bucket Name where VPCFlowLogs are sent.
+
+  TemplateVersion:
+    Value: 1.0.0
