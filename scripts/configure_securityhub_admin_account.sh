@@ -8,9 +8,18 @@ aws organizations list-accounts | jq '[ .Accounts[] | { AccountId: .Id, Email: .
 REGIONS=`aws ec2 describe-regions --query 'Regions[].[RegionName]' --output text`
 for r in $REGIONS ; do
   echo "Enabling SecurityHub Delegated Admin in $r"
+
+  # Enable Security Hub in this delegated Admin account
   aws securityhub enable-security-hub --no-enable-default-standards --output text --region $r
+
+  # Update the org config to auto-enable new accounts
   aws securityhub update-organization-configuration --auto-enable --region $r
+
+  # Add all of the existing accounts
   aws securityhub create-members --account-details file://ACCOUNT_INFO.txt --region $r
+
+  # Configure the Consolidated controls and enable all the controls for the enabled frameworks
+  aws securityhub update-security-hub-configuration --auto-enable-controls --control-finding-generator SECURITY_CONTROL --region $r
 done
 
 # cleanup
