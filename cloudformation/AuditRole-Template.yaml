@@ -15,7 +15,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: This template creates a cross account role for audit & security tool management from a dedicated security account
 
-# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AuditRole-Template.yaml
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/AuditRole-Template.yaml
 
 Parameters:
 

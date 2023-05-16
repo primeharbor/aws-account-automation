@@ -11,7 +11,7 @@ for r in $REGIONS ; do
   DETECTOR=`aws guardduty list-detectors --query DetectorIds[] --output text --region $r `
   if [ -z $DETECTOR ] ; then
     echo "No detector in $r, creating one"
-    DETECTOR=`aws guardduty create-detector  --output text --region $r --finding-publishing-frequency ONE_HOUR --enable`
+    DETECTOR=`aws guardduty create-detector  --output text --region $r --finding-publishing-frequency FIFTEEN_MINUTES --enable`
     if [ -z $DETECTOR ] ; then
       echo "Failed to create a detector in $r. Aborting script"
       exit 1

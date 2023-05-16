@@ -1,13 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deploy S3 Buckets for recieving AWS Org CloudTrail Events
-# TemplateSource: https://github.com/jchrisfarris/pht-private-artifacts/blob/master/content/cloudformation/OrgTrails-Bucket-Template.yaml
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/OrgCloudTrailBucket-Template.yaml
+# S3-Source: https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/OrgCloudTrailBucket-Template.yaml
 
 Parameters:
-
-  pSecurityAccountIDs:
-    Description: Account IDs to allow to read any S3 Object (useful for security account, etc)
-    Type: CommaDelimitedList
-    Default: "None"
 
   pCloudtrailEventBucketName:
     Description: Name of the bucket to create for storing the CloudTrail Events
@@ -27,7 +23,6 @@ Parameters:
 
 Conditions:
   cOrgAccess: !Not [!Equals [!Ref pOrganizationId, "o-xxxnonexxx"]]
-  cSecurityAccountAccess: !Not [!Contains [!Ref pSecurityAccountIDs, "NONE"]]
 
 Resources:
 
@@ -94,21 +89,6 @@ Resources:
             StringEquals:
               s3:x-amz-acl: bucket-owner-full-control
 
-        # Only add this statement if a security account is defined
-        - Fn::If:
-          - cSecurityAccountAccess
-          - Sid: SecurityAccountRead
-            Action:
-            - s3:Get*
-            - s3:List*
-            Effect: Allow
-            Resource:
-              - !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}/*"
-              - !Sub "arn:aws:s3:::${pCloudtrailEventBucketName}"
-            Principal:
-              AWS: !Ref pSecurityAccountIDs
-          - !Ref AWS::NoValue
-
         # Only add this statement if a Org ID is provided
         - Fn::If:
           - cOrgAccess
@@ -149,12 +129,6 @@ Resources:
             Service: cloudtrail.amazonaws.com
           Resource: '*'
           Action: SNS:Publish
-        - Sid: AWSCloudTrailSNSPolicy2
-          Effect: Allow
-          Principal:
-            AWS: !Ref pSecurityAccountIDs
-          Resource: '*'
-          Action: sns:Subscribe
         - Sid: AllowBucketPublish
           Effect: Allow
           Principal:

@@ -14,7 +14,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deploy the a Security Audit Role in all account in your Organization
-# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AuditRole-StackSetTemplate.yaml
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/AuditRole-StackSetTemplate.yaml
 
 Parameters:
 
