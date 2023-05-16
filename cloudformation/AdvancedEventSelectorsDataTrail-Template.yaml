@@ -1,0 +1,233 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Manage an AWS CloudTrail S3 datatrail using AdvancedEventSelectors
+
+Parameters:
+
+  pDataTrailName:
+    Description: Name of the CloudTrail datatrail to create
+    Type: String
+
+  pDataEventsBucketName:
+    Description: Name of the Bucket to create to hold the CloudTrail data events
+    Type: String
+    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
+
+  pAdvancedEventSelectorObjectKey:
+    Type: String
+    Description: Object Key for the AdvancedEventSelectors in S3
+    Default: advanced-event-selectors.json
+
+  pExecutionRate:
+    Description: How frequently to sync the AdvancedEventSelectors (As a CloudWatch ScheduleExpression)
+    Type: String
+    Default: rate(1 hour)
+
+  pEnableTrail:
+    Description: Enable to disable the logging of the datatrail
+    Type: String
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+
+Resources:
+  #
+  # DataTrail
+  #
+  DataEventsCloudTrail:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: !Ref pDataTrailName
+      S3BucketName: !Ref pDataEventsBucketName
+      IsLogging: !Ref pEnableTrail
+      EnableLogFileValidation: true
+      IncludeGlobalServiceEvents: true
+      IsMultiRegionTrail: true
+      IsOrganizationTrail: true
+      EventSelectors:
+        - DataResources:
+            - Type: AWS::S3::Object
+              Values:
+                # This will log all events in all S3 Buckets in this account
+                # It will also log all S3 events this account does with buckets in _other_ accounts
+                # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudtrail-trail-dataresource.html
+                - !Sub "arn:aws:s3:::"
+          IncludeManagementEvents: false
+          ReadWriteType: All
+
+  #
+  # Advanced EventSelector application Lambda
+  #
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: S3Access
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - s3:GetObject
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:aws:s3:::${pDataEventsBucketName}/${pAdvancedEventSelectorObjectKey}'
+          - Action:
+            - s3:ListAllMyBuckets
+            - s3:GetBucketLocation
+            Effect: Allow
+            Resource: '*'
+      - PolicyName: LambdaLogging
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - logs:*
+            Effect: Allow
+      - PolicyName: UpdateCloudTrail
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - cloudtrail:PutEventSelectors
+            Resource: !Sub arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${pDataTrailName}
+
+  UpdateAdvancedEventSelectorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-UpdateAdvancedEventSelectors"
+      Description: Update the AdvancedEventSelectors on a CloudTrail
+      Handler: index.handler
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.9
+      MemorySize: 1024
+      Timeout: 90
+      Environment:
+        Variables:
+            BUCKET: !Ref pDataEventsBucketName
+            ADVANCED_EVENT_SELECTORS: !Ref pAdvancedEventSelectorObjectKey
+            CLOUDTRAIL_NAME: !Ref pDataTrailName
+            LOG_LEVEL: 'INFO'
+      Code:
+        ZipFile: |
+          # Download EventSelectors from S3 and apply them to CloudTrail
+          from botocore.exceptions import ClientError
+          import boto3
+          import json
+          import os
+          import sys
+
+          import logging
+          logger = logging.getLogger()
+          logger.setLevel(getattr(logging, os.getenv('LOG_LEVEL', default='INFO')))
+          logging.getLogger('botocore').setLevel(logging.WARNING)
+          logging.getLogger('boto3').setLevel(logging.WARNING)
+          logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+          def handler(event, context):
+              logger.debug("Received event: " + json.dumps(event, sort_keys=True))
+              s3_client = boto3.client('s3')
+              try:
+                response = s3_client.get_object(
+                  Bucket=os.environ['BUCKET'],
+                  Key=os.environ['ADVANCED_EVENT_SELECTORS']
+                )
+                event_selectors = json.loads(response['Body'].read().decode("utf-8"))
+              except ClientError as e:
+                logger.error(f"ClientError Account list s3://{os.environ['BUCKET']}/{os.environ['ADVANCED_EVENT_SELECTORS']}: {e}")
+                raise
+
+              try:
+                cloudtrail = boto3.client('cloudtrail')
+                response = cloudtrail.put_event_selectors(TrailName=os.environ['CLOUDTRAIL_NAME'],AdvancedEventSelectors=event_selectors)
+              except ClientError as e:
+                logger.error(f"Failed to push event_selectors {event_selectors} to Trail {os.environ['CLOUDTRAIL_NAME']}")
+                raise
+          # End of Function code
+
+  TriggerLambdaEvent:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: UpdateAdvancedEventSelectorFunction
+      State: ENABLED
+      ScheduleExpression: !Ref pExecutionRate
+      Targets:
+        - Arn: !GetAtt UpdateAdvancedEventSelectorFunction.Arn
+          Id: UpdateAdvancedEventSelectorFunction
+
+  TriggerLambdaEventPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      FunctionName: !Ref UpdateAdvancedEventSelectorFunction
+      SourceArn: !GetAtt TriggerLambdaEvent.Arn
+
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub ${AWS::StackName}-LambdaErrors
+      AlarmDescription: "Alarm if lambda errors out"
+      Namespace: "AWS/Lambda"
+      MetricName: "Errors"
+      Dimensions:
+      - Name: "FunctionName"
+        Value: !Ref UpdateAdvancedEventSelectorFunction
+      Statistic: "Sum"
+      ComparisonOperator: "GreaterThanThreshold"
+      Threshold: 0
+      EvaluationPeriods: 1
+      Period: 60
+      TreatMissingData: "ignore"
+      # AlarmActions:
+      #   - !Ref SlackSNSTopic
+
+
+Outputs:
+  StackName:
+    Value: !Ref AWS::StackName
+    Description: Just the name of this stack
+
+  DataTrailArn:
+    Value: !GetAtt DataEventsCloudTrail.Arn
+
+  DataTrailBucket:
+    Value: !Ref pDataEventsBucketName
+
+  AdvancedEventSelectorS3Path:
+    Value: !Sub "s3://${pDataEventsBucketName}/${pAdvancedEventSelectorObjectKey}"
+    Description: Object Path for the AdvancedEventSelectors file
+
+
+#
+# Sample EventSelector JSON File
+#
+
+# [
+#   {
+#     "Name": "S3DataEvents",
+#     "FieldSelectors": [
+#       {"Field": "eventCategory", "Equals": ["Data"] },
+#       {"Field": "resources.type", "Equals": ["AWS::S3::Object"] },
+#       {
+#         "Field": "resources.ARN",
+#         "NotStartsWith": [
+#           "arn:aws:s3:::MYCLOUDTRAILBUCKET",
+#           "arn:aws:s3:::MYDATATRAILTRAILBUCKET",
+#           "arn:aws:s3:::SOMEOTHERACTIVEBUCKET"
+#         ]
+#       }
+#     ]
+#   }
+# ]
