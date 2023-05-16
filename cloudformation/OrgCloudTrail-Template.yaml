@@ -30,9 +30,27 @@ Parameters:
       - false
     Default: false
 
+  pCloudTrailLogGroupName:
+    Type: String
+    Default: CloudTrail/DefaultLogGroup
+
+  pCloudTrailLogGroupRetention:
+    Type: String
+    Default: 365
+
+  pSendToCloudWatch:
+    Type: String
+    Description: Boolean to send events to CloudWatch Logs
+    AllowedValues:
+      - true
+      - false
+    Default: false      
+
+
 Conditions:
   cEnableEventsTopic: !Equals [!Ref 'pEnableEventsTopic', 'true']
   cEnableDataEvents: !Equals [!Ref 'pEnableDataTrails', 'true']
+  cSendToCloudWatch: !Equals [!Ref 'pSendToCloudWatch', 'true']
 
 
 Resources:
@@ -47,12 +65,50 @@ Resources:
       EnableLogFileValidation: true
       IncludeGlobalServiceEvents: true
       IsMultiRegionTrail: true
+      IsOrganizationTrail: true
       SnsTopicName: !If [cEnableEventsTopic, !GetAtt CloudTrailTopic.TopicName, !Ref AWS::NoValue ]
+      CloudWatchLogsRoleArn: !If [cSendToCloudWatch, !GetAtt CloudTrailToCloudWatchLogsRole.Arn, !Ref AWS::NoValue ] 
+      CloudWatchLogsLogGroupArn: !If [cSendToCloudWatch, !GetAtt CloudTrailLogGroup.Arn, !Ref AWS::NoValue ] 
       # EventSelectors:
       #   - IncludeManagementEvents: true
       #     ReadWriteType: WriteOnly
 
-
+  # Define a Log Group to Send the Cloudtrail Events to CloudWatch Logs
+  CloudTrailToCloudWatchLogsRole:
+    Type: "AWS::IAM::Role"
+    Condition: cSendToCloudWatch
+    Properties: 
+      Path: "/"
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: 
+                - "cloudtrail.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: SendtoCloudWatchLogs
+          PolicyDocument: 
+            Version: '2012-10-17'
+            Statement:
+            - Sid: AWSCloudTrailCreateLogStream
+              Effect: Allow
+              Action: logs:CreateLogStream
+              Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${pCloudTrailLogGroupName}:log-stream:*
+            - Sid: AWSCloudTrailPutLogEvents20141101
+              Effect: Allow
+              Action: logs:PutLogEvents
+              Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${pCloudTrailLogGroupName}:log-stream:*
+  
+  CloudTrailLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Condition: cSendToCloudWatch
+    DeletionPolicy: Retain
+    Properties: 
+      LogGroupName: !Ref pCloudTrailLogGroupName
+      RetentionInDays: !Ref pCloudTrailLogGroupRetention
 
   CloudTrailTopic:
     Type: AWS::SNS::Topic
@@ -60,7 +116,6 @@ Resources:
     Properties:
       DisplayName: !Sub "${AWS::StackName}-ModifyEventsTopic"
       TopicName: !Sub "${AWS::StackName}-ModifyEventsTopic"
-
 
   CloudTrailPolicy:
     Type: AWS::SNS::TopicPolicy
@@ -121,5 +176,13 @@ Outputs:
     Description: Arn of the SNS Topic attached to the Org Event Trail
     Value: !Ref CloudTrailTopic
 
+  CloudTrailLogGroup:
+    Value: !Ref pCloudTrailLogGroupName
+    Description: Location in CloudWatch Logs where the CT Events are sent
+
+  CloudTrailLogGroupArn:
+    Value: !GetAtt CloudTrailLogGroup.Arn
+    Description: ARN Location in CloudWatch Logs where the CT Events are sent
+
   TemplateVersion:
-    Value: 1.0.0
+    Value: 1.1.0
