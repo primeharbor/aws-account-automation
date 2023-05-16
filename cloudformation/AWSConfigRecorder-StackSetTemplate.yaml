@@ -14,7 +14,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deploy the AWS Config Service Recorder in this region and send recorded events to central bucket
-# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AWSConfigRecorder-StackSetTemplate.yaml
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/AWSConfigRecorder-StackSetTemplate.yaml
 
 Parameters:
 

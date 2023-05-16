@@ -14,7 +14,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Configure The Organizational Config Service Aggregator and Conformance Pack Infrastructure
-# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/AWSConfigAggregator-Template.yaml
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/AWSConfigAggregator-Template.yaml
 
 Parameters:
 

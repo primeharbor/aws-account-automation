@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deploy S3 Buckets for recieving AWS Org CloudTrail Events
-# TemplateSource: 
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/OrgCloudTrailBucket-Template.yaml
+# S3-Source: https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/OrgCloudTrailBucket-Template.yaml
 
 Parameters:
 
