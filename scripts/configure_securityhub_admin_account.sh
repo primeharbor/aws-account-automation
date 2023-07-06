@@ -12,6 +12,8 @@ for r in $REGIONS ; do
   # Enable Security Hub in this delegated Admin account
   aws securityhub enable-security-hub --no-enable-default-standards --output text --region $r
 
+  sleep 10
+
   # Update the org config to auto-enable new accounts
   aws securityhub update-organization-configuration --auto-enable --region $r
 
