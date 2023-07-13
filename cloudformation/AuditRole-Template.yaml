@@ -67,6 +67,9 @@ Resources:
                 Action:
                   - "iam:Simulate*"
                   - "account:GetContactInformation"
+                  - "glue:GetConnections"
+                  - "wellarchitected:ListWorkloads"
+                  - "aws-marketplace:ViewSubscriptions"
                 Resource: "*"
         - PolicyName: SecurityAuditTools
           PolicyDocument: 
@@ -104,12 +107,17 @@ Resources:
           Principal:
             AWS: !Join ['', ['arn:aws:iam::', !Ref 'AuditorAccountNumber',':root']]
       Policies:
-        - PolicyName: IAMSimulateResources
+        - PolicyName: MissingPermissions
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: "Allow"
-                Action: "iam:Simulate*"
+                Action:
+                  - "iam:Simulate*"
+                  - "account:GetContactInformation"
+                  - "glue:GetConnections"
+                  - "wellarchitected:ListWorkloads"
+                  - "aws-marketplace:ViewSubscriptions"
                 Resource: "*"
         - PolicyName: ContainmentActions
           PolicyDocument:
@@ -174,4 +182,4 @@ Outputs:
 
 
   TemplateVersion:
-    Value: 1.2.1
+    Value: 1.2.2
