@@ -76,15 +76,36 @@ Resources:
                 Action: 
                 - "trustedAdvisor:*"
                 - "health:*"
-                - "aws-portal:View*"
                 - "guardduty:*"
                 - "macie:*"
                 - "inspector:*"
                 - "support:*"
                 - "guardduty:*"
                 - "securityhub:*"
-                - "ce:*"
                 Resource: "*"
+        - PolicyName: BillingAuditPermissions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                - "aws-portal:View*" # Legacy Perm going away
+                - "ce:*"             # Full Access to Cost Explorer
+                - "account:Get*"
+                - "billing:Get*"
+                - "payments:List*"
+                - "payments:Get*"
+                - "tax:List*"
+                - "tax:Get*"
+                - "consolidatedbilling:Get*"
+                - "consolidatedbilling:List*"
+                - "invoicing:List*"
+                - "invoicing:Get*"
+                - "cur:Get*"
+                - "cur:Validate*"
+                - "freetier:Get*"
+                Resource: "*"
+
 
   ResponderCrossAccountRole:
     Type: AWS::IAM::Role
@@ -94,6 +115,7 @@ Resources:
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/SecurityAudit
       - arn:aws:iam::aws:policy/ReadOnlyAccess
+      - arn:aws:iam::aws:policy/AWSAccountManagementReadOnlyAccess
       Path: /
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -152,15 +174,39 @@ Resources:
             Statement:
               - Effect: "Allow"
                 Action:
-                - "trustedAdvisor:*"
-                - "health:*"
-                - "aws-portal:View*"
-                - "inspector:*"
-                - "support:*"
-                - "ce:*"
-                - "wafv2:*"
                 - "cloudshell:*"
+                - "guardduty:*"
+                - "health:*"
+                - "inspector:*"
+                - "macie:*"
+                - "securityhub:*"
+                - "support:*"
+                - "trustedAdvisor:*"
+                - "wafv2:*"
                 Resource: "*"
+        - PolicyName: BillingAuditPermissions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                - "aws-portal:View*" # Legacy Perm going away
+                - "ce:*"             # Full Access to Cost Explorer
+                - "account:Get*"
+                - "billing:Get*"
+                - "payments:List*"
+                - "payments:Get*"
+                - "tax:List*"
+                - "tax:Get*"
+                - "consolidatedbilling:Get*"
+                - "consolidatedbilling:List*"
+                - "invoicing:List*"
+                - "invoicing:Get*"
+                - "cur:Get*"
+                - "cur:Validate*"
+                - "freetier:Get*"
+                Resource: "*"
+
 
 Outputs:
   RoleARN:
@@ -174,4 +220,4 @@ Outputs:
 
 
   TemplateVersion:
-    Value: 1.2.1
+    Value: 1.3.0
