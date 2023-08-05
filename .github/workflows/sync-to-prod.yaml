@@ -1,5 +1,8 @@
 name: Sync Master Branch to S3
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
