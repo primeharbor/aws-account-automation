@@ -1,3 +1,4 @@
+aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml	hkiegQ1bzudlu5AWPJIrUsdUlzBJ5LcH	2023-08-08T13:18:52+00:00
 aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml	zJ7zRoTkHV8MD_sVYk2xd2VABdfEvgX9	2023-08-05T14:00:50+00:00
 aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml	bYGiV26sIGaOcXsl6JuPsvWswczaeJZC	2023-08-05T13:43:22+00:00
 aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml	Lrv.d_gQ6iG9cALxYhPBUuch82rhs6v1	2023-08-05T13:36:36+00:00
@@ -53,6 +54,7 @@ aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml	Yt9AEZWOh1BM
 aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml	rCtZ4UEPv3ZF8sANIfMIhR1ZMX125Xnm	2020-11-25T18:20:49+00:00
 aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml	msMZdAG7ys6u5ZnjWOdAz61ZfxbB0Y_C	2020-10-23T14:00:32+00:00
 aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml	9GFusAVNkcmFCIsa07DlJqxo9SDcI5kG	2020-10-23T13:48:35+00:00
+aws-account-automation/AWSConfigAggregator-Template.yaml	EPbfdPkHP4UKhJ9IrF5YqAGEMKQ8FXRU	2023-08-08T13:18:52+00:00
 aws-account-automation/AWSConfigAggregator-Template.yaml	vVRV33cXmAEPLG0tjiqwm3BBOdhHbuo4	2023-08-05T14:00:50+00:00
 aws-account-automation/AWSConfigAggregator-Template.yaml	JJYQCrWOzvzFOu66e2lOtuFMX1uM71na	2023-08-05T13:43:22+00:00
 aws-account-automation/AWSConfigAggregator-Template.yaml	bpI486_jTnJGloQOS.3h2aQHtK5Htn0x	2023-08-05T13:36:36+00:00
@@ -87,6 +89,7 @@ aws-account-automation/AWSConfigAggregator-Template.yaml	OH297jCdelkO.lji0BQuEwj
 aws-account-automation/AWSConfigAggregator-Template.yaml	KCwZg.A39S4ht07BPT_vu3ewsulFFt6x	2021-07-25T17:26:52+00:00
 aws-account-automation/AWSConfigAggregator-Template.yaml	TXyoBArk0EJ_V96xaZOi8CGdmt4fRk5z	2021-07-25T17:20:26+00:00
 aws-account-automation/AWSConfigAggregator-Template.yaml	rjMiSnCwfJTAsXSJFPdizBIX3EwuDm4T	2021-07-25T17:18:39+00:00
+aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml	2c7BgHIysFpGCJCM3daakahQ2zBSFkQ1	2023-08-08T13:18:52+00:00
 aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml	th3V4vf0flxv9ars3ny9K4hFn4T9vQh3	2023-08-05T14:00:50+00:00
 aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml	R0gGXT4ibqvT9_TcOl9tDwguPhgz92SB	2023-08-05T13:43:22+00:00
 aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml	6TwV0rzKlhqYwnIm7zENMcoMD_MFHIHf	2023-08-05T13:36:36+00:00
@@ -127,6 +130,7 @@ aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml	oyEDg7JegJ3CAPXNc
 aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml	xOboWwLNB8miFxiNzuYacUmQTT4IoWPh	2021-07-25T16:19:33+00:00
 aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml	4MQ0wqoqWv1p10p46OkKVnDMRhGOtu8I	2021-07-25T16:07:14+00:00
 aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml	BEp5Etll0Vz4oHOhjeEx6iwd1miUnymH	2021-07-25T15:30:45+00:00
+aws-account-automation/AWSConfigRecorder-Template.yaml	DD62JL.GeD6U6KpUm2R4WS9e2QA8mlIk	2023-08-08T13:18:52+00:00
 aws-account-automation/AWSConfigRecorder-Template.yaml	6r0kMoK_p4YVFmZ3HFXNW71f4eJBu8LJ	2023-08-05T14:00:50+00:00
 aws-account-automation/AWSConfigRecorder-Template.yaml	Jjg86r7LRMWcizCLkmLbvWdIXAC2Cvep	2023-08-05T13:43:22+00:00
 aws-account-automation/AWSConfigRecorder-Template.yaml	..ZB5FBaWN0gHnMYHV7dnea63hFR9OJx	2023-08-05T13:36:36+00:00
@@ -167,6 +171,7 @@ aws-account-automation/AWSConfigRecorder-Template.yaml	c1GT78fSSaoOubXnqJ6KrYwnr
 aws-account-automation/AWSConfigRecorder-Template.yaml	cp3UEIvUu.ODXKSBFa5j8BnZUC9J0pPd	2021-07-25T16:19:33+00:00
 aws-account-automation/AWSConfigRecorder-Template.yaml	kZv557txGdFKLcyVoYbH95JRQZwXjDVy	2021-07-25T16:07:14+00:00
 aws-account-automation/AWSConfigRecorder-Template.yaml	j4EAILg2_dgkxG3QtJx4OiEg0j2JQF3F	2021-07-25T15:30:45+00:00
+aws-account-automation/AccountAlertTopics-Template.yaml	v3b13zsZUqiw45KiG3MmVRBur_sWNbeT	2023-08-08T13:18:52+00:00
 aws-account-automation/AccountAlertTopics-Template.yaml	N2DG90gzl4_LGCEJR9nq2XpSMHpqA6AI	2023-08-05T14:00:50+00:00
 aws-account-automation/AccountAlertTopics-Template.yaml	6AfJdH_sP_I5t4Xjaf9mAotxmflHFIQE	2023-08-05T13:43:22+00:00
 aws-account-automation/AccountAlertTopics-Template.yaml	PwbDYzP73DcGJWv1zPTQxYBW.kHYX8L7	2023-08-05T13:36:36+00:00
@@ -233,6 +238,7 @@ aws-account-automation/AccountAlertTopics-Template.yaml	Z293AgRPi1qDBUjVewDlQuix
 aws-account-automation/AccountAlertTopics-Template.yaml	a0THfZElJ7GRo2uZs46HIPP2W6ZPrhyc	2020-05-02T16:55:28+00:00
 aws-account-automation/AccountAlertTopics-Template.yaml	MoUNHFy5Whsud4lKKGLR4PshyJqhIRdG	2020-05-02T16:54:40+00:00
 aws-account-automation/AccountAlertTopics-Template.yaml	MzDrAUGff.OAylsqnlF1IB23R4Tjh1yF	2020-05-02T15:38:05+00:00
+aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml	LKUzGY3Ph_MTFnp.oqltcRBeJytpRuak	2023-08-08T13:18:52+00:00
 aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml	YjKeoHknVZli4yfKsGywtBFfh4KgaL_4	2023-08-05T14:00:50+00:00
 aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml	HLkGJ_P5c0vBjxuSxMQp74gGLUPwCVI1	2023-08-05T13:43:22+00:00
 aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml	Y.soG4ExscQR9bZR7YxKm.0NziOKadDW	2023-08-05T13:36:37+00:00
@@ -242,6 +248,7 @@ aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml	HfoRL2PpdWV
 aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml	mYEbQHwX_gghp38puhd2IUWO5zKS.ABv	2023-07-06T20:31:09+00:00
 aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml	4DEjlMRRj_yaLOMpmyEpi01arpZgMAA_	2023-05-16T15:11:44+00:00
 aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml	cn1HMOFS.QFcThAxSvzw7PLBeQXTpGY8	2023-05-16T15:05:11+00:00
+aws-account-automation/AuditRole-StackSetTemplate.yaml	4ztZczVKHD.R7_UvKoAlAqorPfyhTrsL	2023-08-08T13:18:52+00:00
 aws-account-automation/AuditRole-StackSetTemplate.yaml	qhFSeHI6wjotP7M2WNe8_rIcRomoh0Id	2023-08-05T14:00:50+00:00
 aws-account-automation/AuditRole-StackSetTemplate.yaml	PDojbrK563QsO5QNjc0cXtdyTE.6d6Rn	2023-08-05T13:43:22+00:00
 aws-account-automation/AuditRole-StackSetTemplate.yaml	E2vHR124el.BXbiwoF7qsz2K7A9vg9ie	2023-08-05T13:36:36+00:00
@@ -272,6 +279,7 @@ aws-account-automation/AuditRole-StackSetTemplate.yaml	.24fo3brLTmOQf7wakcQbKRtQ
 aws-account-automation/AuditRole-StackSetTemplate.yaml	bR6toUpoD_WDF.D5uDlYQHAMGkHAUs9W	2021-07-31T21:00:55+00:00
 aws-account-automation/AuditRole-StackSetTemplate.yaml	W22JdyazvcLOn_W7.X1BfdUO7ul0yo.J	2021-07-31T19:57:05+00:00
 aws-account-automation/AuditRole-StackSetTemplate.yaml	3z89P0uJgrstZZNxQXSCgbbQ9nr75fYK	2021-07-31T19:34:11+00:00
+aws-account-automation/AuditRole-Template.yaml	Vdw.MmcGqxJ10cO0CT.tVld8EMwH258d	2023-08-08T13:18:52+00:00
 aws-account-automation/AuditRole-Template.yaml	JKt3hKXsUi2z3PXlJAGKuAInDXtXLxVw	2023-08-05T14:00:50+00:00
 aws-account-automation/AuditRole-Template.yaml	X2gzvvUHJY9Bkd1UAkDCebYThToAKXpn	2023-08-05T13:43:22+00:00
 aws-account-automation/AuditRole-Template.yaml	xp3eCdVHFZhSCECBMNzl8LlfQzhkK5XA	2023-08-05T13:36:36+00:00
@@ -338,6 +346,7 @@ aws-account-automation/AuditRoleTemplate.yaml	r0pfYyVWIK0_eVYYvRz44WvSlApMnjru	2
 aws-account-automation/AuditRoleTemplate.yaml	omyETXfPRLxNdkDcxZ_ATSZaaZHMkvDM	2020-05-02T16:55:28+00:00
 aws-account-automation/AuditRoleTemplate.yaml	HWh7NqJjFYdh1I8p_xqi_V0k68pYL0O8	2020-05-02T16:54:40+00:00
 aws-account-automation/AuditRoleTemplate.yaml	Mp7RPAXy64.0sDhKVdlpSEWZswX28HJt	2020-05-02T15:38:05+00:00
+aws-account-automation/BillingBucket-Template.yaml	qBAD9vAu3LhxRRoJJBjyvOND1g1UrPtB	2023-08-08T13:18:52+00:00
 aws-account-automation/BillingBucket-Template.yaml	sS6pnqOgva4oxaDpqpeVVfUn3tR7Z_eD	2023-08-05T14:00:50+00:00
 aws-account-automation/BillingBucket-Template.yaml	SIZzBqIJhHo85SomN.kcWt8mDyp9ECr9	2023-08-05T13:43:22+00:00
 aws-account-automation/BillingBucket-Template.yaml	liqaHFHfxKMwFX0ApVYbWEOWlQhD3GWQ	2023-08-05T13:36:36+00:00
@@ -404,6 +413,7 @@ aws-account-automation/BillingBucket.yaml	bGBmjfSfrv6EQ3MGcXivPbjugI5R1fRp	2020-
 aws-account-automation/BillingBucket.yaml	1XLJbxiaxaJl4LBgfmpDwBxIABm26sw3	2020-05-02T16:55:28+00:00
 aws-account-automation/BillingBucket.yaml	R3EPeoX.aR2FMGQTzQ4YRxIogRi1YtxF	2020-05-02T16:54:40+00:00
 aws-account-automation/BillingBucket.yaml	Mt6zU5KgoO8AWTS0ERHL0z7WThCrCVI0	2020-05-02T15:38:05+00:00
+aws-account-automation/BillingMetrics-Template-Transformed.yaml	Li2V3P2EzHDpadD5OQSQMdNPtr5HXCQc	2023-08-08T13:18:52+00:00
 aws-account-automation/BillingMetrics-Template-Transformed.yaml	RF24RHSpWJZ8cS._SITZVIZ8UOHy9FqX	2023-08-05T14:00:50+00:00
 aws-account-automation/BillingMetrics-Template-Transformed.yaml	6rWRPgNmzPjl3cItXhyQTVRGrxLD3N3h	2023-08-05T13:43:22+00:00
 aws-account-automation/BillingMetrics-Template-Transformed.yaml	W_OHf6aAk31GllDxv.zlXf9cmguGdP6x	2023-08-05T13:36:36+00:00
@@ -456,6 +466,7 @@ aws-account-automation/BillingMetrics-Template-Transformed.yaml	K6DJCfUiqKcb6QsR
 aws-account-automation/BillingMetrics-Template-Transformed.yaml	SV8.9Y37hc43Q_LrNwJij7Vk1uDlQpd7	2020-12-20T13:12:06+00:00
 aws-account-automation/BillingMetrics-Template-Transformed.yaml	ddqT_bS295RrfPEzhBORT7QNShHc5X_r	2020-12-20T13:08:56+00:00
 aws-account-automation/BillingMetrics-Template-Transformed.yaml	cj6xTKu1Wgsba1BsjK7MNq1R1Jgf4C1n	2020-12-20T12:50:35+00:00
+aws-account-automation/BillingMetrics-Template.yaml	bL6w6UZ7u01cdJvs9opfXdtmWZpFCKbV	2023-08-08T13:18:52+00:00
 aws-account-automation/BillingMetrics-Template.yaml	JoR7Z4V6nRbxlYX5O4QW4AfNcnzg2sTv	2023-08-05T14:00:51+00:00
 aws-account-automation/BillingMetrics-Template.yaml	9G.A.Rv1Ld1LvQUZZq9N3FwZ87kfe2vx	2023-08-05T13:43:22+00:00
 aws-account-automation/BillingMetrics-Template.yaml	vsEi3zXjKXqhnLeMcCZMknBEsk_9q4Lu	2023-08-05T13:36:37+00:00
@@ -508,6 +519,7 @@ aws-account-automation/BillingMetrics-Template.yaml	He2zIBBXGnvIuJlZ2geEHbYmd73q
 aws-account-automation/BillingMetrics-Template.yaml	oRfMluygeZbuXUvhqrn6osU9Os2_dl27	2020-12-20T13:12:06+00:00
 aws-account-automation/BillingMetrics-Template.yaml	I5Wqa7Sfeywm0P3UileWk_oNtlHr4e50	2020-12-20T13:08:56+00:00
 aws-account-automation/BillingMetrics-Template.yaml	zvicJLEpu22ufGsLOOuDamy17oQPfpMd	2020-12-20T12:50:35+00:00
+aws-account-automation/CloudTrail-Template.yaml	dr1DxcMMGN0IR1LSyNEjsmh9iOhHoCzc	2023-08-08T13:18:52+00:00
 aws-account-automation/CloudTrail-Template.yaml	qrnA6FgdV56xwf4K78jnDccW._OeeP4T	2023-08-05T14:00:51+00:00
 aws-account-automation/CloudTrail-Template.yaml	kd3ePlEaht4V_dB4uh1LYcdz.j855aZX	2023-08-05T13:43:22+00:00
 aws-account-automation/CloudTrail-Template.yaml	elvLSbfYwy.2cyVxkc4zMCNS0MRPCRhK	2023-08-05T13:36:36+00:00
@@ -570,6 +582,7 @@ aws-account-automation/CloudTrail-Template.yaml	bcacJlhv.v9VTLB.e1l7H6f4nmP.R9z4
 aws-account-automation/CloudTrail-Template.yaml	4ojQ70pJ0TxCvYe0q1axYa5eb.YTYIKR	2020-05-02T18:24:12+00:00
 aws-account-automation/CloudTrail-Template.yaml	Gfi2yi27AXihB14E9r87NTZsZw8tvFmf	2020-05-02T18:21:11+00:00
 aws-account-automation/CloudTrailBucket-Template.yaml	s94pUkXcKAkyrcMmo73xcm9nQJeB64zU	2021-07-25T14:34:52+00:00
+aws-account-automation/CloudTrailConfigBucket-Template.yaml	rvuXOPNJS4RY9lHfNo.0FtBOm5mjDDv7	2023-08-08T13:18:52+00:00
 aws-account-automation/CloudTrailConfigBucket-Template.yaml	kgZO5.Hm4ZwGeOMpEBEIvmTxTUHvdZ.x	2023-08-05T14:00:51+00:00
 aws-account-automation/CloudTrailConfigBucket-Template.yaml	DHZBQU56AT.0N1SvI616rymj5ehkvp6c	2023-08-05T13:43:22+00:00
 aws-account-automation/CloudTrailConfigBucket-Template.yaml	j4XwSJ3vvux9q9mJcHG4rZ6cXhnDYiF1	2023-08-05T13:36:37+00:00
@@ -616,6 +629,7 @@ aws-account-automation/CloudTrailTemplate.yaml	v_4T.DmgkjlUd2t9pZiEZviXhyEsMaLm	
 aws-account-automation/CloudTrailTemplate.yaml	Qadp8UZ291kJpx_a7e7NTnh_GSTL1k1T	2020-05-02T16:55:28+00:00
 aws-account-automation/CloudTrailTemplate.yaml	pTi7wacuOoHN7wo43iv.54DpYn63RKJs	2020-05-02T16:54:40+00:00
 aws-account-automation/CloudTrailTemplate.yaml	Q0_IFXdgeV5d5FZDjqmAMwXGB4Ql4YfQ	2020-05-02T15:38:05+00:00
+aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml	6dh7JoLgwR2DHXjRh8CaYlPWjY.FGdCC	2023-08-08T13:18:52+00:00
 aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml	7YNT8IIxUZyamIrKRBkXe3InRXs8o1he	2023-08-05T14:00:51+00:00
 aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml	d5EYlq5Uge6u_G37krcR3eK4r7z54UL0	2023-08-05T13:43:22+00:00
 aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml	jBG4qmkY99jTb1lBNLyk.ne5P8Dzgv9i	2023-08-05T13:36:36+00:00
@@ -682,6 +696,7 @@ aws-account-automation/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml	F3eo1p
 aws-account-automation/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml	Qu4xH0j1XR7WZys6vu01.N5.VeKnCiUL	2020-05-02T16:55:28+00:00
 aws-account-automation/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml	1hrf4ZN6ED7PxZT7kMbKBpUTVveu5bsC	2020-05-02T16:54:40+00:00
 aws-account-automation/CloudWatch_Alarms_for_CloudTrail_API_Activity.yaml	SCITPXiSTVd4hj6OAR7ZA_0Za8U3.byY	2020-05-02T15:38:05+00:00
+aws-account-automation/CostExplorerAlerts-Template.yaml	ZGzSng6uwhiK.rG1g2fr7Xd.urMWy1q0	2023-08-08T13:18:52+00:00
 aws-account-automation/CostExplorerAlerts-Template.yaml	LsPkQEIFvgoB22SwSzI1CuVx_9Rfo4ly	2023-08-05T14:00:51+00:00
 aws-account-automation/CostExplorerAlerts-Template.yaml	1NLNvAjX7E50ImbtM0IHITZxmi6wr_iP	2023-08-05T13:43:22+00:00
 aws-account-automation/CostExplorerAlerts-Template.yaml	Y47zKBA9NyYNaqywcrNek5Ggh2QywY4e	2023-08-05T13:36:36+00:00
@@ -706,6 +721,7 @@ aws-account-automation/CostExplorerAlerts-Template.yaml	9cORBxGQKcoP_xkhB8il4BIP
 aws-account-automation/DeployBucketTemplate.yaml	36qk9I8E.uD5BSNF.r7uj0qLcLpGJh4V	2020-05-02T16:55:28+00:00
 aws-account-automation/DeployBucketTemplate.yaml	vpr_KVt5AUmhGz.DETpbGKZ_jWoNn4BA	2020-05-02T16:54:40+00:00
 aws-account-automation/DeployBucketTemplate.yaml	j0lib.gBIbhK_m_RZpZb96rTQ3ZV5MN5	2020-05-02T15:38:05+00:00
+aws-account-automation/EBSAutomatedTagging.yaml	pXZK_WoqnsHpuDR3m5pezzeycVASJ.n4	2023-08-08T13:18:52+00:00
 aws-account-automation/EBSAutomatedTagging.yaml	iGkHyYDdG3_uHFU8FlKt.t314oN_Ar1z	2023-08-05T14:00:51+00:00
 aws-account-automation/EBSAutomatedTagging.yaml	YMPnHX7pO6ox1ckMDNGaJfOT7PQ_8nLD	2023-08-05T13:43:22+00:00
 aws-account-automation/EBSAutomatedTagging.yaml	Upx5v8hSd87E1OVV2BzPHxYyUV07OpSU	2023-08-05T13:36:37+00:00
@@ -772,6 +788,7 @@ aws-account-automation/EBSAutomatedTagging.yaml	43Xq76yoo4T24GLTXhuFhSWsksttlPE.
 aws-account-automation/EBSAutomatedTagging.yaml	vjnC4EJWmCvBMsb5jKetxb1Hj5Fd62MN	2020-05-02T16:55:28+00:00
 aws-account-automation/EBSAutomatedTagging.yaml	4DjAGrQLKwMkwl4I0corDM_zapY63jBY	2020-05-02T16:54:40+00:00
 aws-account-automation/EBSAutomatedTagging.yaml	Q873MrEDkKLMR0xltyFhz9UzNUtpH2OH	2020-05-02T15:38:05+00:00
+aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml	08KK_bIkBIkIQ64TGD5Qv2DJAcHCTxkc	2023-08-08T13:18:52+00:00
 aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml	1CX3obSplHYNfIzM5mdejTyg9TL4zwS.	2023-08-05T14:00:51+00:00
 aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml	xfGBD.I_nbDDk6PKPXVvmX5jGIER_38Y	2023-08-05T13:43:22+00:00
 aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml	ORovu2hC64RudScJcdDDcAoSind6Af25	2023-08-05T13:36:36+00:00
@@ -801,6 +818,7 @@ aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml	XXGwmwGP2tfIgXOo
 aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml	DLRdt08uToGwy3m3nKycC8qstQf9XgQ7	2021-07-31T22:23:55+00:00
 aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml	Td9peOdGxN7ZIXSSQF1LrgCnyswhGwoS	2021-07-31T21:00:55+00:00
 aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml	o9BnnFP7H0rIAXroEz5Gg9PfRaca3slC	2021-07-31T19:57:05+00:00
+aws-account-automation/GuardDuty-to-Slack-Template.yaml	XXcdi9LIj743z31zL6a7UvKbfC9l680f	2023-08-08T13:18:52+00:00
 aws-account-automation/GuardDuty-to-Slack-Template.yaml	4qhnKpprP5USiyeWIFsL0y97WCc_E7LA	2023-08-05T14:00:51+00:00
 aws-account-automation/GuardDuty-to-Slack-Template.yaml	ex1vXkMwNH3LP0bUWuDbwhBkIkEkBFt7	2023-08-05T13:43:22+00:00
 aws-account-automation/GuardDuty-to-Slack-Template.yaml	FDaPWqgcfnYNJguV7wCCJ3GVgfbcFTuX	2023-08-05T13:36:37+00:00
@@ -858,6 +876,7 @@ aws-account-automation/GuardDuty-to-Slack-Template.yaml	XRQKbdZswcZ8m.njefvbVjm8
 aws-account-automation/GuardDuty-to-Slack-Template.yaml	NfbS9RZ2jh5MH6YiFzxQAqPm1iDDiIWy	2020-10-23T13:48:36+00:00
 aws-account-automation/GuardDuty-to-Slack-Template.yaml	qjE0WRRkh_u_0DLHmtsJyImxmmyuu0Cn	2020-10-23T00:17:24+00:00
 aws-account-automation/GuardDuty-to-Slack-Template.yaml	At4mHKQxEZa6_KFuzEbkFsIO9vedhmWe	2020-10-22T23:26:35+00:00
+aws-account-automation/IAM-ExpireUsers-Template.yaml	9kMNJJI56ybNHCzwk_G3sZn5BzuQS2JS	2023-08-08T13:18:52+00:00
 aws-account-automation/IAM-ExpireUsers-Template.yaml	dNt5ftfNvm359NR7EM7Et7caV9y3NqIa	2023-08-05T14:00:51+00:00
 aws-account-automation/IAM-ExpireUsers-Template.yaml	2K6vHoQMEkFHjnBzXGktxy2HmXCVAhoW	2023-08-05T13:43:22+00:00
 aws-account-automation/IAM-ExpireUsers-Template.yaml	1KLm5l4CFHF8QkFfq0iZzI557PYGp8Mu	2023-08-05T13:36:37+00:00
@@ -924,6 +943,7 @@ aws-account-automation/IAM-ExpireUsers-Template.yaml	K9deDhAKQ2fM10dS9OvjsXBEQRD
 aws-account-automation/IAM-ExpireUsers-Template.yaml	0_D8v0C2JCI7HQ8BJeDyXVCh3UXKO2.z	2020-05-02T16:55:28+00:00
 aws-account-automation/IAM-ExpireUsers-Template.yaml	WZnusvzYr3EnKbUKTP8ZmMeluk_j0mKu	2020-05-02T16:54:40+00:00
 aws-account-automation/IAM-ExpireUsers-Template.yaml	Sh32lvoebQJF75svsG1Cfb5uTXyO68g2	2020-05-02T15:38:05+00:00
+aws-account-automation/OrgCloudTrail-Template.yaml	tLhqGZPfKuGNFknVfWstrv3FytHs6bqg	2023-08-08T13:18:52+00:00
 aws-account-automation/OrgCloudTrail-Template.yaml	9lLQSnL31feet4a1Jd8Wdm_wJs7HPEU0	2023-08-05T14:00:51+00:00
 aws-account-automation/OrgCloudTrail-Template.yaml	UxCTNXhgRQZHLibRZhjabV3I4TSkxRaq	2023-08-05T13:43:22+00:00
 aws-account-automation/OrgCloudTrail-Template.yaml	82vFLu0CoR3n__65ypZq6nC1BT0MvnGx	2023-08-05T13:36:37+00:00
@@ -969,6 +989,7 @@ aws-account-automation/OrgCloudTrail-Template.yaml	CjSExSCFzeQV_1zdBkpkOc2GXIUiu
 aws-account-automation/OrgCloudTrail-Template.yaml	auSoQxkWRUV93mY62lapssBybXCWh9Kq	2021-07-07T10:48:52+00:00
 aws-account-automation/OrgCloudTrail-Template.yaml	db6AdXDIn6W1vQ23j9TvMQA8XJIq8fcX	2021-07-05T17:05:25+00:00
 aws-account-automation/OrgCloudTrail-Template.yaml	QZ.kAqbs4DcVXzkU9OOssqQI9Qwb74BC	2021-07-05T16:36:35+00:00
+aws-account-automation/OrgCloudTrailBucket-Template.yaml	8p69LqlNVTHcgbZfhJkL3sZZjXuF_156	2023-08-08T13:18:52+00:00
 aws-account-automation/OrgCloudTrailBucket-Template.yaml	SY7Iw7vSY0esNpnaOcvw31O9lQgzlCn1	2023-08-05T14:00:51+00:00
 aws-account-automation/OrgCloudTrailBucket-Template.yaml	6OWmTtax3.Q7zrtW5jhNYaT9JC8wA._6	2023-08-05T13:43:22+00:00
 aws-account-automation/OrgCloudTrailBucket-Template.yaml	qCkXZ3iSMWHOv0OTmKtnUnwNd1TS4V9P	2023-08-05T13:36:37+00:00
@@ -980,6 +1001,7 @@ aws-account-automation/OrgCloudTrailBucket-Template.yaml	YtfZKpeD4cLsFQSBbKWDeRV
 aws-account-automation/OrgCloudTrailBucket-Template.yaml	eGgzhpReTTewsp_FTou.wiV83RUNaEqW	2023-05-16T15:05:11+00:00
 aws-account-automation/OrgCloudTrailBucket-Template.yaml	xN.2NazdyJJMH95uND_XWRw_5kn_Kzoz	2023-05-03T13:32:03+00:00
 aws-account-automation/OrgCloudTrailBucket-Template.yaml	F7BiLZvJTzGbnCod21GDSOos5iirqJrh	2023-04-28T19:08:48+00:00
+aws-account-automation/SESRuleToSlack-Template.yaml	k6gDUIiBJ47J7_Jk2G_R3D3fGBwKcHOs	2023-08-08T13:18:52+00:00
 aws-account-automation/SESRuleToSlack-Template.yaml	FAfUR1CBd1PNk2NxC_vDjWGUtYi.EJ5w	2023-08-05T14:00:51+00:00
 aws-account-automation/SESRuleToSlack-Template.yaml	ryP_cXK08YgGVVg4eGjohBXnHq92JpYX	2023-08-05T13:43:22+00:00
 aws-account-automation/SESRuleToSlack-Template.yaml	FP_z2YVebDpgGLRU6kdGE40KrOv8PgJc	2023-08-05T13:36:37+00:00
@@ -1003,6 +1025,7 @@ aws-account-automation/SESRuleToSlack-Template.yaml	WYmDpDCsKQxvSCLcKXCShMsO2Nlm
 aws-account-automation/SESRuleToSlack-Template.yaml	qxWdq_4PA7MMMQDznPc48LjFsOnd4Luj	2022-02-15T13:23:30+00:00
 aws-account-automation/SESRuleToSlack-Template.yaml	c6VCo7a.EjQnTNculrBPXmy5GP1qpFfI	2022-01-15T20:58:19+00:00
 aws-account-automation/SESRuleToSlack-Template.yaml	.9lvWs05aFGvipaQUwKsvRwfRQbE2jow	2022-01-08T12:27:15+00:00
+aws-account-automation/SecurityAlertChatBot-Template.yaml	ZiLOEfWWVbYqCiTaK5cEdl8_xnkRViyE	2023-08-08T13:18:52+00:00
 aws-account-automation/SecurityAlertChatBot-Template.yaml	d.Sa7U6vdcqw.X1puDkDSjbkLsCw77T3	2023-08-05T14:00:51+00:00
 aws-account-automation/SecurityAlertChatBot-Template.yaml	BSnQVndk9_mw_SrhUvrzgsa5TCHGUkYu	2023-08-05T13:43:22+00:00
 aws-account-automation/SecurityAlertChatBot-Template.yaml	R5r1fxilNTfzpcO.zpmlJc95QYzH0Wke	2023-08-05T13:36:37+00:00
@@ -1011,6 +1034,7 @@ aws-account-automation/SecurityAlertChatBot-Template.yaml	lo7kqVZZpZEsJ4ZjnHV1Me
 aws-account-automation/SecurityAlertChatBot-Template.yaml	_hJp5VAn2aol.Q_A9UD1xIw2TuVwgd3H	2023-08-05T12:45:23+00:00
 aws-account-automation/SecurityAlertChatBot-Template.yaml	C1wllSD4qRPkFwwNdIpjqX5sa.oO945O	2023-07-06T20:31:09+00:00
 aws-account-automation/SecurityAlertChatBot-Template.yaml	K5cug0UBNx74EPaxZ1reF5GW2GkCDYO9	2023-05-16T15:11:44+00:00
+aws-account-automation/VPCFlowLogBucket-Template.yaml	ZfEw2IooSiPTSOlnznTAKHKpSZopK7I4	2023-08-08T13:18:52+00:00
 aws-account-automation/VPCFlowLogBucket-Template.yaml	FFKmK9z4DA.Gl4QegXV0lom18pHJ1Inx	2023-08-05T14:00:51+00:00
 aws-account-automation/VPCFlowLogBucket-Template.yaml	cD_FMQfFXDcLktdykycX2k2Jy5uhWIA9	2023-08-05T13:43:22+00:00
 aws-account-automation/VPCFlowLogBucket-Template.yaml	JBlyNAeXQmiNUtDNcSi91FPxz4lzYv6i	2023-08-05T13:36:37+00:00
@@ -1021,6 +1045,7 @@ aws-account-automation/VPCFlowLogBucket-Template.yaml	TfvH.B3FBedlW34hM13gVKu9uR
 aws-account-automation/VPCFlowLogBucket-Template.yaml	9pNzTLEIqBgUr4bgnatv0XCApiA9Hdaz	2023-05-16T15:11:44+00:00
 aws-account-automation/VPCFlowLogBucket-Template.yaml	RE1QZQXZhPFokUe9HlhFt.WtDEeRUKsz	2023-05-16T15:05:11+00:00
 aws-account-automation/VPCFlowLogBucket-Template.yaml	wg2uFE6cUe9aq3_CL4FBNAO2m2Xgp6IE	2023-05-03T13:32:03+00:00
+aws-account-automation/requireMFA-Template.yaml	BE50fr_i2SSJOqQegrd6_lvfZHUgjABD	2023-08-08T13:18:52+00:00
 aws-account-automation/requireMFA-Template.yaml	Qko2Ko.0w35tIl8yjaS7OiPWIHALktOC	2023-08-05T14:00:51+00:00
 aws-account-automation/requireMFA-Template.yaml	Lh8DFkr4K1sdS3XffjKtN1f5G4oSYvJS	2023-08-05T13:43:22+00:00
 aws-account-automation/requireMFA-Template.yaml	HYLF8mYd9lzc.9wQtAGM_yv49Vbw2EST	2023-08-05T13:36:37+00:00
