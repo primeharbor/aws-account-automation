@@ -13,12 +13,12 @@
 # limitations under the License.
 
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Deploy the a Security Audit Role in all account in your Organization
-# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/AuditRole-StackSetTemplate.yaml
+Description: Deploy A Security Role to all account in your Organization
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/SecurityRole-StackSetTemplate.yaml
 
 Parameters:
 
-  AuditorAccountNumber:
+  TrustedAccountNumber:
     Description: The 12 digit AWS account number to grant access to.
     Default: '123456789012'
     MinLength: '12'
@@ -28,13 +28,16 @@ Parameters:
 
   RoleName:
     Description: The name of the Role to be created
-    Default: 'Auditor'
+    Default: 'Security-Audit'
     Type: String
 
   pTemplateURL:
     Description: Location of the S3 Template to deploy as the StackSet
     Type: String
     Default: https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRole-Template.yaml
+    AllowedValues:
+      - "https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/AuditRole-Template.yaml"
+      - "https://s3.amazonaws.com/pht-cloudformation/aws-account-automation/ResponderRole-Template.yaml"
 
   pTemplateObjectVersion:
     Description: Version ID of the Template to Deploy
@@ -47,7 +50,7 @@ Parameters:
 
 Resources:
 
-  AuditRoleStackSet:
+  SecurityRoleStackSet:
     Type: AWS::CloudFormation::StackSet
     Properties:
       # AdministrationRoleARN: String
@@ -60,11 +63,11 @@ Resources:
       Description: Organizational StackSet to Deploy Security Account Audit Role
       # ExecutionRoleName: String
       OperationPreferences:
-        FailureTolerancePercentage: 100
+        FailureTolerancePercentage: 0
         MaxConcurrentPercentage: 100
       Parameters:
-        - ParameterKey: AuditorAccountNumber
-          ParameterValue: !Ref AuditorAccountNumber
+        - ParameterKey: TrustedAccountNumber
+          ParameterValue: !Ref TrustedAccountNumber
         - ParameterKey: RoleName
           ParameterValue: !Ref RoleName
       PermissionModel: SERVICE_MANAGED
@@ -75,9 +78,15 @@ Resources:
           Regions:
             - us-east-1
       StackSetName: !Sub "${AWS::StackName}-StackSet"
-      TemplateURL: !Sub "${pTemplateURL}?versionId=${pTemplateObjectVersion}"
+      TemplateURL: !Ref pTemplateURL
 
 
 Outputs:
   TemplateVersion:
     Value: "1.1.0"
+
+  TemplateURL:
+    Value: !Ref pTemplateURL
+
+  TemplateVersion:
+    Value: !Ref pTemplateObjectVersion

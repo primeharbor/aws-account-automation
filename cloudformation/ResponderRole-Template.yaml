@@ -1,0 +1,167 @@
+# Copyright 2018-2023 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template creates a least-privledge cross-account role incident response
+
+# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/ResponderRole-Template.yaml
+
+Parameters:
+
+  TrustedAccountNumber:
+    Description: The 12 digit AWS account number to grant access to.
+    Default: '123456789012'
+    MinLength: '12'
+    AllowedPattern: '[0-9]+'
+    MaxLength: '12'
+    Type: String
+  
+  RoleName:
+    Description: The name of the Role to be created
+    Default: 'incident-responder'
+    Type: String
+  
+Resources:
+  ResponderCrossAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/SecurityAudit
+      - arn:aws:iam::aws:policy/ReadOnlyAccess
+      - arn:aws:iam::aws:policy/AWSAccountManagementReadOnlyAccess
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Sid: ''
+          Effect: Allow
+          Principal:
+            AWS: !Sub "arn:aws:iam::${TrustedAccountNumber}:root"
+      Policies:
+        - PolicyName: MissingAuditingPermissions
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action:
+                  - "iam:Simulate*"
+                  - "ce:*"
+                  - "aws-portal:View*"
+                  - "sts:DecodeAuthorizationMessage"
+                Resource: "*"
+        - PolicyName: ContainmentActions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  # required to create an untracked security group
+                - "ec2:CreateSecurityGroup"
+                  # Allow modification of SG Rules
+                - "ec2:AuthorizeSecurityGroupEgress"
+                - "ec2:AuthorizeSecurityGroupIngress"
+                - "ec2:RevokeSecurityGroupEgress"
+                - "ec2:RevokeSecurityGroupIngress"
+                  # Allow Enable IMDSv2
+                - "ec2:ModifyInstanceMetadataOptions"
+                  # Allow attaching a new SG to an Instance
+                - "ec2:ModifyInstanceAttribute"
+                - "ec2:ModifyNetworkInterfaceAttribute"
+                  # Stop rogue Instances
+                - "ec2:StopInstances"
+                  # Disable Access Keys
+                - "iam:UpdateAccessKey"
+                  # Apply a Deny policy to a role
+                - "iam:PutRolePolicy"
+                  # Undo the above
+                - "iam:DetachRolePolicy"
+                - "iam:DeleteRolePolicy"
+                # WAF!
+                - "wafv2:*"
+                Resource: "*"
+              - Sid: EvidenceCollection
+                Effect: "Allow"
+                Action:
+                - "ec2:CopySnapshot"
+                - "ec2:CreateSnapshot"
+                - "ec2:CreateSnapshots"
+                - "ec2:DeleteSnapshots"
+                - "ec2:ModifySnapshotAttribute"
+                - "ec2:CreateTags"
+                Resource: "*"
+        - PolicyName: SecurityAuditTools
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Sid: SecurityTools
+                Effect: "Allow"
+                Action: 
+                - "trustedAdvisor:*"
+                - "access-analyzer:*"
+                - "guardduty:*"
+                - "health:*"
+                - "inspector:*"
+                - "support:*"
+                - "securityhub:*"
+                Resource: "*"
+              - Sid: CloudShell
+                Effect: "Allow"
+                Action:
+                - "cloudshell:*"
+                Resource: "*"
+              - Sid: Macie
+                Effect: "Allow"
+                Action:
+                - "macie2:*"
+                - "pricing:GetProducts" # Required for Macie
+                Resource: "*"
+              - Sid: Athena
+                Effect: "Allow"
+                Action:
+                - "athena:*"
+                - "glue:*" # Needed for Athena
+                - "s3:*" # Needed for Athena
+                Resource: "*"
+        - PolicyName: BillingAuditPermissions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                - "aws-portal:View*" # Legacy Perm going away
+                - "ce:*"             # Full Access to Cost Explorer
+                - "account:Get*"
+                - "billing:Get*"
+                - "payments:List*"
+                - "payments:Get*"
+                - "tax:List*"
+                - "tax:Get*"
+                - "consolidatedbilling:Get*"
+                - "consolidatedbilling:List*"
+                - "invoicing:List*"
+                - "invoicing:Get*"
+                - "cur:Get*"
+                - "cur:Validate*"
+                - "freetier:Get*"
+                Resource: "*"
+
+Outputs:
+  RoleARN:
+    Description: The ARN of the Responder role that can be assumed by the other account.
+    Value: !GetAtt ResponderCrossAccountRole.Arn
+
+  TemplateVersion:
+    Value: 1.1.0
