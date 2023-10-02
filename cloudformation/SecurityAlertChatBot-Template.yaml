@@ -67,6 +67,15 @@ Resources:
             Action:
             - logs:*
             Effect: Allow
+      - PolicyName: ReadTelemetry
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: '*'
+            Action:
+            - cloudwatch:Describe*
+            Effect: Allow
+
 
 
 Outputs:
