@@ -27,8 +27,15 @@ Parameters:
     Default: NONE
     Type: String
 
+  pAggregationAccount:
+    Description: Delegated Admin Account ID for AWS Config Service
+    Default: NONE
+    Type: String
+
 Conditions:
-  CreateAggregationAuthorization:  !Equals [ !Ref "AWS::Region", !Ref pAggregationRegion ]
+  CreateAggregationAuthorization: !And
+  - !Equals [ !Ref "AWS::AccountId", !Ref pAggregationAccount ]
+  - !Equals [ !Ref "AWS::Region", !Ref pAggregationRegion ]
   CreateServiceLinkedRole: !Equals [ !Ref "AWS::Region", "us-east-1"]
   cIncludeGlobalResourceTypes: !Equals [ !Ref "AWS::Region", "us-east-1"]
 

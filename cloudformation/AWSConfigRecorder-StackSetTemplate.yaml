@@ -27,6 +27,11 @@ Parameters:
     Default: NONE
     Type: String
 
+  pAggregationAccount:
+    Description: Delegated Admin Account ID for AWS Config Service
+    Default: NONE
+    Type: String
+
   pTemplateURL:
     Description: Location of the S3 Template to deploy as the StackSet
     Type: String
@@ -83,6 +88,8 @@ Resources:
           ParameterValue: !Ref pOrganizationConfigBucket
         - ParameterKey: pAggregationRegion
           ParameterValue: !Ref pAggregationRegion
+        - ParameterKey: pAggregationAccount
+          ParameterValue: !Ref pAggregationAccount
       PermissionModel: SERVICE_MANAGED
       StackInstancesGroup:
         - DeploymentTargets:
@@ -107,8 +114,7 @@ Resources:
             - us-west-1
             - us-west-2
       StackSetName: !Sub "${AWS::StackName}-StackSet"
-      TemplateURL: !Ref pTemplateURL
-
+      TemplateURL: !Sub ${pTemplateURL}?versionId=${pTemplateObjectVersion}
 
 Outputs:
   TemplateVersion:
