@@ -78,7 +78,7 @@ Resources:
           Regions:
             - us-east-1
       StackSetName: !Sub "${AWS::StackName}-StackSet"
-      TemplateURL: !Ref pTemplateURL
+      TemplateURL: !Sub ${pTemplateURL}?versionId=${pTemplateObjectVersion}
 
 
 Outputs:
