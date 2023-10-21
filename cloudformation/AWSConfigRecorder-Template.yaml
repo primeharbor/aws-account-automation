@@ -1,4 +1,4 @@
-# Copyright 2021 Chris Farris <chrisf@primeharbor.com>
+# Copyright 2021-2023 Chris Farris <chrisf@primeharbor.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ Parameters:
     Type: String
 
 Conditions:
-  CreateAggregationAuthorization: !Not [!Equals [ !Ref pAggregationRegion, "NONE"]]
+  CreateAggregationAuthorization:  !Equals [ !Ref "AWS::Region", !Ref pAggregationRegion ]
   CreateServiceLinkedRole: !Equals [ !Ref "AWS::Region", "us-east-1"]
   cIncludeGlobalResourceTypes: !Equals [ !Ref "AWS::Region", "us-east-1"]
 
@@ -79,6 +79,34 @@ Resources:
     Condition: CreateServiceLinkedRole
     Properties:
       AWSServiceName: config.amazonaws.com
+
+  # Why they don't have a service linked role here is beyond me
+  ConfigAggregatorRole:
+    Condition: CreateAggregationAuthorization
+    Type: AWS::IAM::Role
+    Properties:
+      # RoleName: !Sub "aws-config-aggregator-role-${AWS::StackName}"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: config.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /service-role/
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSConfigRoleForOrganizations
+
+  # Create the Aggregator
+  ConfigAggregator:
+    Type: AWS::Config::ConfigurationAggregator
+    Condition: CreateAggregationAuthorization
+    Properties:
+      ConfigurationAggregatorName: !Sub "${AWS::StackName}-Aggregator"
+      OrganizationAggregationSource:
+          AllAwsRegions: True
+          RoleArn: !GetAtt ConfigAggregatorRole.Arn
 
 
 Outputs:

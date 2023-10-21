@@ -1,0 +1,95 @@
+# Copyright 2021-2023 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy S3 Bucket for recieving Events from AWS Config Recorder
+
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/AWSConfigBucket-Template.yaml
+
+Parameters:
+
+  pBucketName:
+    Description: Name of the bucket to create for storing the CloudTrail or Config Events
+    Type: String
+    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
+
+  pTransitionToIADays:
+    Description: Days after object creation before the object is transitioned to InfrequentAccess (Must be >= 30)
+    Type: String
+    Default: 30
+
+
+Resources:
+
+  Bucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: LogDeliveryWrite
+      BucketName: !Ref 'pBucketName'
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: False  # This rule also prohibits Cross-Account bucket access
+      LifecycleConfiguration:
+        Rules:
+          - Id: InfrequentAccessRule
+            Prefix: AWSLogs
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: !Ref pTransitionToIADays
+                StorageClass: STANDARD_IA
+
+  EventsS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: AWSServiceAclCheck
+          Effect: Allow
+          Principal:
+            Service: config.amazonaws.com
+          Action: s3:GetBucketAcl
+          Resource: !Sub "arn:aws:s3:::${pBucketName}"
+        - Sid: AWSServiceWrite
+          Effect: Allow
+          Principal:
+            Service: config.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub "arn:aws:s3:::${pBucketName}/AWSLogs/*"
+          Condition:
+            StringEquals:
+              s3:x-amz-acl: bucket-owner-full-control
+
+
+Outputs:
+
+  LogBucket:
+    Value: !Ref Bucket
+    Description: Bucket Name where Config events sent.
+
+  TemplateVersion:
+    Value: 1.0.0
