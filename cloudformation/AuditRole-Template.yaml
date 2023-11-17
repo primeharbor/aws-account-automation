@@ -26,7 +26,7 @@ Parameters:
     AllowedPattern: '[0-9]+'
     MaxLength: '12'
     Type: String
-  
+
   RoleName:
     Description: The name of the Audit Role to be created
     Default: 'security-audit'
@@ -53,20 +53,20 @@ Resources:
             AWS: !Sub "arn:aws:iam::${TrustedAccountNumber}:root"
       Policies:
         - PolicyName: MissingPermissions
-          PolicyDocument: 
+          PolicyDocument:
             Version: "2012-10-17"
-            Statement: 
+            Statement:
               - Effect: "Allow"
                 Action:
                   - "iam:Simulate*"
                   - "account:GetContactInformation"
                 Resource: "*"
         - PolicyName: SecurityAuditTools
-          PolicyDocument: 
+          PolicyDocument:
             Version: "2012-10-17"
-            Statement: 
+            Statement:
               - Effect: "Allow"
-                Action: 
+                Action:
                 - "trustedAdvisor:*"
                 - "health:*"
                 - "guardduty:*"

@@ -1,0 +1,146 @@
+# Copyright 2021 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: StackSet to push out Access Analyzer CFT in all regions
+
+Parameters:
+
+  pCreateAnalyzer:
+    Description: Set this to false to disable the creation of an addtional Analyer
+    Type: String
+    Default: "True"
+    AllowedValues:
+      - "False"
+      - "True"
+
+  pAlertTopic:
+    Description: ChatBot SNS Topic to send the IAM AccessAnalyzer Alerts to
+    Type: String
+
+  pAnalyzerType:
+    Description: Type of Analyzer to create ACCOUNT or ORGANIZATION
+    Type: String
+    Default: "ORGANIZATION"
+    AllowedValues:
+      - "ACCOUNT"
+      - "ORGANIZATION"
+
+Resources:
+
+  StackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      Capabilities:
+        - CAPABILITY_IAM
+      Description: StackSet to push out Access Analyzer CFT in all regions
+      OperationPreferences:
+        # Per the docs: MaxConcurrentCount is at most one more than the FailureToleranceCount.
+        FailureToleranceCount: 0
+        MaxConcurrentCount: 20
+        RegionConcurrencyType: PARALLEL
+      Parameters:
+        - ParameterKey: pCreateAnalyzer
+          ParameterValue: !Ref pCreateAnalyzer
+        - ParameterKey: pAlertTopic
+          ParameterValue: !Ref pAlertTopic
+      PermissionModel: SELF_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            Accounts:
+              - !Ref AWS::AccountId
+          Regions:
+            - us-east-1
+            - eu-north-1
+            - ap-south-1
+            - eu-west-3
+            - eu-west-2
+            - eu-west-1
+            - ap-northeast-3
+            - ap-northeast-2
+            - ap-northeast-1
+            - sa-east-1
+            - ca-central-1
+            - ap-southeast-1
+            - ap-southeast-2
+            - eu-central-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+      StackSetName: !Sub "${AWS::StackName}-StackSet"
+      TemplateBody: |
+        AWSTemplateFormatVersion: '2010-09-09'
+        Description: >
+          Generate Alerts from IAM Access Analyer when a resource is made public
+          Authored by Chris Farris <chris@primeharbor.com>
+
+        Parameters:
+
+          pCreateAnalyzer:
+            Description: Set this to false to disable the creation of an addtional Analyer
+            Type: String
+            Default: "True"
+            AllowedValues:
+              - "False"
+              - "True"
+
+          pAlertTopic:
+            Description: ChatBot SNS Topic to send the IAM AccessAnalyzer Alerts to
+            Type: String
+
+          pAnalyzerType:
+            Description: Type of Analyzer to create ACCOUNT or ORGANIZATION
+            Type: String
+            Default: "ORGANIZATION"
+            AllowedValues:
+              - "ACCOUNT"
+              - "ORGANIZATION"            
+
+        Conditions:
+          CreateAnalyzer: !Equals [ !Ref pCreateAnalyzer, "True"]
+
+        Resources:
+          IAMAccessAnalyzer:
+            Type: AWS::AccessAnalyzer::Analyzer
+            Condition: CreateAnalyzer
+            Properties:
+              AnalyzerName: !Sub "${AWS::StackName}"
+              Type: !Ref pAnalyzerType
+
+          AnalyzerEventRule:
+            Type: AWS::Events::Rule
+            Properties:
+              Description: AccessAnalyzerEvents
+              State: ENABLED
+              EventPattern:
+                source:
+                  - "aws.access-analyzer"
+                detail-type:
+                  - "Access Analyzer Finding"
+              Targets:
+                - Arn: !Ref pAlertTopic
+                  Id: IAMAccessAnalyzerTopic
+
+        Outputs:
+          StackName:
+            Description: Name of this Stack
+            Value: !Ref AWS::StackName
+
+          TemplateVersion:
+            Description: Version of this CFT
+            Value: 1.0.0      
+
+Outputs:
+  StackName:
+    Value: !Ref AWS::StackName

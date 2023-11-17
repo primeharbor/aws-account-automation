@@ -1,0 +1,68 @@
+# Copyright 2023 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Generate Alerts from IAM Access Analyer when a resource is made public
+  Authored by Chris Farris <chris@chrisfarris.com>
+
+Parameters:
+
+  pCreateAnalyzer:
+    Description: Set this to false to disable the creation of an addtional Analyer
+    Type: String
+    Default: "True"
+    AllowedValues:
+      - "False"
+      - "True"
+
+  pAlertTopic:
+    Description: ChatBot SNS Topic to send the IAM AccessAnalyzer Alerts to
+    Type: String
+
+Conditions:
+  CreateAnalyzer: !Equals [ !Ref pCreateAnalyzer, "True"]
+
+Resources:
+
+  IAMAccessAnalyzer:
+    Type: AWS::AccessAnalyzer::Analyzer
+    Condition: CreateAnalyzer
+    Properties:
+      AnalyzerName: !Sub "${AWS::StackName}"
+      Type: ACCOUNT
+
+  AnalyzerEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: AccessAnalyzerEvents
+      State: ENABLED
+      EventPattern:
+        source:
+          - "aws.access-analyzer"
+        detail-type:
+          - "Access Analyzer Finding"
+      Targets:
+        - Arn: !Ref pAlertTopic
+          Id: IAMAccessAnalyzerTopic
+
+
+Outputs:
+  StackName:
+    Description: Name of this Stack
+    Value: !Ref AWS::StackName
+
+  TemplateVersion:
+    Description: Version of this CFT
+    Value: 1.0.0
