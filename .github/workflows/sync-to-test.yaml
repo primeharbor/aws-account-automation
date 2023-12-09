@@ -25,6 +25,7 @@ jobs:
         pip install boto3
         .github/workflows/index_files.py > Test-Links.md
 
+        git checkout test
         git config user.name github-actions
         git config user.email github-actions@github.com
         git add Test-Links.md
