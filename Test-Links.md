@@ -3,6 +3,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (1H8f7TOfPWj7VncNie_9nR4LMs2k3.7C)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml?versionId=1H8f7TOfPWj7VncNie_9nR4LMs2k3.7C)
 	 * [2023-12-09 14:54:57+00:00 (9FDAp.cDnvMMAwf_QDxF2TNLv3qD6YrL)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml?versionId=9FDAp.cDnvMMAwf_QDxF2TNLv3qD6YrL)
 	 * [2023-12-09 14:45:42+00:00 (mAmSKUQFeJFvEimpTnMjLCwGCqfOVd4y)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml?versionId=mAmSKUQFeJFvEimpTnMjLCwGCqfOVd4y)
 	 * [2023-12-09 14:38:03+00:00 (8i8neCMagKa.bW2eJX3jfgvAPisxl18E)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSCloudFormationStackSetRoles-Template.yaml?versionId=8i8neCMagKa.bW2eJX3jfgvAPisxl18E)
@@ -21,6 +22,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigBucket-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AWSConfigBucket-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (HBa7sd32CnH0.VLEzCdbgfs3GzhVLsQZ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigBucket-Template.yaml?versionId=HBa7sd32CnH0.VLEzCdbgfs3GzhVLsQZ)
 	 * [2023-12-09 14:54:57+00:00 (NsYCG_ntdctmx0fHa4JBORODAWo_Cwy_)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigBucket-Template.yaml?versionId=NsYCG_ntdctmx0fHa4JBORODAWo_Cwy_)
 	 * [2023-12-09 14:45:42+00:00 (fe6VxXuZLidMTxNYslnqsFIHPOHNEz6J)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigBucket-Template.yaml?versionId=fe6VxXuZLidMTxNYslnqsFIHPOHNEz6J)
 	 * [2023-12-09 14:38:03+00:00 (3UipFwY09OtM2kT5rMgI98K7vZonPiXm)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigBucket-Template.yaml?versionId=3UipFwY09OtM2kT5rMgI98K7vZonPiXm)
@@ -34,6 +36,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (OvxLJCbhjMzvwktxO0KpA4q7QI36fdwt)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml?versionId=OvxLJCbhjMzvwktxO0KpA4q7QI36fdwt)
 	 * [2023-12-09 14:54:57+00:00 (OGP30.P8MsezQnY5y4sTUdU8ykS78DJ.)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml?versionId=OGP30.P8MsezQnY5y4sTUdU8ykS78DJ.)
 	 * [2023-12-09 14:45:42+00:00 (CXMHH2EIYnWCrdJ0jIUPvI62GuY0OpkR)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml?versionId=CXMHH2EIYnWCrdJ0jIUPvI62GuY0OpkR)
 	 * [2023-12-09 14:38:03+00:00 (qqJbpj5Bam20oB_zifC8bttLVBbKuZhF)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-StackSetTemplate.yaml?versionId=qqJbpj5Bam20oB_zifC8bttLVBbKuZhF)
@@ -47,6 +50,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AWSConfigRecorder-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (kHgwJlONf3Tfer70BKV2lXpzH41Ys77L)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-Template.yaml?versionId=kHgwJlONf3Tfer70BKV2lXpzH41Ys77L)
 	 * [2023-12-09 14:54:57+00:00 (k8FrD1f64DTCSiPxH7h102F.JmvIEryB)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-Template.yaml?versionId=k8FrD1f64DTCSiPxH7h102F.JmvIEryB)
 	 * [2023-12-09 14:45:42+00:00 (LYgaSrid3e.UlXgMPOTfBK5w7v6ZGSmP)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-Template.yaml?versionId=LYgaSrid3e.UlXgMPOTfBK5w7v6ZGSmP)
 	 * [2023-12-09 14:38:03+00:00 (Xwul7uWplCa3XOHlT2UV2Kav_PsIbwLM)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AWSConfigRecorder-Template.yaml?versionId=Xwul7uWplCa3XOHlT2UV2Kav_PsIbwLM)
@@ -60,6 +64,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-StackSetTemplate.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AccessAnalyzerAlert-StackSetTemplate.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (v9vIw76iDRWz55GhiHJjrWq14YqGW8uJ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-StackSetTemplate.yaml?versionId=v9vIw76iDRWz55GhiHJjrWq14YqGW8uJ)
 	 * [2023-12-09 14:54:57+00:00 (7Po6DHebSnMc.4Brry.92BDN3VaMJXYP)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-StackSetTemplate.yaml?versionId=7Po6DHebSnMc.4Brry.92BDN3VaMJXYP)
 	 * [2023-12-09 14:45:42+00:00 (ozT01mK51bEqPZPBOImTWvnNlOClSpRI)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-StackSetTemplate.yaml?versionId=ozT01mK51bEqPZPBOImTWvnNlOClSpRI)
 	 * [2023-12-09 14:38:03+00:00 (Q1_xj1HkaiLlusq7anXdrJEl1_aYTwPW)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-StackSetTemplate.yaml?versionId=Q1_xj1HkaiLlusq7anXdrJEl1_aYTwPW)
@@ -73,6 +78,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AccessAnalyzerAlert-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (T5V65hNjw9bRKDcLWEkzBQUw0GqttZUZ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-Template.yaml?versionId=T5V65hNjw9bRKDcLWEkzBQUw0GqttZUZ)
 	 * [2023-12-09 14:54:57+00:00 (wcNG52mq3thGE8OkMMbE_rwbq6e9dFgC)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-Template.yaml?versionId=wcNG52mq3thGE8OkMMbE_rwbq6e9dFgC)
 	 * [2023-12-09 14:45:42+00:00 (RiRhvQO0nj.P2ul1Ft3GHc4JD_DPwapW)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-Template.yaml?versionId=RiRhvQO0nj.P2ul1Ft3GHc4JD_DPwapW)
 	 * [2023-12-09 14:38:03+00:00 (OKvdPrNHLZP9UrKwx26axy17YK8QPTnZ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccessAnalyzerAlert-Template.yaml?versionId=OKvdPrNHLZP9UrKwx26axy17YK8QPTnZ)
@@ -86,6 +92,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccountAlertTopics-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AccountAlertTopics-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (XLBrlsa8dgseD1GAB6CBw84lnmYMSF7W)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccountAlertTopics-Template.yaml?versionId=XLBrlsa8dgseD1GAB6CBw84lnmYMSF7W)
 	 * [2023-12-09 14:54:57+00:00 (2dF4jaXXtSftXdllQbldxidP86s.Ytfb)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccountAlertTopics-Template.yaml?versionId=2dF4jaXXtSftXdllQbldxidP86s.Ytfb)
 	 * [2023-12-09 14:45:42+00:00 (8EwVfOnlICBOumMll.0Vh13BhcPp11CH)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccountAlertTopics-Template.yaml?versionId=8EwVfOnlICBOumMll.0Vh13BhcPp11CH)
 	 * [2023-12-09 14:38:03+00:00 (x3pLJtyM9i1TkMMpZ_flCZgr6ZmO.ypl)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AccountAlertTopics-Template.yaml?versionId=x3pLJtyM9i1TkMMpZ_flCZgr6ZmO.ypl)
@@ -104,6 +111,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (HNCharRfog5cCFLVlGibNqBiiu.ruhFC)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml?versionId=HNCharRfog5cCFLVlGibNqBiiu.ruhFC)
 	 * [2023-12-09 14:54:57+00:00 (_kbk8.mRaoOoftwioMcrQP5YgAqMVJOQ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml?versionId=_kbk8.mRaoOoftwioMcrQP5YgAqMVJOQ)
 	 * [2023-12-09 14:45:42+00:00 (h4Y2N5Gk64AdbHFZpMS3Gv_AoeYA61E2)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml?versionId=h4Y2N5Gk64AdbHFZpMS3Gv_AoeYA61E2)
 	 * [2023-12-09 14:38:03+00:00 (ZjEjV98h7MWWCZc9ot_n06X8SH9SvHdp)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AdvancedEventSelectorsDataTrail-Template.yaml?versionId=ZjEjV98h7MWWCZc9ot_n06X8SH9SvHdp)
@@ -117,6 +125,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/AuditRole-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (QC5SQcal9vQEvMPJYpvBqgWl2OXoPsR3)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=QC5SQcal9vQEvMPJYpvBqgWl2OXoPsR3)
 	 * [2023-12-09 14:54:57+00:00 (FxljsR2wWwN5H9yA4zo0LEZjZgQ.3rk_)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=FxljsR2wWwN5H9yA4zo0LEZjZgQ.3rk_)
 	 * [2023-12-09 14:45:42+00:00 (64Sx1nBb7KjrrHafbYbWrqH8GocGe3vC)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=64Sx1nBb7KjrrHafbYbWrqH8GocGe3vC)
 	 * [2023-12-09 14:38:03+00:00 (IvjSYlCXB68bV47X9syOAZxB5TaA2DoC)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=IvjSYlCXB68bV47X9syOAZxB5TaA2DoC)
@@ -135,6 +144,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingBucket-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/BillingBucket-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (A7THhBP4R1NnxpXK9qgWjH9ciLLU20Nz)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingBucket-Template.yaml?versionId=A7THhBP4R1NnxpXK9qgWjH9ciLLU20Nz)
 	 * [2023-12-09 14:54:57+00:00 (L3gAoPP2nWAvfXSycrEFDd4eA8OCcHdg)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingBucket-Template.yaml?versionId=L3gAoPP2nWAvfXSycrEFDd4eA8OCcHdg)
 	 * [2023-12-09 14:45:42+00:00 (X21jhX80D_7F4G7IEk15sMBLEs7Wds8c)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingBucket-Template.yaml?versionId=X21jhX80D_7F4G7IEk15sMBLEs7Wds8c)
 	 * [2023-12-09 14:38:03+00:00 (6M3xkOMmurRThPoe.TLxFAZig3C6tGvV)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingBucket-Template.yaml?versionId=6M3xkOMmurRThPoe.TLxFAZig3C6tGvV)
@@ -153,6 +163,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/BillingMetrics-Template-Transformed.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (hcOT_.MHAXoyTO14NxCmIDf0rBSYVTJ9)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=hcOT_.MHAXoyTO14NxCmIDf0rBSYVTJ9)
 	 * [2023-12-09 14:54:57+00:00 (xNuz_zqcg3ZTlWQBk1_hqn6m9KLyQfcz)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=xNuz_zqcg3ZTlWQBk1_hqn6m9KLyQfcz)
 	 * [2023-12-09 14:45:42+00:00 (OUjBvYnQpPGznRcZ5DM5nbVPKlldaNTU)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=OUjBvYnQpPGznRcZ5DM5nbVPKlldaNTU)
 	 * [2023-12-09 14:38:03+00:00 (XkzJZ5tEI.WtxA5W9tQp1Y.SiXjUIGQ9)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=XkzJZ5tEI.WtxA5W9tQp1Y.SiXjUIGQ9)
@@ -170,6 +181,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/BillingMetrics-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (axwm0KVpBvddtiSEGcBwkmyPialzcdlU)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template.yaml?versionId=axwm0KVpBvddtiSEGcBwkmyPialzcdlU)
 	 * [2023-12-09 14:54:58+00:00 (blgYUUEzWxRDeG4cP6Ekw7rfv288QO7s)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template.yaml?versionId=blgYUUEzWxRDeG4cP6Ekw7rfv288QO7s)
 	 * [2023-12-09 14:45:42+00:00 (npw7Q118wDusbCBAs4RkJs3Pb_dzO9Ft)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template.yaml?versionId=npw7Q118wDusbCBAs4RkJs3Pb_dzO9Ft)
 	 * [2023-12-09 14:38:03+00:00 (izphBrktDbG5NwHRA6XJMEJsZt5pQg48)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template.yaml?versionId=izphBrktDbG5NwHRA6XJMEJsZt5pQg48)
@@ -187,6 +199,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrail-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/CloudTrail-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (9K0GzRttMdtp1FvS6PkqwZuge1z9QtOf)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrail-Template.yaml?versionId=9K0GzRttMdtp1FvS6PkqwZuge1z9QtOf)
 	 * [2023-12-09 14:54:58+00:00 (GcdrVKy9RmILDv1kCeQo5tKS0Z8792mK)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrail-Template.yaml?versionId=GcdrVKy9RmILDv1kCeQo5tKS0Z8792mK)
 	 * [2023-12-09 14:45:42+00:00 (Rzrwdxs3F346DpF0WGtYs08mi.q3Fj7d)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrail-Template.yaml?versionId=Rzrwdxs3F346DpF0WGtYs08mi.q3Fj7d)
 	 * [2023-12-09 14:38:03+00:00 (jyYIpj3LQvuMjkx04HfLaIyGo_GM8IOC)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrail-Template.yaml?versionId=jyYIpj3LQvuMjkx04HfLaIyGo_GM8IOC)
@@ -205,6 +218,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrailConfigBucket-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/CloudTrailConfigBucket-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (_IjtF2PoSHSfsKtVMV5YcUvA5QAR92S9)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrailConfigBucket-Template.yaml?versionId=_IjtF2PoSHSfsKtVMV5YcUvA5QAR92S9)
 	 * [2023-12-09 14:54:58+00:00 (C.B9O6gG1lCM9z1q2soOcGC_9cBjguUs)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrailConfigBucket-Template.yaml?versionId=C.B9O6gG1lCM9z1q2soOcGC_9cBjguUs)
 	 * [2023-12-09 14:45:42+00:00 (RTD6h6j19_d909arKELotgP6B9lOJmmN)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrailConfigBucket-Template.yaml?versionId=RTD6h6j19_d909arKELotgP6B9lOJmmN)
 	 * [2023-12-09 14:38:03+00:00 (lOr6I0v8RxNdXCxCuhqpnG7Iaesn1JLe)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudTrailConfigBucket-Template.yaml?versionId=lOr6I0v8RxNdXCxCuhqpnG7Iaesn1JLe)
@@ -218,6 +232,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (7qMrdPKIqsCN1ZOOek8XE5KU9tztsmdZ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml?versionId=7qMrdPKIqsCN1ZOOek8XE5KU9tztsmdZ)
 	 * [2023-12-09 14:54:58+00:00 (9Dkef0J4C2xcOaLwKBXkh_TWWI8XIgLG)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml?versionId=9Dkef0J4C2xcOaLwKBXkh_TWWI8XIgLG)
 	 * [2023-12-09 14:45:42+00:00 (RrHNFBn.eL8P7q7ELZvNNJBOQ3XVY5wV)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml?versionId=RrHNFBn.eL8P7q7ELZvNNJBOQ3XVY5wV)
 	 * [2023-12-09 14:38:03+00:00 (iiD54cwrxazhgzoaQOeVHjFRSz6wMwkv)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CloudWatchAlarmsForCloudTrailAPIActivity-Template.yaml?versionId=iiD54cwrxazhgzoaQOeVHjFRSz6wMwkv)
@@ -236,6 +251,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/CostExplorerAlerts-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (D6DzJUUCXE76MFnViU_MDiOEww0p_Gbb)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml?versionId=D6DzJUUCXE76MFnViU_MDiOEww0p_Gbb)
 	 * [2023-12-09 14:54:58+00:00 (fpx3.RJqJKhrBfLD8DL.V_HGETMsbPuW)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml?versionId=fpx3.RJqJKhrBfLD8DL.V_HGETMsbPuW)
 	 * [2023-12-09 14:45:42+00:00 (.yC6O1Q7a0.QTg8.4LrE_MZL1T9is1zo)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml?versionId=.yC6O1Q7a0.QTg8.4LrE_MZL1T9is1zo)
 	 * [2023-12-09 14:38:03+00:00 (htjrUGqGNMzMDDrYZqzEPxhKlv4PNsTk)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml?versionId=htjrUGqGNMzMDDrYZqzEPxhKlv4PNsTk)
@@ -249,6 +265,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/EBSAutomatedTagging.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/EBSAutomatedTagging.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (A_1vgzaZVe.K7tw6WG54Qmmpc_2puCT5)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/EBSAutomatedTagging.yaml?versionId=A_1vgzaZVe.K7tw6WG54Qmmpc_2puCT5)
 	 * [2023-12-09 14:54:58+00:00 (klAEp38eS.ohdbtar0PrrvgonmJdd011)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/EBSAutomatedTagging.yaml?versionId=klAEp38eS.ohdbtar0PrrvgonmJdd011)
 	 * [2023-12-09 14:45:42+00:00 (5MBPqOa.wcW0kREMJp6zNkYDq88q.D5b)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/EBSAutomatedTagging.yaml?versionId=5MBPqOa.wcW0kREMJp6zNkYDq88q.D5b)
 	 * [2023-12-09 14:38:03+00:00 (uU1_dzimYI8sfWVm14yVlcGT.nnCZLLZ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/EBSAutomatedTagging.yaml?versionId=uU1_dzimYI8sfWVm14yVlcGT.nnCZLLZ)
@@ -267,6 +284,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (zXJv6RExsYZ68FzdnINqoAMWIwPTKIlO)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml?versionId=zXJv6RExsYZ68FzdnINqoAMWIwPTKIlO)
 	 * [2023-12-09 14:54:58+00:00 (jETPdk4NFDI4BshkJxQi3Jieu8rRpWLT)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml?versionId=jETPdk4NFDI4BshkJxQi3Jieu8rRpWLT)
 	 * [2023-12-09 14:45:42+00:00 (5nl_mSaEVIhPqCJgxaaLJn0edTUMXSdP)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml?versionId=5nl_mSaEVIhPqCJgxaaLJn0edTUMXSdP)
 	 * [2023-12-09 14:38:03+00:00 (ApNAnAy5iclwOO1zl9ADXMSfkLcW7ffQ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml?versionId=ApNAnAy5iclwOO1zl9ADXMSfkLcW7ffQ)
@@ -280,6 +298,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/GuardDuty-to-Slack-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (bTB7FSwbSOt0gonA8SS0F0g8QxCKVvDr)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=bTB7FSwbSOt0gonA8SS0F0g8QxCKVvDr)
 	 * [2023-12-09 14:54:58+00:00 (VrSOit7DsmoLCMhbXsBWdRDocbBz2P5c)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=VrSOit7DsmoLCMhbXsBWdRDocbBz2P5c)
 	 * [2023-12-09 14:45:42+00:00 (vEft41x.ju2pZQxyD2Xsg3yT5OZDejyW)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=vEft41x.ju2pZQxyD2Xsg3yT5OZDejyW)
 	 * [2023-12-09 14:38:03+00:00 (rVpckbw7QsqLPZTf4a.753hqtIMNie8A)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=rVpckbw7QsqLPZTf4a.753hqtIMNie8A)
@@ -298,6 +317,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/IAM-ExpireUsers-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/IAM-ExpireUsers-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (yGmSsPtkb5dNl3LDhuGfFehUrmA1GhMx)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/IAM-ExpireUsers-Template.yaml?versionId=yGmSsPtkb5dNl3LDhuGfFehUrmA1GhMx)
 	 * [2023-12-09 14:54:58+00:00 (bDVoeu3TeF9iYWXw5_1NrqPeTyEM42J1)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/IAM-ExpireUsers-Template.yaml?versionId=bDVoeu3TeF9iYWXw5_1NrqPeTyEM42J1)
 	 * [2023-12-09 14:45:42+00:00 (RzVhQkNp_v8efksVh72TrIOtm8P9F74d)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/IAM-ExpireUsers-Template.yaml?versionId=RzVhQkNp_v8efksVh72TrIOtm8P9F74d)
 	 * [2023-12-09 14:38:03+00:00 (szyU5vYRr4ePIBTkx4ob7uBHdFU0xCdH)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/IAM-ExpireUsers-Template.yaml?versionId=szyU5vYRr4ePIBTkx4ob7uBHdFU0xCdH)
@@ -316,6 +336,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrail-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/OrgCloudTrail-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (MIIl9oz0Q0Cc5GxRTlcLcK_O7zPyOu5a)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrail-Template.yaml?versionId=MIIl9oz0Q0Cc5GxRTlcLcK_O7zPyOu5a)
 	 * [2023-12-09 14:54:58+00:00 (ptqOlg_bV965dJlQDbJ1nZJYC9hXkt9y)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrail-Template.yaml?versionId=ptqOlg_bV965dJlQDbJ1nZJYC9hXkt9y)
 	 * [2023-12-09 14:45:42+00:00 (ilZdSO0yK_hfRrnR8sDxH2GYHLJtjL7_)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrail-Template.yaml?versionId=ilZdSO0yK_hfRrnR8sDxH2GYHLJtjL7_)
 	 * [2023-12-09 14:38:03+00:00 (lZZoHDxSS1EI4J.60nItVGCsYOSvJxcJ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrail-Template.yaml?versionId=lZZoHDxSS1EI4J.60nItVGCsYOSvJxcJ)
@@ -329,6 +350,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrailBucket-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/OrgCloudTrailBucket-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (ZUZIrlRd5fnAdv.ljM2Jrv4Cu_MxqPXG)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrailBucket-Template.yaml?versionId=ZUZIrlRd5fnAdv.ljM2Jrv4Cu_MxqPXG)
 	 * [2023-12-09 14:54:58+00:00 (JJiraxlXxCiJzQnMGCDK6NBXrmhj_iM2)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrailBucket-Template.yaml?versionId=JJiraxlXxCiJzQnMGCDK6NBXrmhj_iM2)
 	 * [2023-12-09 14:45:42+00:00 (Wf9RjxCl4TMzK3RLpU12jDw8XW7ievCo)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrailBucket-Template.yaml?versionId=Wf9RjxCl4TMzK3RLpU12jDw8XW7ievCo)
 	 * [2023-12-09 14:38:03+00:00 (rTW3br2fITp8XO.IyIUPUZChEzqwUvtb)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/OrgCloudTrailBucket-Template.yaml?versionId=rTW3br2fITp8XO.IyIUPUZChEzqwUvtb)
@@ -342,6 +364,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/ResponderRole-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/ResponderRole-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (kGGANNGul5lJz_RLLf7nGc0E2u8M_6Dc)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/ResponderRole-Template.yaml?versionId=kGGANNGul5lJz_RLLf7nGc0E2u8M_6Dc)
 	 * [2023-12-09 14:54:58+00:00 (wEgB4.8l7v8dEYhmjM5o5HWIufq2l4qG)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/ResponderRole-Template.yaml?versionId=wEgB4.8l7v8dEYhmjM5o5HWIufq2l4qG)
 	 * [2023-12-09 14:45:42+00:00 (6MqnvxQcgNIkIiE9ka17aED2vGr_WgkJ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/ResponderRole-Template.yaml?versionId=6MqnvxQcgNIkIiE9ka17aED2vGr_WgkJ)
 	 * [2023-12-09 14:38:03+00:00 (WupR4..ErV_7l5zCCSbJsUoDSVlbY7fw)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/ResponderRole-Template.yaml?versionId=WupR4..ErV_7l5zCCSbJsUoDSVlbY7fw)
@@ -355,6 +378,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SESRuleToSlack-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/SESRuleToSlack-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (acPO1WjSGsIhZWQ9ErUNYSm3JRvweu6Z)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SESRuleToSlack-Template.yaml?versionId=acPO1WjSGsIhZWQ9ErUNYSm3JRvweu6Z)
 	 * [2023-12-09 14:54:58+00:00 (Lp7hMFSJuzidadh9h_SO9vP8N7l6bB6S)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SESRuleToSlack-Template.yaml?versionId=Lp7hMFSJuzidadh9h_SO9vP8N7l6bB6S)
 	 * [2023-12-09 14:45:42+00:00 (rGXW7l7q4CWLvBaabOvcmvrbeYYfJj_t)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SESRuleToSlack-Template.yaml?versionId=rGXW7l7q4CWLvBaabOvcmvrbeYYfJj_t)
 	 * [2023-12-09 14:38:03+00:00 (z4IX5gfJ9ConJ5R2qhrCOGYhgoR6_fEZ)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SESRuleToSlack-Template.yaml?versionId=z4IX5gfJ9ConJ5R2qhrCOGYhgoR6_fEZ)
@@ -368,6 +392,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/SecurityAlertChatBot-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (xK8YCaa21u3ApOR08_bZPW.46nB6jral)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml?versionId=xK8YCaa21u3ApOR08_bZPW.46nB6jral)
 	 * [2023-12-09 14:54:58+00:00 (WPMJknkz6Up..3Rg0a1CybVMHXRdibjf)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml?versionId=WPMJknkz6Up..3Rg0a1CybVMHXRdibjf)
 	 * [2023-12-09 14:45:42+00:00 (5NP0MOCjoK8iyrDU1lliCAJlSORMG11N)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml?versionId=5NP0MOCjoK8iyrDU1lliCAJlSORMG11N)
 	 * [2023-12-09 14:38:03+00:00 (0Pgne2CCCf1ZAsL9P7LwaxnACYW9U3Sf)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml?versionId=0Pgne2CCCf1ZAsL9P7LwaxnACYW9U3Sf)
@@ -381,6 +406,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityRole-StackSetTemplate.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/SecurityRole-StackSetTemplate.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (9nEi99ODioPQp3Y2LRm7VXZHcrvMnHwi)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityRole-StackSetTemplate.yaml?versionId=9nEi99ODioPQp3Y2LRm7VXZHcrvMnHwi)
 	 * [2023-12-09 14:54:58+00:00 (FFBbg8Lth61lPDuTjw27dr2TXK.RgYro)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityRole-StackSetTemplate.yaml?versionId=FFBbg8Lth61lPDuTjw27dr2TXK.RgYro)
 	 * [2023-12-09 14:45:42+00:00 (LTtsvioZUVMTWFLw.p8IyYMvnNYrFKvy)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityRole-StackSetTemplate.yaml?versionId=LTtsvioZUVMTWFLw.p8IyYMvnNYrFKvy)
 	 * [2023-12-09 14:38:03+00:00 (K7cSvvE3Ip4sP6Q6d2nJ5VXSg711NAWB)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/SecurityRole-StackSetTemplate.yaml?versionId=K7cSvvE3Ip4sP6Q6d2nJ5VXSg711NAWB)
@@ -394,6 +420,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/VPCFlowLogBucket-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/VPCFlowLogBucket-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (KNJdsga2UcekU9KhO8JRwdz6olt7AlYq)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/VPCFlowLogBucket-Template.yaml?versionId=KNJdsga2UcekU9KhO8JRwdz6olt7AlYq)
 	 * [2023-12-09 14:54:58+00:00 (n1agqHZhxDwM7Xf390fth9pW5INOQhJU)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/VPCFlowLogBucket-Template.yaml?versionId=n1agqHZhxDwM7Xf390fth9pW5INOQhJU)
 	 * [2023-12-09 14:45:42+00:00 (tEDiPutq0RLXQYsDhUS6Bd0ZexX1_Ims)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/VPCFlowLogBucket-Template.yaml?versionId=tEDiPutq0RLXQYsDhUS6Bd0ZexX1_Ims)
 	 * [2023-12-09 14:38:03+00:00 (q_jsXctWZ3ivF43kzdzCn.n5SGMtUV6I)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/VPCFlowLogBucket-Template.yaml?versionId=q_jsXctWZ3ivF43kzdzCn.n5SGMtUV6I)
@@ -407,6 +434,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/requireMFA-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation-dev/aws-account-automation/requireMFA-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2023-12-09 14:56:35+00:00 (qp4a_EKfZAqxzlx3SxC.1DkwiHXrl3.g)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/requireMFA-Template.yaml?versionId=qp4a_EKfZAqxzlx3SxC.1DkwiHXrl3.g)
 	 * [2023-12-09 14:54:58+00:00 (26hU6d0s4PALK0QuymP0Fj2fRayROPWP)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/requireMFA-Template.yaml?versionId=26hU6d0s4PALK0QuymP0Fj2fRayROPWP)
 	 * [2023-12-09 14:45:42+00:00 (231wZOOEzlyNxUBtgkfwrEPLHZwpkKCe)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/requireMFA-Template.yaml?versionId=231wZOOEzlyNxUBtgkfwrEPLHZwpkKCe)
 	 * [2023-12-09 14:38:03+00:00 (k7YGhusMqm7huK5I9UwAHBd_uzhHXtaI)](https://pht-cloudformation-dev.s3.amazonaws.com/aws-account-automation/requireMFA-Template.yaml?versionId=k7YGhusMqm7huK5I9UwAHBd_uzhHXtaI)
