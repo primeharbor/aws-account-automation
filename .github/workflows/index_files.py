@@ -24,6 +24,14 @@ for o in response['Contents']:
 		Bucket=bucket,
 		Prefix=o['Key']
 	)
-	for v in r2['Versions']:
-		print(f"\t * [{v['LastModified']} ({v['VersionId']})](https://{bucket}.s3.amazonaws.com/{o['Key']}?versionId={v['VersionId']})")
 
+	versions_to_report = []
+	current_etag = None
+	for v in reversed(r2['Versions']):
+		if current_etag != v['ETag']:
+			versions_to_report.append(v)
+		current_etag = v['ETag']
+
+
+	for v in reversed(versions_to_report):
+		print(f"\t * [{v['LastModified']} ({v['VersionId']})](https://{bucket}.s3.amazonaws.com/{o['Key']}?versionId={v['VersionId']})")
