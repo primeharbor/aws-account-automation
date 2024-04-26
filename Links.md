@@ -95,6 +95,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/BillingMetrics-Template-Transformed.yaml
 * Previous Version HTTP URLs:
+	 * [2024-04-26 10:11:39+00:00 (AJhdAX7mecyTchiLT2LowsN8gOeuNdbq)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=AJhdAX7mecyTchiLT2LowsN8gOeuNdbq)
 	 * [2024-01-08 19:19:49+00:00 (SeMWYL.1agHzGGRNaQsodcpJT5fbpcoL)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=SeMWYL.1agHzGGRNaQsodcpJT5fbpcoL)
 	 * [2023-12-09 15:41:33+00:00 (pOUHN36OLHNzg2DYJJWV5lH__mrjLasJ)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=pOUHN36OLHNzg2DYJJWV5lH__mrjLasJ)
 	 * [2023-12-09 14:59:56+00:00 (s0ygcFoCBqton74cZBEQYHK8NvGxzVSs)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=s0ygcFoCBqton74cZBEQYHK8NvGxzVSs)
@@ -186,6 +187,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/CostExplorerAlerts-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2024-04-26 10:11:39+00:00 (_8x0_4_6u1G4PHUFBMM4UczaEqUWQBI6)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml?versionId=_8x0_4_6u1G4PHUFBMM4UczaEqUWQBI6)
 	 * [2022-03-23 11:37:45+00:00 (hx0RTMzDk19sMXuscIlJM2jB6ocYWM0x)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml?versionId=hx0RTMzDk19sMXuscIlJM2jB6ocYWM0x)
 	 * [2022-02-20 15:18:21+00:00 (LOq8GzEqSB93boHo6eRDAfLirvqzsnb2)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml?versionId=LOq8GzEqSB93boHo6eRDAfLirvqzsnb2)
 	 * [2022-02-15 14:07:49+00:00 (pyBkHlgA3a8Ssm0hBRUlKKuDOYo2gRbX)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/CostExplorerAlerts-Template.yaml?versionId=pyBkHlgA3a8Ssm0hBRUlKKuDOYo2gRbX)
