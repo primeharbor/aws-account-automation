@@ -89,7 +89,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Description: Fetch the latest billing info and send it to Slack
-      Runtime: python3.7
+      Runtime: python3.12
       Handler: index.lambda_handler
       Timeout: 120
       MemorySize: 1024
