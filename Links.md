@@ -73,6 +73,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/AuditRole-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2024-05-14 09:48:25+00:00 (aRRb095D2w_Pc_3.ypdH7QLI8azwdydD)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=aRRb095D2w_Pc_3.ypdH7QLI8azwdydD)
 	 * [2023-11-17 19:41:53+00:00 (mCQCrfuKfQBbIPb5XSZokXHEoYzhy8cv)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=mCQCrfuKfQBbIPb5XSZokXHEoYzhy8cv)
 	 * [2023-09-13 21:28:08+00:00 (wbdUVGOWS0IccB1bwXXl1IQIV1u0YTej)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=wbdUVGOWS0IccB1bwXXl1IQIV1u0YTej)
 	 * [2023-08-05 12:45:23+00:00 (4c04hypGjPV3GG6oJ8VcPdXV5LC2h12g)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=4c04hypGjPV3GG6oJ8VcPdXV5LC2h12g)
@@ -95,6 +96,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/BillingMetrics-Template-Transformed.yaml
 * Previous Version HTTP URLs:
+	 * [2024-05-14 09:48:25+00:00 (lb6_M3pa6BUKH1nh.aOOHg4K9jI5DX2O)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=lb6_M3pa6BUKH1nh.aOOHg4K9jI5DX2O)
 	 * [2024-04-26 10:11:39+00:00 (AJhdAX7mecyTchiLT2LowsN8gOeuNdbq)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=AJhdAX7mecyTchiLT2LowsN8gOeuNdbq)
 	 * [2024-01-08 19:19:49+00:00 (SeMWYL.1agHzGGRNaQsodcpJT5fbpcoL)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=SeMWYL.1agHzGGRNaQsodcpJT5fbpcoL)
 	 * [2023-12-09 15:41:33+00:00 (pOUHN36OLHNzg2DYJJWV5lH__mrjLasJ)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=pOUHN36OLHNzg2DYJJWV5lH__mrjLasJ)
