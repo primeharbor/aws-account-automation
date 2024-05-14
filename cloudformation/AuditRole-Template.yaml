@@ -42,6 +42,7 @@ Resources:
       - arn:aws:iam::aws:policy/SecurityAudit
       - arn:aws:iam::aws:policy/ReadOnlyAccess
       - arn:aws:iam::aws:policy/AWSAccountManagementReadOnlyAccess
+      - arn:aws:iam::aws:policy/AWSSSOReadOnly
       Path: /
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -69,7 +70,7 @@ Resources:
                 Action:
                 - "trustedAdvisor:*"
                 - "health:*"
-                - "guardduty:*"
+                - "access-analyzer:*"
                 - "macie:*"
                 - "inspector:*"
                 - "support:*"
