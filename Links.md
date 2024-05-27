@@ -73,6 +73,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/AuditRole-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2024-05-27 10:17:32+00:00 (KJhm0TnfdFzUX9iN52.FFiUgEayKtKWq)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=KJhm0TnfdFzUX9iN52.FFiUgEayKtKWq)
 	 * [2024-05-14 09:48:25+00:00 (aRRb095D2w_Pc_3.ypdH7QLI8azwdydD)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=aRRb095D2w_Pc_3.ypdH7QLI8azwdydD)
 	 * [2023-11-17 19:41:53+00:00 (mCQCrfuKfQBbIPb5XSZokXHEoYzhy8cv)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=mCQCrfuKfQBbIPb5XSZokXHEoYzhy8cv)
 	 * [2023-09-13 21:28:08+00:00 (wbdUVGOWS0IccB1bwXXl1IQIV1u0YTej)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/AuditRole-Template.yaml?versionId=wbdUVGOWS0IccB1bwXXl1IQIV1u0YTej)
@@ -96,6 +97,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/BillingMetrics-Template-Transformed.yaml
 * Previous Version HTTP URLs:
+	 * [2024-05-27 10:17:32+00:00 (0SLl9fovZkGZmGSK.EAK.OJthR_i7Nsf)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=0SLl9fovZkGZmGSK.EAK.OJthR_i7Nsf)
 	 * [2024-05-14 09:48:25+00:00 (lb6_M3pa6BUKH1nh.aOOHg4K9jI5DX2O)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=lb6_M3pa6BUKH1nh.aOOHg4K9jI5DX2O)
 	 * [2024-04-26 10:11:39+00:00 (AJhdAX7mecyTchiLT2LowsN8gOeuNdbq)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=AJhdAX7mecyTchiLT2LowsN8gOeuNdbq)
 	 * [2024-01-08 19:19:49+00:00 (SeMWYL.1agHzGGRNaQsodcpJT5fbpcoL)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=SeMWYL.1agHzGGRNaQsodcpJT5fbpcoL)
@@ -262,6 +264,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/SecurityAlertChatBot-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2024-05-27 10:17:32+00:00 (XTSBOolJuFqLN4JW95BbhVH3ItbBjIf5)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml?versionId=XTSBOolJuFqLN4JW95BbhVH3ItbBjIf5)
 	 * [2023-10-02 12:30:54+00:00 (PwLS7uhH3yQ4nKnoccBxtC54Z0BBZz4R)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml?versionId=PwLS7uhH3yQ4nKnoccBxtC54Z0BBZz4R)
 	 * [2023-05-16 15:11:44+00:00 (K5cug0UBNx74EPaxZ1reF5GW2GkCDYO9)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/SecurityAlertChatBot-Template.yaml?versionId=K5cug0UBNx74EPaxZ1reF5GW2GkCDYO9)
 ## aws-account-automation/SecurityRole-StackSetTemplate.yaml
