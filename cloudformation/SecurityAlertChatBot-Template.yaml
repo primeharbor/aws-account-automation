@@ -27,8 +27,8 @@ Resources:
     Type: AWS::Chatbot::SlackChannelConfiguration
     Properties:
       ConfigurationName: !Sub "${AWS::StackName}-Chatbot"
-      # GuardrailPolicies:
-      #   - String
+      GuardrailPolicies:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
       IamRoleArn: !GetAtt ChatbotRole.Arn
       LoggingLevel: INFO
       SlackChannelId: !Ref pSlackChannelId
@@ -56,17 +56,9 @@ Resources:
           Action:
           - sts:AssumeRole
       Path: /
-      # ManagedPolicyArns:
-      #   - TBD
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/aws-service-role/AWSChatbotServiceLinkedRolePolicy
       Policies:
-      - PolicyName: Logging
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Resource: '*'
-            Action:
-            - logs:*
-            Effect: Allow
       - PolicyName: ReadTelemetry
         PolicyDocument:
           Version: '2012-10-17'
