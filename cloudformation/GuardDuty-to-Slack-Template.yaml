@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Chris Farris <chrisf@primeharbor.com>
+# Copyright 2019-2024 Chris Farris <chrisf@primeharbor.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deploy Lambda to send GuardDuty CloudWatch Events to Slack WebHook
 
-# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/GuardDuty-to-Slack-Template.yaml
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/GuardDuty-to-Slack-Template.yaml
 
 Parameters:
 
@@ -108,7 +108,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Description: Send GuardDuty CloudWatch Events to Slack Channel
-      Runtime: python3.7
+      Runtime: python3.12
       Handler: index.lambda_handler
       Timeout: '80'
       FunctionName: !Sub "${pFunctionName}-${AWS::Region}"

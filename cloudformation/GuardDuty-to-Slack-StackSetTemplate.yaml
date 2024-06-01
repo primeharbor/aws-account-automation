@@ -1,4 +1,4 @@
-# Copyright 2021 Chris Farris <chrisf@primeharbor.com>
+# Copyright 2021-2024 Chris Farris <chrisf@primeharbor.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: StackSet to push out GuardDuty-to-Slack automation CFT in all regions
 
-# TemplateSource: https://github.com/jchrisfarris/aws-account-automation/blob/master/cloudformation/GuardDuty-to-Slack-StackSetTemplate.yaml
+# TemplateSource: https://github.com/primeharbor/aws-account-automation/blob/master/cloudformation/GuardDuty-to-Slack-StackSetTemplate.yaml
 
 Parameters:
 
