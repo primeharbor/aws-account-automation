@@ -32,6 +32,16 @@ Parameters:
     Default: 'security-audit'
     Type: String
 
+  DenyDataAccess:
+    Description: If set to 'true' it will restrict the audit role from accessing most data resources
+    Type: String
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Default: 'false'
+
+Conditions:
+  cEnableDenyDataAccessPolicy: !Equals [!Ref 'DenyDataAccess', 'true']
 
 Resources:
   AuditorCrossAccountRole:
@@ -103,10 +113,173 @@ Resources:
                 - "freetier:Get*"
                 Resource: "*"
 
+  DenyDataAccessPolicy:
+    Type: AWS::IAM::Policy
+    Condition: cEnableDenyDataAccessPolicy
+    Properties:
+      PolicyName: DenyDataAccess
+      Roles:
+        - !Ref AuditorCrossAccountRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Deny"
+            Resource: "*"
+            Action:
+              - aoss:APIAccessAll
+              - aoss:DashboardsAccessAll
+              - appsync:GetDataSource
+              - appsync:GetFunction
+              - athena:GetQueryExecution
+              - athena:GetQueryResults
+              - athena:GetQueryResultsStream
+              - cassandra:Select
+              - chatbot:DescribeSlackChannels
+              - chatbot:DescribeSlackUserIdentities
+              - chatbot:ListMicrosoftTeamsConfiguredTeams
+              - chatbot:ListMicrosoftTeamsUserIdentities
+              - chime:GetAttendee
+              - chime:GetChannelMessage
+              - chime:GetMeeting
+              - chime:GetMeetingDetail
+              - chime:GetRoom
+              - chime:GetUser
+              - chime:GetUserActivityReportData
+              - chime:GetUserByEmail
+              - chime:GetUserSettings
+              - chime:ListAttendees
+              - chime:ListMeetingEvents
+              - chime:ListMeetings
+              - chime:ListUsers
+              - cleanrooms:GetProtectedQuery
+              - cloudformation:GetTemplate
+              - cloudfront:GetFunction
+              - cloudtrail:GetQueryResults
+              - cloudtrail:LookupEvents
+              - codeartifact:GetPackageVersionAsset
+              - codeartifact:GetPackageVersionReadme
+              - codeartifact:ReadFromRepository
+              - codebuild:BatchGetReportGroups
+              - codebuild:BatchGetReports
+              - codecommit:BatchGetCommits
+              - codecommit:BatchGetPullRequests
+              - codecommit:BatchGetRepositories
+              - codecommit:DescribeMergeConflicts
+              - codecommit:DescribePullRequestEvents
+              - codecommit:GetApprovalRuleTemplate
+              - codecommit:GetBlob
+              - codecommit:GetBranch
+              - codecommit:GetComment
+              - codecommit:GetCommentReactions
+              - codecommit:GetCommentsForComparedCommit
+              - codecommit:GetCommentsForPullRequest
+              - codecommit:GetCommit
+              - codecommit:GetCommitHistory
+              - codecommit:GetCommitsFromMergeBase
+              - codecommit:GetDifferences
+              - codecommit:GetFile
+              - codecommit:GetFolder
+              - codecommit:GetMergeCommit
+              - codecommit:GetMergeConflicts
+              - codecommit:GetMergeOptions
+              - codecommit:GetObjectIdentifier
+              - codecommit:GetPullRequest
+              - codecommit:GetPullRequestApprovalStates
+              - codecommit:GetPullRequestOverrideState
+              - codecommit:GetReferences
+              - codecommit:GetTree
+              - codecommit:GitPull
+              - codeguru-profiler:GetRecommendations
+              - codeguru-reviewer:DescribeCodeReview
+              - codeguru-reviewer:DescribeRecommendationFeedback
+              - codepipeline:GetPipelineExecution
+              - cognito-identity:LookupDeveloperIdentity
+              - cognito-idp:AdminGetDevice
+              - cognito-idp:AdminGetUser
+              - cognito-idp:AdminListDevices
+              - cognito-idp:AdminListGroupsForUser
+              - cognito-idp:AdminListUserAuthEvents
+              - cognito-idp:GetDevice
+              - cognito-idp:GetGroup
+              - cognito-idp:GetUser
+              - cognito-idp:ListUsers
+              - cognito-idp:ListDevices
+              - cognito-idp:ListGroups
+              - cognito-sync:ListRecords
+              - cognito-sync:QueryRecords
+              - connect:ListUsers
+              - datapipeline:QueryObjects
+              - dax:BatchGetItem
+              - dax:GetItem
+              - dax:Query
+              - dax:Scan
+              - dynamodb:BatchGetItem
+              - dynamodb:GetItem
+              - dynamodb:GetRecords
+              - dynamodb:Query
+              - dynamodb:Scan
+              - ecr:GetDownloadUrlForLayer
+              - es:ESHttpDelete
+              - es:ESHttpGet
+              - es:ESHttpHead
+              - es:ESHttpPatch
+              - es:ESHttpPost
+              - es:ESHttpPut
+              - gamelift:GetInstanceAccess
+              - healthlake:ReadResource
+              - healthlake:SearchWithGet
+              - healthlake:SearchWithPost
+              - kendra:Query
+              - kinesis:GetRecords
+              - kinesisvideo:GetImages
+              - kinesisvideo:GetMedia
+              - lambda:GetFunction
+              - lambda:GetLayerVersion
+              - lightsail:GetContainerImages
+              - logs:GetLogEvents
+              - logs:GetLogRecord
+              - logs:GetQueryResults
+              - logs:Unmask
+              - macie2:GetFindings
+              - mediastore:GetObject
+              - qldb:GetBlock
+              - rds:DownloadCompleteDBLogFile
+              - rds:DownloadDBLogFilePortion
+              - robomaker:GetWorldTemplateBody
+              - s3-object-lambda:GetObject
+              - s3-object-lambda:GetObjectVersion
+              - s3-object-lambda:ListBucket
+              - s3:GetObject
+              - s3:GetObjectVersion
+              - sagemaker:Search
+              - sdb:Select
+              - serverlessrepo:GetApplication
+              - serverlessrepo:GetCloudFormationTemplate
+              - sqs:ReceiveMessage
+              - ssm:GetDocument
+              - ssm:GetParameter
+              - ssm:GetParameterHistory
+              - ssm:GetParameters
+              - ssm:GetParametersByPath
+              - sso-directory:DescribeGroup
+              - sso-directory:DescribeUser
+              - sso-directory:SearchGroups
+              - sso-directory:SearchUsers
+              - sso:SearchGroups
+              - sso:SearchUsers
+              - support:DescribeAttachment
+              - support:DescribeCommunications
+              - workdocs:GetDocument
+              - workdocs:GetDocumentPath
+              - workdocs:GetDocumentVersion
+              - workmail:ListGroupMembers
+              - workmail:ListGroups
+              - workmail:ListUsers
+
 Outputs:
   RoleARN:
     Description: The ARN of the Audit role that can be assumed by the other account.
     Value: !GetAtt AuditorCrossAccountRole.Arn
 
   TemplateVersion:
-    Value: 1.3.2
+    Value: 1.4.0
