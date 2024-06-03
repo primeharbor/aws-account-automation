@@ -97,6 +97,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/BillingMetrics-Template-Transformed.yaml
 * Previous Version HTTP URLs:
+	 * [2024-06-01 19:10:05+00:00 (oWSc6un2s3p73epvl8l3vo92h79CbJ1w)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=oWSc6un2s3p73epvl8l3vo92h79CbJ1w)
 	 * [2024-05-27 10:17:32+00:00 (0SLl9fovZkGZmGSK.EAK.OJthR_i7Nsf)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=0SLl9fovZkGZmGSK.EAK.OJthR_i7Nsf)
 	 * [2024-05-14 09:48:25+00:00 (lb6_M3pa6BUKH1nh.aOOHg4K9jI5DX2O)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=lb6_M3pa6BUKH1nh.aOOHg4K9jI5DX2O)
 	 * [2024-04-26 10:11:39+00:00 (AJhdAX7mecyTchiLT2LowsN8gOeuNdbq)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=AJhdAX7mecyTchiLT2LowsN8gOeuNdbq)
@@ -207,6 +208,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml
 * Previous Version HTTP URLs:
+	 * [2024-06-01 19:10:05+00:00 (8Ndm_ZXP.0DBGwBKvbDy4Z8CWPBQ_N9N)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml?versionId=8Ndm_ZXP.0DBGwBKvbDy4Z8CWPBQ_N9N)
 	 * [2021-08-03 22:51:09+00:00 (XXGwmwGP2tfIgXOoVphziO97DbLCiR0H)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml?versionId=XXGwmwGP2tfIgXOoVphziO97DbLCiR0H)
 	 * [2021-07-31 22:23:55+00:00 (DLRdt08uToGwy3m3nKycC8qstQf9XgQ7)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml?versionId=DLRdt08uToGwy3m3nKycC8qstQf9XgQ7)
 	 * [2021-07-31 21:00:55+00:00 (Td9peOdGxN7ZIXSSQF1LrgCnyswhGwoS)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml?versionId=Td9peOdGxN7ZIXSSQF1LrgCnyswhGwoS)
@@ -216,6 +218,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/GuardDuty-to-Slack-Template.yaml
 * Previous Version HTTP URLs:
+	 * [2024-06-01 19:10:05+00:00 (KQ0kaZ01tX_USkDfADVvytkCHKB07ALA)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=KQ0kaZ01tX_USkDfADVvytkCHKB07ALA)
 	 * [2021-08-04 09:52:56+00:00 (8iuJVKVXccAECCriGyChBgxxvqa5DwId)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=8iuJVKVXccAECCriGyChBgxxvqa5DwId)
 	 * [2021-08-03 22:51:09+00:00 (zCcp3hh7QMxYCsf.8PGMhIFLLp7dTxhX)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=zCcp3hh7QMxYCsf.8PGMhIFLLp7dTxhX)
 	 * [2021-07-31 19:57:05+00:00 (sfKLGTkescCbvJfUqQp._HRBw4V3HXty)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=sfKLGTkescCbvJfUqQp._HRBw4V3HXty)
