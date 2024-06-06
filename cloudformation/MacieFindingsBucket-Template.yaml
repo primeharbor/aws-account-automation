@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy Bucket & KMS Key for Macie Data Discovery
+
+Parameters:
+
+  pSecureBucket:
+    Description: Name of the Macie Bucket
+    Type: String
+
+Resources:
+
+  # Create the Bucket
+  SecureBucket:
+    Type: AWS::S3::Bucket
+    # Keep the bucket if we delete the stack.
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: Private
+      BucketName: !Ref pSecureBucket
+      # Add Versioning. Always safe vs sorry
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: True
+          ServerSideEncryptionByDefault:
+            KMSMasterKeyID: !Ref KMSKey
+            SSEAlgorithm: 'aws:kms'
+
+  SecureBucketPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref pSecureBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: Allow Macie to use the GetBucketLocation operation
+          Effect: Allow
+          Principal:
+            Service: macie.amazonaws.com
+          Action: s3:GetBucketLocation
+          Resource: !Sub arn:aws:s3:::${pSecureBucket}
+        - Sid: Allow Macie to add objects to the bucket
+          Effect: Allow
+          Principal:
+            Service: macie.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub arn:aws:s3:::${pSecureBucket}/*
+        - Sid: Deny unencrypted object uploads. This is optional
+          Effect: Deny
+          Principal:
+            Service: macie.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub arn:aws:s3:::${pSecureBucket}/*
+          Condition:
+            StringNotEquals:
+              s3:x-amz-server-side-encryption: aws:kms
+        - Sid: Deny incorrect encryption headers. This is optional
+          Effect: Deny
+          Principal:
+            Service: macie.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub arn:aws:s3:::${pSecureBucket}/*
+          Condition:
+            StringNotEquals:
+              s3:x-amz-server-side-encryption-aws-kms-key-id: !GetAtt KMSKey.Arn
+        - Sid: Deny non-HTTPS access
+          Effect: Deny
+          Principal: "*"
+          Action: s3:*
+          Resource: !Sub arn:aws:s3:::${pSecureBucket}/*
+          Condition:
+            Bool:
+              aws:SecureTransport: 'false'
+
+
+
+  # KMS Resources
+  #
+  # First we create a key.
+  KMSKey:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Description: !Sub "Key to secure content in ${pSecureBucket}"
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: "key-default-1"
+        Statement:
+          - Sid: "Allow administration of the key"
+            Effect: "Allow"
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action:
+              - "kms:*"
+            Resource: "*"
+          - Sid: "Allow Macie to use the key"
+            Effect: Allow
+            Principal:
+              Service: macie.amazonaws.com
+            Action:
+            - kms:GenerateDataKey
+            - kms:Encrypt
+            Resource: "*"
+
+  # Then we give it an Alias
+  KMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${pSecureBucket}"
+      TargetKeyId:
+        Ref: KMSKey
+
+Outputs:
+  KMSKeyId:
+    Description: Key ID of KMS Key Created
+    Value: !Ref KMSKey
+  MKSKeyArn:
+    Value: !GetAtt KMSKey.Arn
+  SecureBucket:
+    Value: !Ref pSecureBucket

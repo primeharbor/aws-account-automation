@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy Bucket & KMS Key for GuardDuty Findings
+
+Parameters:
+
+  pSecureBucket:
+    Description: Name of the GuardDuty Finding Bucket
+    Type: String
+
+Resources:
+
+  # Create the Bucket
+  SecureBucket:
+    Type: AWS::S3::Bucket
+    # Keep the bucket if we delete the stack.
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: Private
+      BucketName: !Ref pSecureBucket
+      # Add Versioning. Always safe vs sorry
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: True
+          ServerSideEncryptionByDefault:
+            KMSMasterKeyID: !Ref KMSKey
+            SSEAlgorithm: 'aws:kms'
+
+  SecureBucketPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref pSecureBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: Deny non-HTTPS access
+          Effect: Deny
+          Principal:
+            Service: guardduty.amazonaws.com
+          Action: s3:*
+          Resource: !Sub "arn:aws:s3:::${pSecureBucket}/*"
+          Condition:
+            Bool:
+              aws:SecureTransport: 'false'
+        - Sid: Deny incorrect encryption header
+          Effect: Deny
+          Principal:
+            Service: guardduty.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub "arn:aws:s3:::${pSecureBucket}/*"
+          Condition:
+            StringNotEquals:
+              s3:x-amz-server-side-encryption-aws-kms-key-id: !GetAtt KMSKey.Arn
+        - Sid: Deny unencrypted object uploads
+          Effect: Deny
+          Principal:
+            Service: guardduty.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub "arn:aws:s3:::${pSecureBucket}/*"
+          Condition:
+            StringNotEquals:
+              s3:x-amz-server-side-encryption: aws:kms
+        - Sid: Allow PutObject
+          Effect: Allow
+          Principal:
+            Service: guardduty.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub "arn:aws:s3:::${pSecureBucket}/*"
+          Condition:
+            StringLike:
+              aws:SourceAccount: !Ref AWS::AccountId
+              aws:SourceArn: !Sub "arn:aws:guardduty:*:${AWS::AccountId}:detector/*"
+        - Sid: Allow GetBucketLocation
+          Effect: Allow
+          Principal:
+            Service: guardduty.amazonaws.com
+          Action: s3:GetBucketLocation
+          Resource: !Sub "arn:aws:s3:::${pSecureBucket}"
+          Condition:
+            StringLike:
+              aws:SourceAccount: !Ref AWS::AccountId
+              aws:SourceArn: !Sub "arn:aws:guardduty:*:${AWS::AccountId}:detector/*"
+
+  # KMS Resources
+  #
+  # First we create a key.
+  KMSKey:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Description: !Sub "Key to secure content in ${pSecureBucket}"
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: "key-default-1"
+        Statement:
+          - Sid: "Allow administration of the key"
+            Effect: "Allow"
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action:
+              - "kms:*"
+            Resource: "*"
+          - Sid: "Allow GuardDuty to encrypt findings"
+            Effect: Allow
+            Principal:
+              Service: guardduty.amazonaws.com
+            Action: kms:GenerateDataKey
+            Resource: "*"
+            Condition:
+              StringLike:
+                aws:SourceAccount: !Ref AWS::AccountId
+                aws:SourceArn: !Sub "arn:aws:guardduty:*:${AWS::AccountId}:detector/*"
+
+  # Then we give it an Alias
+  KMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${pSecureBucket}"
+      TargetKeyId:
+        Ref: KMSKey
+
+Outputs:
+  KMSKeyId:
+    Description: Key ID of KMS Key Created
+    Value: !Ref KMSKey
+  KMSKeyArn:
+    Value: !GetAtt KMSKey.Arn
+  SecureBucketArn:
+    Value: !Sub "arn:aws:s3:::${pSecureBucket}"
