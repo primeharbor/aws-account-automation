@@ -98,6 +98,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/BillingMetrics-Template-Transformed.yaml
 * Previous Version HTTP URLs:
+	 * [2024-06-06 22:55:35+00:00 (AD7lCy.7FNtdTXpM95LWhh8oTTvC3d2n)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=AD7lCy.7FNtdTXpM95LWhh8oTTvC3d2n)
 	 * [2024-06-03 10:19:25+00:00 (39JG2r46eC2GfBXqRjPNLyyuHeie7Hzo)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=39JG2r46eC2GfBXqRjPNLyyuHeie7Hzo)
 	 * [2024-06-01 19:10:05+00:00 (oWSc6un2s3p73epvl8l3vo92h79CbJ1w)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=oWSc6un2s3p73epvl8l3vo92h79CbJ1w)
 	 * [2024-05-27 10:17:32+00:00 (0SLl9fovZkGZmGSK.EAK.OJthR_i7Nsf)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=0SLl9fovZkGZmGSK.EAK.OJthR_i7Nsf)
@@ -231,12 +232,24 @@
 	 * [2020-10-23 13:48:36+00:00 (NfbS9RZ2jh5MH6YiFzxQAqPm1iDDiIWy)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=NfbS9RZ2jh5MH6YiFzxQAqPm1iDDiIWy)
 	 * [2020-10-23 00:17:24+00:00 (qjE0WRRkh_u_0DLHmtsJyImxmmyuu0Cn)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=qjE0WRRkh_u_0DLHmtsJyImxmmyuu0Cn)
 	 * [2020-10-22 23:26:35+00:00 (At4mHKQxEZa6_KFuzEbkFsIO9vedhmWe)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-Template.yaml?versionId=At4mHKQxEZa6_KFuzEbkFsIO9vedhmWe)
+## aws-account-automation/GuardDutyFindingsBucket-Template.yaml
+* [Quick Deploy URL](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https%3A//pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDutyFindingsBucket-Template.yaml)
+* [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDutyFindingsBucket-Template.yaml)
+* S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/GuardDutyFindingsBucket-Template.yaml
+* Previous Version HTTP URLs:
+	 * [2024-06-06 22:55:35+00:00 (Z1Ml9PGdUTcL2BhJ4scVybvXryb1cWQ2)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDutyFindingsBucket-Template.yaml?versionId=Z1Ml9PGdUTcL2BhJ4scVybvXryb1cWQ2)
 ## aws-account-automation/IAM-ExpireUsers-Template.yaml
 * [Quick Deploy URL](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https%3A//pht-cloudformation.s3.amazonaws.com/aws-account-automation/IAM-ExpireUsers-Template.yaml)
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/IAM-ExpireUsers-Template.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/IAM-ExpireUsers-Template.yaml
 * Previous Version HTTP URLs:
 	 * [2020-05-02 15:38:05+00:00 (Sh32lvoebQJF75svsG1Cfb5uTXyO68g2)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/IAM-ExpireUsers-Template.yaml?versionId=Sh32lvoebQJF75svsG1Cfb5uTXyO68g2)
+## aws-account-automation/MacieFindingsBucket-Template.yaml
+* [Quick Deploy URL](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https%3A//pht-cloudformation.s3.amazonaws.com/aws-account-automation/MacieFindingsBucket-Template.yaml)
+* [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/MacieFindingsBucket-Template.yaml)
+* S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/MacieFindingsBucket-Template.yaml
+* Previous Version HTTP URLs:
+	 * [2024-06-06 22:55:35+00:00 (4eRLz7ofbpM96CuhJZTQG.XgQrPOh22N)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/MacieFindingsBucket-Template.yaml?versionId=4eRLz7ofbpM96CuhJZTQG.XgQrPOh22N)
 ## aws-account-automation/OrgCloudTrail-Template.yaml
 * [Quick Deploy URL](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https%3A//pht-cloudformation.s3.amazonaws.com/aws-account-automation/OrgCloudTrail-Template.yaml)
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/OrgCloudTrail-Template.yaml)
