@@ -21,6 +21,16 @@ for r in $REGIONS ; do
   echo "Detector $DETECTOR in $r"
   aws guardduty update-organization-configuration --detector-id $DETECTOR --auto-enable --region $r
   aws guardduty create-members --detector-id $DETECTOR --account-details file://ACCOUNT_INFO.txt --region $r
+
+  # Adding this line because the Original create-detector command doesn't seem to set it
+  aws guardduty update-detector --detector-id $DETECTOR --finding-publishing-frequency FIFTEEN_MINUTES --region $r
+
+  BUCKET=$1
+  KMS_KEY=$2
+  if [[ ! -z "$KMS_KEY" ]] ; then
+    aws guardduty create-publishing-destination --detector-id $DETECTOR --destination-type S3 --destination-properties DestinationArn=$BUCKET,KmsKeyArn=$KMS_KEY --region $r
+  fi
+
 done
 
 # cleanup
