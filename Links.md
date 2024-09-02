@@ -98,6 +98,7 @@
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml)
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/BillingMetrics-Template-Transformed.yaml
 * Previous Version HTTP URLs:
+	 * [2024-09-02 11:46:09+00:00 (OsJOKVz.Kyv2iVcDgBO.5BkGrtxdwwRu)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=OsJOKVz.Kyv2iVcDgBO.5BkGrtxdwwRu)
 	 * [2024-07-20 17:48:10+00:00 (UGO9CxOxQ7S6FktzyDOh9dznK2bgfuxb)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=UGO9CxOxQ7S6FktzyDOh9dznK2bgfuxb)
 	 * [2024-06-06 22:55:35+00:00 (AD7lCy.7FNtdTXpM95LWhh8oTTvC3d2n)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=AD7lCy.7FNtdTXpM95LWhh8oTTvC3d2n)
 	 * [2024-06-03 10:19:25+00:00 (39JG2r46eC2GfBXqRjPNLyyuHeie7Hzo)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/BillingMetrics-Template-Transformed.yaml?versionId=39JG2r46eC2GfBXqRjPNLyyuHeie7Hzo)
@@ -207,6 +208,12 @@
 * S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/EBSAutomatedTagging.yaml
 * Previous Version HTTP URLs:
 	 * [2020-05-02 15:38:05+00:00 (Q873MrEDkKLMR0xltyFhz9UzNUtpH2OH)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/EBSAutomatedTagging.yaml?versionId=Q873MrEDkKLMR0xltyFhz9UzNUtpH2OH)
+## aws-account-automation/GuardDuty-Canary-Template.yaml
+* [Quick Deploy URL](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https%3A//pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-Canary-Template.yaml)
+* [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-Canary-Template.yaml)
+* S3 URL (latest) - s3://pht-cloudformation/aws-account-automation/GuardDuty-Canary-Template.yaml
+* Previous Version HTTP URLs:
+	 * [2024-09-02 11:46:10+00:00 (m5oq2MvpQxwGrjZia9NFNt5umcF9.KEx)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-Canary-Template.yaml?versionId=m5oq2MvpQxwGrjZia9NFNt5umcF9.KEx)
 ## aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml
 * [Quick Deploy URL](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https%3A//pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml)
 * [HTTP URL (latest)](https://pht-cloudformation.s3.amazonaws.com/aws-account-automation/GuardDuty-to-Slack-StackSetTemplate.yaml)
