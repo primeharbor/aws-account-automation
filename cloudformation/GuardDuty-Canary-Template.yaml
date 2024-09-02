@@ -1,0 +1,132 @@
+# Copyright 2024 Chris Farris <chrisf@primeharbor.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# If you don't have a lot of guardduty alerts, your detection flow may be broken and you wouldn't know it.
+# This CFT creates a public S3 bucket every four hours, so you can alert on no GuardDuty messages in the last four hours.
+
+
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy a Lambda to create a public S3 bucket every four hours to ensure GuardDuty detections are in place
+
+Resources:
+  # IAM Role for Lambda
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'S3AccessPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 's3:ListAllMyBuckets'
+                  - 's3:CreateBucket'
+                  - 's3:DeleteBucket'
+                  - 's3:PutBucketPolicy'
+                  - 's3:PutBucketPublicAccessBlock'
+                Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # Lambda Function
+  PublicS3BucketLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: 'index.lambda_handler'
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: 'python3.12'
+      Timeout: 30
+      Code:
+        ZipFile: |
+          import boto3
+          import time
+          import json
+
+          def lambda_handler(event, context):
+              s3 = boto3.client('s3')
+              epoch_time = int(time.time())
+              bucket_name = f'public-test-{epoch_time}'
+
+              # Delete existing buckets starting with 'public-test'
+              response = s3.list_buckets()
+              for bucket in response['Buckets']:
+                  if bucket['Name'].startswith('public-test'):
+                      s3.delete_bucket(Bucket=bucket['Name'])
+
+              # Create a new S3 bucket
+              s3.create_bucket(Bucket=bucket_name)
+
+              # Disable Block Public Access
+              public_access_block_config = {
+                  'BlockPublicAcls': False,
+                  'IgnorePublicAcls': False,
+                  'BlockPublicPolicy': False,
+                  'RestrictPublicBuckets': False
+              }
+              s3.put_public_access_block(
+                  Bucket=bucket_name,
+                  PublicAccessBlockConfiguration=public_access_block_config
+              )
+
+              # Make the bucket public
+              bucket_policy = {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                      {
+                          "Effect": "Allow",
+                          "Principal": "*",
+                          "Action": "s3:GetObject",
+                          "Resource": f"arn:aws:s3:::{bucket_name}/*"
+                      }
+                  ]
+              }
+
+              s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(bucket_policy))
+
+              return {'statusCode': 200, 'body': f'Bucket {bucket_name} created and made public.'}
+
+  # EventBridge Rule to trigger Lambda every 4 hours
+  LambdaScheduleRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      ScheduleExpression: 'rate(4 hours)'
+      Targets:
+        - Arn: !GetAtt PublicS3BucketLambda.Arn
+          Id: 'PublicS3BucketLambdaTarget'
+
+  # Permission for EventBridge to invoke Lambda
+  LambdaInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !Ref PublicS3BucketLambda
+      Action: 'lambda:InvokeFunction'
+      Principal: 'events.amazonaws.com'
+      SourceArn: !GetAtt LambdaScheduleRule.Arn
+
+Outputs:
+  LambdaFunctionName:
+    Description: 'Name of the Lambda function created'
+    Value: !Ref PublicS3BucketLambda
+  LambdaFunctionArn:
+    Description: 'ARN of the Lambda function created'
+    Value: !GetAtt PublicS3BucketLambda.Arn
